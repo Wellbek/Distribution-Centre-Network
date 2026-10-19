@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from . import config as C
-from . import geo
+from . import distances
 
 
 @dataclass
@@ -21,10 +21,15 @@ class Params:
 
 
 def dist_matrix(dc_lat, dc_lon, lat, lon, mountain):
-    # Road km, index 0 = DC, 1..n = stores
+    # Road km from coordinates alone (live demo), index 0 = DC, 1..n = stores; calibrated model
     la, lo = np.r_[dc_lat, lat], np.r_[dc_lon, lon]
     mt = np.r_[False, mountain]
-    return geo.road_km(la[:, None], lo[:, None], la[None, :], lo[None, :], mountain1=mt[:, None] | mt[None, :])
+    return distances.model_km(la[:, None], lo[:, None], la[None, :], lo[None, :], mt[:, None] | mt[None, :])
+
+
+def territory_matrix(ctx, j, idx):
+    # Road km for site j and planning stores idx: cached DC and nearest-store legs, model for the rest
+    return distances.territory(ctx["dsite"][idx, j], ctx["full"][idx], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx])
 
 
 def walk(seq, D, p):

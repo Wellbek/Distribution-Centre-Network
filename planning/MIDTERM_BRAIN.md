@@ -739,6 +739,7 @@ Two append-only files in `planning/`, updated in the same session as the work th
 | File | What goes in | Feeds |
 |---|---|---|
 | `LLM_USE.md` | Every task an LLM or agent did: context search, research, guardrails, role assumption, coding, review, drafting; the skill or agent used; why; how I checked it; where the result went | The definition's header line "LLM tools and use" and Section 7 (three discussions, at least one checked by calculation or experiment [A §8]) |
+| `WORK_LOG.md` | What was done by hand: commands, machines, problems hit, results | The executive summary and Section 7 |
 | `DECISIONS.md` | Every decision with alternatives, reason, evidence and status (proposed, accepted, superseded, rejected), including the "we realised X was inefficient, so we did Y" moments | The balance table's reasoning, the approaches table, Section 7, and an ADR for each major decision |
 
 Rules: a row is added when the event happens, never reconstructed at the end; a reversed decision gets a new row pointing back; both files stay out of the ZIP, and the definition quotes only what it needs.

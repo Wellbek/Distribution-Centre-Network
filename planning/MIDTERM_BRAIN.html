@@ -135,6 +135,7 @@ footer { color: var(--muted); font-size: 12px; margin-top: 24px; }
 <a href="#appendix-b">B. Review 01 transcript</a>
 <a href="#appendix-c">C. Rolling record: LLM use</a>
 <a href="#appendix-d">D. Rolling record: decisions</a>
+<a href="#appendix-e">E. Rolling record: work log</a>
 </details>
 </nav>
 <main>
@@ -1832,6 +1833,11 @@ The transcript is <code>planning/stakeholders/REVIEW-01-plan-v1.md</code>; the c
 <td>The definition's header line &quot;LLM tools and use&quot; and Section 7 (three discussions, at least one checked by calculation or experiment [A §8])</td>
 </tr>
 <tr>
+<td><code>WORK_LOG.md</code></td>
+<td>What was done by hand: commands, machines, problems hit, results</td>
+<td>The executive summary and Section 7</td>
+</tr>
+<tr>
 <td><code>DECISIONS.md</code></td>
 <td>Every decision with alternatives, reason, evidence and status (proposed, accepted, superseded, rejected), including the &quot;we realised X was inefficient, so we did Y&quot; moments</td>
 <td>The balance table's reasoning, the approaches table, Section 7, and an ADR for each major decision</td>
@@ -3147,6 +3153,33 @@ This record feeds the header line &quot;LLM tools and use&quot; and Section 7 (L
 <td>Agents' numbers spot-checked against the registry (relay 803 vs 418 M, 72% of the saving, reproduced by four agents independently)</td>
 <td><code>planning/stakeholders/REVIEW-02-v0.1.md</code></td>
 </tr>
+<tr>
+<td>2026-10-19</td>
+<td>v0.2: blockers and demo redesign</td>
+<td><code>ecc:frontend-design-direction</code>, WebFetch (nicetocu.com.my), Playwright</td>
+<td>Fixed the review-02 blockers in <code>code/</code> (relay priced as a driver-day with a reversal row, east-coast DC in the current network, pinned Python 3.10 environment, stratified weighted days, empirical-Bayes prior, overdispersion, LP-aligned G, whole-pool validation band, top-5 re-scoring, store-level service); rebuilt the demo as four tabs with a zoomable map, followable trucks, shop icons, and lecture-style formula sections pre-rendered with KaTeX</td>
+<td>User asked for v0.2, fewer tabs, CU style, zoomable map following trucks, lecture-aligned algorithm visuals, ECC skills</td>
+<td>Ran the pipeline under Python 3.10 (pinned), <code>verify.py</code>, Playwright screenshots of every view; fixed clipped labels, nav wrapping and an evidence-contradicting headline</td>
+<td><code>code/</code>, <code>demo.html</code>, <code>tools/render_math.py</code></td>
+</tr>
+<tr>
+<td>2026-10-19</td>
+<td>Coding: OSRM road-distance cache</td>
+<td>none</td>
+<td>Wrote <code>code/osrm/build_cache.py</code>, <code>code/osrm/README.md</code> and <code>code/dcn/distances.py</code>, and wired the cache into the evaluation, routing, G1, the registry and the demo; downloaded the Geofabrik extract (md5 checked) and confirmed the OSRM v6.0.0 image has an arm64 build</td>
+<td>Brief §2.5 requires actual or calibrated road distances, cached in <code>code/</code></td>
+<td>Ran the builder against a mock OSRM server (road = 1.3 x map with noise): cached values within the mock's 2% noise, held-out model error under 1%, lint clean; the real run is pending on the Spark</td>
+<td><code>code/osrm/</code>, <code>code/dcn/distances.py</code>, D-035 to D-038</td>
+</tr>
+<tr>
+<td>2026-10-19</td>
+<td>Guidance: OSRM on the Spark, then checks on the real cache</td>
+<td>none</td>
+<td>Gave the Spark steps (docker group, container shell without <code>-i</code>, server warm-up), read the PBF header for the extract date, measured leg coverage on two current territories, wrote <code>WORK_LOG.md</code></td>
+<td>User ran OSRM; the brief requires a stated extract date and measured accuracy</td>
+<td>Leg coverage measured on full territories (Yongin 1,071 stores, Wonju 325); timestamp decoded from the header's protobuf field and checked as plausible against the download</td>
+<td><code>planning/WORK_LOG.md</code>, D-039, D-040</td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="appendix-d">D. Rolling record: decisions</h2><p>Every decision taken along the way: what we chose, what we rejected, why, and what changed because of it (&quot;we realised X was inefficient, so we did Y&quot;).
@@ -3400,8 +3433,266 @@ Larger decisions also get an architecture decision record (<code>ecc:architectur
 <td>Accepted</td>
 <td>Demo</td>
 </tr>
+<tr>
+<td>D-027</td>
+<td>2026-10-19</td>
+<td>Over-limit routes are charged one relay driver-day (180,822 KRW, an owned vehicle-day), with a reversal row at 0 and 550,000</td>
+<td>550,000 spot rate (D-019)</td>
+<td>Supersedes D-019/D-023: a second driver, not a whole extra truck; the reversal shows k* = 12 at all three prices</td>
+<td>Accepted</td>
+<td>Evaluation</td>
+</tr>
+<tr>
+<td>D-028</td>
+<td>2026-10-19</td>
+<td>Current DC12 moves from Ulsan to Gangneung (east coast); Ulsan becomes a candidate</td>
+<td>Ulsan</td>
+<td>Accepts D-024: over-limit routes in the baseline fall from 48 to about 20 a day</td>
+<td>Accepted</td>
+<td>Baseline</td>
+</tr>
+<tr>
+<td>D-029</td>
+<td>2026-10-19</td>
+<td>Pinned numpy 2.2.6 and scipy 1.15.3 and ran under Python 3.10; versions recorded in the registry</td>
+<td>Loose pins on Python 3.13</td>
+<td>Review 02 (TA): the registry must reproduce in a fresh 3.10 environment</td>
+<td>Accepted</td>
+<td>Reproducibility</td>
+</tr>
+<tr>
+<td>D-030</td>
+<td>2026-10-19</td>
+<td>Days stratified by calendar class (holiday or eve, weekend, weekday) with weights; one posterior draw of rates per scenario; held-out dates disjoint from final dates; prior strength by empirical Bayes (about 2.3 store-days); fitted overdispersion</td>
+<td>Uniform random days; prior 14</td>
+<td>Review 02 (statistician)</td>
+<td>Accepted</td>
+<td>Demand</td>
+</tr>
+<tr>
+<td>D-031</td>
+<td>2026-10-19</td>
+<td>We realised that skipping stores with zero cages contradicts the brief (one delivery per store per day) and distorted the R2 and per-store numbers, so every store keeps its daily stop</td>
+<td>Skip zero-order stores</td>
+<td>Brief §2.1; found while reading v0.2 results</td>
+<td>Accepted</td>
+<td>Lower level</td>
+</tr>
+<tr>
+<td>D-032</td>
+<td>2026-10-19</td>
+<td>The demo's headline follows the evidence: when the saving interval includes zero it recommends keeping today's network</td>
+<td>Always headline the best alternative</td>
+<td>v0.2 shows the alternative within noise of today's network</td>
+<td>Accepted</td>
+<td>Demo, proposal</td>
+</tr>
+<tr>
+<td>D-033</td>
+<td>2026-10-19</td>
+<td>Demo reduced to four tabs (answer, delivery day, how it works, checks), white top navigation in a CU-inspired style, zoomable map with followable trucks, formulas pre-rendered with KaTeX so graders need no node</td>
+<td>Eight tabs, dark sidebar</td>
+<td>User instruction</td>
+<td>Accepted</td>
+<td>Demo</td>
+</tr>
+<tr>
+<td>D-034</td>
+<td>2026-10-19</td>
+<td>User accepted the recommended options: full 10,000 stores with the day-3 speed gate (D-007), window-aware assignment LP (D-008), hard 12:00 window (D-009), pool search with discrepancy GP and EI (D-010), Kontur H3 population-weighted store locations, bonus = VOI and robustness (closure sequence if time), I prepare and the user runs DGX commands</td>
+<td>Alternatives in brain Section 23</td>
+<td>User instruction</td>
+<td>Accepted</td>
+<td>D-007 to D-010, world, bonus</td>
+</tr>
+<tr>
+<td>D-035</td>
+<td>2026-10-19</td>
+<td>OSRM preprocessing runs on the DGX Spark; the cache build queries it from the laptop through an SSH tunnel</td>
+<td>Everything on the laptop with a roads-only pre-filter; the OSRM demo server</td>
+<td>The laptop has 6 GB (about 3 GB free) and hard-resets under sustained load, while extract and partition peak around 3-4 GB; the demo server allows a calibration sample, not bulk queries (brief §2.5); results are identical on either machine</td>
+<td>Accepted</td>
+<td>Distances</td>
+</tr>
+<tr>
+<td>D-036</td>
+<td>2026-10-19</td>
+<td>Road cache: OSRM for every store-site pair and each store's 50 nearest stores; other store pairs from road = map x exp(a + b ln map), one line for flat pairs and one for Gangwon or North Gyeongsang, fitted on about 4,000 OSRM pairs over 1-250 km with a held-out half for the error; values are the mean of both directions plus both snap legs</td>
+<td>All pairs from OSRM (100 M pairs, too big to ship); a single detour factor</td>
+<td>The brief's own example row (OSRM near, calibrated factor far); long store-store legs rarely enter routes; the symmetric mean matches the 2-opt move, which assumes symmetric legs</td>
+<td>Accepted</td>
+<td><code>code/dcn/distances.py</code>, <code>code/osrm/</code></td>
+</tr>
+<tr>
+<td>D-037</td>
+<td>2026-10-19</td>
+<td>The demo's live solve and <code>app.py</code> use the calibrated model from coordinates; the engine uses the cache</td>
+<td>Ship the live territory's cached matrix in the page</td>
+<td>Keeps the page small and the JS and Python solves identical; revisit on demo day 10</td>
+<td>Proposed</td>
+<td>Demo</td>
+</tr>
+<tr>
+<td>D-038</td>
+<td>2026-10-19</td>
+<td>The engine refuses a cache whose store coordinates differ from the generated world</td>
+<td>Silent reuse</td>
+<td>The Kontur switch (D-034) changes the stores, and a stale cache would silently give wrong distances</td>
+<td>Accepted</td>
+<td><code>distances.site_km</code></td>
+</tr>
+<tr>
+<td>D-039</td>
+<td>2026-10-19</td>
+<td>The extract date comes from the PBF header (osmosis_replication_timestamp 2026-10-18T20:25:06Z) and is stored with the md5 in the cache</td>
+<td>OSRM's <code>data_version</code> field</td>
+<td>OSRM returned an empty <code>data_version</code>; the brief requires the extract date</td>
+<td>Accepted</td>
+<td><code>code/osrm/build_cache.py</code></td>
+</tr>
+<tr>
+<td>D-040</td>
+<td>2026-10-19</td>
+<td>Keep 50 cached neighbours per store and the two-class log-linear model for now; revisit after the Kontur switch</td>
+<td>100 neighbours; snap-aware model</td>
+<td>93% of route legs already use OSRM values and model legs carry about 12% of route km (about 2% km uncertainty); the short-range model error (25% median at 1-10 km) is partly caused by synthetic points far from roads, which Kontur removes</td>
+<td>Accepted (review after Kontur)</td>
+<td>Distances, balance table</td>
+</tr>
 </tbody>
 </table></div>
+<h2 id="appendix-e">E. Rolling record: work log</h2><p>Append-only, dated record of what was done by hand (commands run, machines used, problems hit, results), kept as the raw material for the executive summary and Section 7 of the definition.
+<code>LLM_USE.md</code> records what the LLM did and <code>DECISIONS.md</code> why; this file records what happened.</p>
+<h2 id="2026-10-19-day-0">2026-10-19 (day 0)</h2>
+<h3 id="decisions-taken">Decisions taken</h3>
+<ul>
+<li>Accepted all recommended options of brain Section 23 (D-034): full 10,000 stores with the day-3 speed gate, window-aware assignment LP inside E, hard 12:00 window, pool search with a discrepancy GP and EI, Kontur H3 population-weighted store locations, bonus = value of information and robustness.</li>
+<li>Heavy one-off computation goes to the DGX Spark; light work stays on the laptop (D-035).</li>
+</ul>
+<h3 id="road-distances-with-osrm">Road distances with OSRM</h3>
+<p><strong>Why.</strong>
+The brief (§2.5) requires every distance to be an actual road value or calibrated against road values, with source, version, extract date and profile stated, and every distance cached in <code>code/</code>.
+v0.1 and v0.2 used uncalibrated factors (map x 1.30, x 1.45 in the mountains), which do not meet that rule.</p>
+<p><strong>Setup.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Map data</td>
+<td>Geofabrik <code>south-korea-latest.osm.pbf</code>, 255 MB, md5 <code>ea750dde8e6e6ded7a677ec7e029257e</code>, OSM data as of 2026-10-18 20:25 UTC</td>
+</tr>
+<tr>
+<td>Engine</td>
+<td>OSRM <code>ghcr.io/project-osrm/osrm-backend:v6.0.0</code> (arm64 build), default car profile, MLD</td>
+</tr>
+<tr>
+<td>Server machine</td>
+<td>DGX Spark (<code>spark-d35c</code>), Docker 28.3.3</td>
+</tr>
+<tr>
+<td>Query machine</td>
+<td>Laptop, through an SSH tunnel (<code>ssh -N -L 5000:localhost:5000 spark</code>)</td>
+</tr>
+<tr>
+<td>Builder</td>
+<td><code>code/osrm/build_cache.py</code>, run in the pinned <code>code/.venv310</code> (Python 3.10, numpy 2.2.6)</td>
+</tr>
+<tr>
+<td>Output</td>
+<td><code>code/data/road_cache.npz</code>, 4.9 MB</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps run.</strong></p>
+<ol>
+<li>Laptop: downloaded the extract and checked its md5; copied it to <code>~/osrm-korea/</code> on the Spark with <code>scp</code>.</li>
+<li>Spark: Docker was already installed, but the user was not in the <code>docker</code> group (&quot;permission denied&quot; on the socket); fixed with <code>sudo usermod -aG docker $USER</code> and a new login.</li>
+<li>Spark: a first <code>docker run</code> without the OSRM command opened a container shell that ignored keyboard input (<code>-t</code> without <code>-i</code>); the container was killed and each step rerun as one complete line.</li>
+<li>Spark: <code>osrm-extract</code> (car profile), <code>osrm-partition</code>, <code>osrm-customize</code>, then <code>osrm-routed</code> as a background container on <code>127.0.0.1:5000</code>; the first test query came back empty only because the server was still loading.</li>
+<li>Laptop: <code>python osrm/build_cache.py</code> through the tunnel, 193 s in total.</li>
+</ol>
+<p><strong>What was cached.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Pairs</th>
+<th>Count</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Store to site</td>
+<td>10,000 x 60</td>
+<td>OSRM</td>
+</tr>
+<tr>
+<td>Store to its 50 nearest stores</td>
+<td>10,000 x 50</td>
+<td>OSRM</td>
+</tr>
+<tr>
+<td>All other store pairs</td>
+<td>-</td>
+<td>Calibrated model <code>road = map x exp(a + b ln map)</code>, one line for flat pairs, one for pairs touching Gangwon or North Gyeongsang</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each value is the mean of both driving directions plus the snap leg from each point to its nearest road.</p>
+<p><strong>Results.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unroutable pairs</td>
+<td>0 (sites, neighbours and calibration)</td>
+</tr>
+<tr>
+<td>Snap distance store to road</td>
+<td>median 57 m, 99th percentile 1.25 km, maximum 4.5 km</td>
+</tr>
+<tr>
+<td>Median road / map ratio</td>
+<td>1.26 for store-site pairs, 1.70 for nearest-store pairs</td>
+</tr>
+<tr>
+<td>Calibration sample</td>
+<td>3,962 OSRM pairs over 1-250 km, half for fitting, half for testing</td>
+</tr>
+<tr>
+<td>Model test error, median (90th percentile)</td>
+<td>25% (58%) at 1-10 km, 10% (24%) at 10-50 km, 5% (14%) at 50-250 km</td>
+</tr>
+<tr>
+<td>Route legs on cached values (current network, one average day)</td>
+<td>93% in the dense Yongin territory (1,071 stores) and in the rural Wonju territory (325 stores)</td>
+</tr>
+<tr>
+<td>Route km on model values</td>
+<td>about 12% in both territories</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What it means.</strong>
+The old factor of 1.30 was too low for short trips (1.70 measured between neighbouring stores) and about right for DC legs (1.26).
+Almost every leg a route drives is a real OSRM value; the model covers about 12% of route km with a 10-25% error, so the remaining distance uncertainty in a day's route km is roughly 2%.
+Short-range model error is driven partly by the synthetic store points that sit up to 4.5 km from any road; the Kontur switch puts stores where people live and should shrink it.</p>
+<p><strong>Open.</strong></p>
+<ul>
+<li>Switch store generation to Kontur H3 population, then rerun <code>build_cache.py</code> (the server stays up on the Spark) and the leg-coverage check.</li>
+<li>Rerun the reduced and full pipelines on road distances; no v0.2 number survives (D-025).</li>
+<li>Balance-table check planned: all-pairs OSRM inside the top candidates' territories against the cache plus model.</li>
+</ul>
 
 </article>
 <footer>Private planning document, never part of the submission. Dasol Retail is fictional; the visual style is inspired by public CU brand colours.</footer>

@@ -1,10 +1,9 @@
-"""Korean geography for the fictional Dasol world: cities, DC sites, land mask, road-distance placeholder."""
+"""Korean geography for the fictional Dasol world: cities, DC sites, land mask, map distance."""
 import json
 from pathlib import Path
 
 import numpy as np
 
-from . import config as C
 
 DATA = Path(__file__).resolve().parents[1] / "data"
 
@@ -164,9 +163,3 @@ def haversine(lat1, lon1, lat2, lon2):
     a = np.sin(dp / 2) ** 2 + np.cos(p1) * np.cos(p2) * np.sin(dl / 2) ** 2
     return 2 * 6371.0 * np.arcsin(np.sqrt(np.minimum(a, 1.0)))
 
-
-def road_km(lat1, lon1, lat2, lon2, mountain1=None):
-    # Placeholder road distance: map distance x regional detour factor (to be replaced by the OSRM cache)
-    d = haversine(lat1, lon1, lat2, lon2)
-    f = C.DETOUR if mountain1 is None else np.where(mountain1, C.DETOUR_MOUNTAIN, C.DETOUR)
-    return d * f

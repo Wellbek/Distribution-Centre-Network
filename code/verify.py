@@ -12,7 +12,7 @@ import numpy as np
 from scipy.optimize import Bounds, LinearConstraint, milp
 
 from dcn import config as C
-from dcn import demand, evaluate, geo, routing
+from dcn import demand, evaluate, routing
 from dcn.world import make_world
 
 ROOT = Path(__file__).resolve().parent
@@ -46,7 +46,7 @@ for net in ("baseline_weekday", "recommended_weekday"):
         for r in blk["routes"]:
             idx = np.array(r["stores"])
             seen[idx] += 1
-            D = routing.dist_matrix(ctx["site_lat"][j], ctx["site_lon"][j], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx])
+            D = routing.territory_matrix(ctx, j, idx)
             km, arr, ret = routing.walk(list(range(1, len(idx) + 1)), D, p)
             load = show_day["q"][idx].sum()
             kmerr = max(kmerr, abs(km - r["km"]))
@@ -86,7 +86,7 @@ for trial in range(25):
     near = np.argsort(ctx["dsite"][:, j])[:60]
     idx = rng.choice(near, size=7, replace=False)
     q = rng.uniform(4, 12, size=7)  # heavier demand so several vehicles are needed
-    D = routing.dist_matrix(ctx["site_lat"][j], ctx["site_lon"][j], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx])
+    D = routing.territory_matrix(ctx, j, idx)
     h = routing.solve(D, q, p)
     cols, cost = [], []
     for size in range(1, 8):
@@ -113,7 +113,7 @@ check("heuristic vs exact (7 stores, 25 instances)", np.mean(gaps_v) <= 0.2,
 
 # JavaScript fallback against Python without 2-opt on the live DC day
 live = REG["live"]; j = live["dc"]; idx = np.array(live["stores"]); q = np.array(live["days"][0]["q"])
-D = routing.dist_matrix(ctx["site_lat"][j], ctx["site_lon"][j], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx])
+D = routing.territory_matrix(ctx, j, idx)
 py1 = routing.solve(D, q, p)
 Dr = routing.dist_matrix(ctx["site_lat"][j], ctx["site_lon"][j], np.round(ctx["lat"][idx], 4), np.round(ctx["lon"][idx], 4), ctx["mountain"][idx])
 py0 = routing.solve(Dr, q, p, improve=False)  # the page stores coordinates to 4 decimals

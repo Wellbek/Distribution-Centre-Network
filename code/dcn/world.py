@@ -90,6 +90,7 @@ def make_world(fraction=1.0, seed=C.SEED):
         opened=opened[keep], closed=closed[keep], mountain=np.isin(prov[keep], list(geo.MOUNTAIN)),
     )
     stores["id"] = np.array([f"ST{i:05d}" for i in keep])
+    stores["full"] = keep
 
     # Historical assignment: nearest current DC by map distance at opening, never rebalanced
     dlat = np.array([d["lat"] for d in dcs]); dlon = np.array([d["lon"] for d in dcs])

@@ -436,7 +436,7 @@ function statements() {
     ["Strategy & Planning", "Cut the DCs from twelve to eight.", "a decision, argued from one cost line", k8 ? `The best ${k8.k}-DC network costs ${fM(k8.total)} M against ${fM(r.total)} M for ${r.k}: fixed cost falls ${fM(b.fixed - k8.fixed)} M, but vehicles, fuel and relays rise.` : ""],
     ["Delivery Operations", "Wider areas, longer drives, more vehicles.", "an evaluation, through the lower level", `Right in kind: owned vehicles ${k8 ? k8.owned : "?"} at ${k8 ? k8.k : "?"} DCs against ${r.owned} at ${r.k}. What limits a route is mostly ${topBinding(r.census)}.`],
     ["Data Team", "Centre of gravity is the optimal site.", "a method that proposes candidates (G0)", `A fair generator: it supplied ${R.pool.filter(p => p.origin.startsWith("G0")).length} pool candidates. It is judged by E, not by its own score, and it cannot choose k.`],
-    ["Field Manager", "Close on the map, far by road.", "a claim about model validity", `True locally; this version still uses map distance × ${P.detour} (× ${P.detour_mountain} in the mountains) until real road distances replace it.`],
+    ["Field Manager", "Close on the map, far by road.", "a claim about model validity", P.road_coef ? `Checked on road distances: ${M.distance_model}.` : `True locally; this version still uses map distance × ${P.detour} (× ${P.detour_mountain} in the mountains) until real road distances replace it.`],
   ];
   $("#stmts").innerHTML = st.map(([w, q, l, p]) => `<div style="border-left:4px solid var(--purple);background:var(--lav);border-radius:0 14px 14px 0;padding:9px 13px;margin-bottom:9px"><b style="color:var(--purple-ink)">${w}</b> <span class="note">"${q}"</span><br><span class="badge live">${l}</span><div style="font-size:13.5px;margin-top:4px">${p}</div></div>`).join("");
 }
@@ -548,7 +548,7 @@ function initLive() {
   sync();
 }
 function sync() { $("#o-dead").textContent = hhmm(+$("#lv-dead").value); $("#o-stop").textContent = $("#lv-stop").value; $("#o-speed").textContent = $("#lv-speed").value; $("#o-cap").textContent = $("#lv-cap").value; $("#o-stops").textContent = $("#lv-stops").value; $("#o-fleet").textContent = $("#lv-fleet").value; }
-function roadKm(la1, lo1, la2, lo2, mt) { const r = Math.PI / 180, dp = (la2 - la1) * r, dl = (lo2 - lo1) * r; const a = Math.sin(dp / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin(dl / 2) ** 2; return 2 * 6371 * Math.asin(Math.sqrt(Math.min(a, 1))) * (mt ? P.detour_mountain : P.detour); }
+function roadKm(la1, lo1, la2, lo2, mt) { const r = Math.PI / 180, dp = (la2 - la1) * r, dl = (lo2 - lo1) * r; const a = Math.sin(dp / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin(dl / 2) ** 2; const d = 2 * 6371 * Math.asin(Math.sqrt(Math.min(a, 1))); if (!P.road_coef) return d * (mt ? P.detour_mountain : P.detour); if (d === 0) return 0; const c = P.road_coef[mt ? 1 : 0], x = Math.max(d, 0.5); return x * Math.exp(c[0] + c[1] * Math.log(x)); }
 function solveJS(dc, st, p) {
   // In-browser copy of routing.py's savings rules, without the 2-opt pass
   const n = st.length, pts = [[dc[0], dc[1], 0], ...st.map(s => [s[0], s[1], s[2]])];

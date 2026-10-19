@@ -4,7 +4,7 @@ from scipy import sparse
 from scipy.optimize import linprog
 
 from . import config as C
-from . import geo
+from . import distances
 from . import routing
 from .world import planning_mask
 
@@ -16,10 +16,11 @@ def context(world, model):
     lat, lon, mt = st["lat"][m], st["lon"][m], st["mountain"][m]
     sites = world["sites"]
     slat = np.array([s["lat"] for s in sites]); slon = np.array([s["lon"] for s in sites])
-    dsite = geo.road_km(lat[:, None], lon[:, None], slat[None, :], slon[None, :], mountain1=mt[:, None])
+    full = st["full"][m]
+    dsite = distances.site_km(full, lat, lon, mt, slat, slon)
     current = np.array([i for i, s in enumerate(sites) if s["current"]])
     return dict(
-        mask=m, lat=lat, lon=lon, mountain=mt, w=model["a"][m] / model["b"][m], dsite=dsite,
+        mask=m, full=full, lat=lat, lon=lon, mountain=mt, w=model["a"][m] / model["b"][m], dsite=dsite,
         fixed=np.array([s["monthly_fixed_cost"] for s in sites], float), site_lat=slat, site_lon=slon,
         lo=world["min_stores"], hi=world["max_stores"], n=int(m.sum()), current=current,
         hist_assign=current[st["current_dc"][m]],
@@ -92,7 +93,7 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
     census, routes_out = {}, []
     for a_i, j in enumerate(used):
         idx_all = np.flatnonzero(assign == j)
-        D_all = routing.dist_matrix(ctx["site_lat"][j], ctx["site_lon"][j], ctx["lat"][idx_all], ctx["lon"][idx_all], ctx["mountain"][idx_all])
+        D_all = routing.territory_matrix(ctx, j, idx_all)
         for d_i, day in enumerate(days):
             sel = np.arange(len(idx_all))  # every store gets its daily delivery, even with zero cages ordered (brief §2.1)
             D = D_all[np.r_[0, sel + 1]][:, np.r_[0, sel + 1]]

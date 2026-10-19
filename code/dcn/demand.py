@@ -3,7 +3,6 @@ from datetime import date, timedelta
 
 import numpy as np
 
-from . import config as C
 from .world import HIST_DAYS, HIST_START
 
 PLAN_START = date(2026, 11, 1)

@@ -3,6 +3,7 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 
 from . import config as C
+from . import distances
 from . import geo
 from .evaluate import assign_lp
 from .gp import GP, expected_improvement
@@ -43,7 +44,7 @@ def g1(ctx, open_idx, a=None):
     x, y = ctx["lon"] * 111 * np.cos(np.radians(36)), ctx["lat"] * 111
     sx = np.sqrt(np.maximum(np.bincount(a, x * x, k) / np.maximum(n_j, 1) - (np.bincount(a, x, k) / np.maximum(n_j, 1)) ** 2, 1))
     sy = np.sqrt(np.maximum(np.bincount(a, y * y, k) / np.maximum(n_j, 1) - (np.bincount(a, y, k) / np.maximum(n_j, 1)) ** 2, 1))
-    km = (2 * rbar * routes + 0.7124 * np.sqrt(n_j * 4 * np.pi * sx * sy) * C.DETOUR).sum()
+    km = (2 * rbar * routes + 0.7124 * np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()).sum()
     veh = np.ceil(routes * 1.08).sum()
     total = ctx["fixed"][open_idx].sum() + veh * C.VEHICLE_MONTH + C.DAYS_MONTH * C.FUEL_KM * km
     return float(total), a

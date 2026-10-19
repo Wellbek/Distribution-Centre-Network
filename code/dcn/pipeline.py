@@ -12,7 +12,7 @@ import numpy as np
 import scipy
 
 from . import config as C
-from . import demand, evaluate, search
+from . import demand, distances, evaluate, search
 from .world import HIST_DAYS, TYPES, make_world
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -233,12 +233,13 @@ def run(profile):
                   generated=datetime.now().isoformat(timespec="seconds"), runtime_s=round(time.time() - t0, 1),
                   command=f"python run_{profile['name']}.py", python=sys.version.split()[0], numpy=np.__version__, scipy=scipy.__version__,
                   machine=platform.machine(),
-                  distance_model=f"map distance x {C.DETOUR} (x {C.DETOUR_MOUNTAIN} in Gangwon and North Gyeongsang), placeholder until the OSRM cache",
+                  distance_model=distances.describe(),
                   bounds=[ctx["lo"], ctx["hi"]], k_range=[kmin, kmax], budget=C.BUDGET, days=[C.SEARCH_DAYS, C.FINAL_DAYS, C.HELDOUT_DAYS],
                   fleet_quantile=C.FLEET_Q),
         params=dict(cap=C.CAP, max_stops=C.MAX_STOPS, max_km=C.MAX_KM, stop_h=C.STOP_H, speed=C.SPEED, depart=C.DEPART,
                     deadline=C.DEADLINE, shift_end=C.SHIFT_END, break_h=C.BREAK_H, fail_at=C.FAIL_AT, detour=C.DETOUR,
-                    detour_mountain=C.DETOUR_MOUNTAIN, fuel_km=C.FUEL_KM, spot_day=C.SPOT_DAY, late_pen=C.LATE_PEN,
+                    detour_mountain=C.DETOUR_MOUNTAIN, road_coef=distances.cache() and distances.cache()['coef'].tolist(),
+                    fuel_km=C.FUEL_KM, spot_day=C.SPOT_DAY, late_pen=C.LATE_PEN,
                     relay_day=C.RELAY_DAY, vehicle_month=C.VEHICLE_MONTH, days_month=C.DAYS_MONTH, fleet_q=C.FLEET_Q),
         geo=dict(provinces=[dict(name=n, rings=[np.round(r, 3).tolist() for r in rings]) for n, rings in world["provinces"]]),
         stores=dict(id=world["stores"]["id"][m].tolist(), lat=np.round(ctx["lat"], 4).tolist(), lon=np.round(ctx["lon"], 4).tolist(),

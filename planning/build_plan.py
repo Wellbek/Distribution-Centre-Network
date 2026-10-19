@@ -88,6 +88,7 @@ def main():
         ("appendix-b", "B. Review 01 transcript", to_html(drop_title(HERE / "stakeholders" / "REVIEW-01-plan-v1.md"), store, seen)),
         ("appendix-c", "C. Rolling record: LLM use", to_html(drop_title(HERE / "LLM_USE.md"), store, seen)),
         ("appendix-d", "D. Rolling record: decisions", to_html(drop_title(HERE / "DECISIONS.md"), store, seen)),
+        ("appendix-e", "E. Rolling record: work log", to_html(drop_title(HERE / "WORK_LOG.md"), store, seen)),
     ]
     toc += [(a, t) for a, t, _ in appendices]
 

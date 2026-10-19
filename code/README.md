@@ -23,7 +23,9 @@ Each run writes `results/<profile>/registry.json` (every reported number), the i
 | File | What it does |
 |---|---|
 | `dcn/config.py` | Teaching defaults (brief §2.6) and run profiles |
-| `dcn/geo.py` | Cities, current DCs, candidate sites, land mask, road-distance placeholder |
+| `dcn/geo.py` | Cities, current DCs, candidate sites, land mask, map distance |
+| `dcn/distances.py` | Road km: OSRM cache (`data/road_cache.npz`) and the calibrated model for uncached pairs |
+| `osrm/` | Rebuilds the road cache from a self-hosted OSRM server (not needed to run) |
 | `dcn/world.py` | Stores, types, rates, churn, historical assignment |
 | `dcn/demand.py` | Calendar, demand history, Poisson-Gamma with exposure, day sampler |
 | `dcn/routing.py` | Lower level: savings + 2-opt with load, stops, km, shift and noon deadline |
@@ -34,5 +36,5 @@ Each run writes `results/<profile>/registry.json` (every reported number), the i
 
 ## Known gaps of this version
 
-Distances are map distance x 1.30 (x 1.45 in Gangwon and North Gyeongsang) until the OSRM cache exists; the reduced run thins stores without aggregating stops; outcome tables, the G remedy, reversal sweeps and the balance-table checks are not in yet.
+Until `data/road_cache.npz` exists (see `osrm/README.md`) distances fall back to map distance x 1.30 (x 1.45 in Gangwon and North Gyeongsang); the reduced run thins stores without aggregating stops; outcome tables, the G remedy, reversal sweeps and the balance-table checks are not in yet.
 Seed 437; Korea outline from Natural Earth via geoBoundaries (public domain).
