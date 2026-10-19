@@ -1,0 +1,106 @@
+{
+ "generated": "2026-10-19T18:23:30",
+ "registry": "2026-10-19T18:22:44",
+ "checks": [
+  {
+   "check": "world rebuilt",
+   "ok": true,
+   "detail": "1955 stores, showcase day 2026-11-04"
+  },
+  {
+   "check": "baseline: every store served once",
+   "ok": true,
+   "detail": "1955/1955 stores"
+  },
+  {
+   "check": "baseline: route limits",
+   "ok": true,
+   "detail": "0 unflagged violations, 23 flagged over-limit routes, max km mismatch 0.050"
+  },
+  {
+   "check": "recommended: every store served once",
+   "ok": true,
+   "detail": "1955/1955 stores"
+  },
+  {
+   "check": "recommended: route limits",
+   "ok": true,
+   "detail": "0 unflagged violations, 25 flagged over-limit routes, max km mismatch 0.050"
+  },
+  {
+   "check": "cost identity baseline",
+   "ok": true,
+   "detail": "components 1,665.7 M = total 1,665.7 M"
+  },
+  {
+   "check": "cost identity reassigned12",
+   "ok": true,
+   "detail": "components 2,168.5 M = total 2,168.5 M"
+  },
+  {
+   "check": "cost identity best12",
+   "ok": true,
+   "detail": "components 1,701.9 M = total 1,701.9 M"
+  },
+  {
+   "check": "cost identity recommended",
+   "ok": true,
+   "detail": "components 1,701.9 M = total 1,701.9 M"
+  },
+  {
+   "check": "cost identity proxy_only",
+   "ok": true,
+   "detail": "components 2,599.8 M = total 2,599.8 M"
+  },
+  {
+   "check": "cost identity best_k8",
+   "ok": true,
+   "detail": "components 2,286.8 M = total 2,286.8 M"
+  },
+  {
+   "check": "paired saving equals total difference",
+   "ok": true,
+   "detail": "-36.2 M vs -36.2 M"
+  },
+  {
+   "check": "assignment LP within bounds",
+   "ok": true,
+   "detail": "loads 100-280 in [100, 280]"
+  },
+  {
+   "check": "deterministic evaluation",
+   "ok": true,
+   "detail": "1,723.117 M twice"
+  },
+  {
+   "check": "heuristic vs exact (7 stores, 25 instances)",
+   "ok": true,
+   "detail": "extra vehicles mean 0.04 (max 1), km gap mean 0.2% (max 11.9%)"
+  },
+  {
+   "check": "JS engine = Python engine without 2-opt",
+   "ok": true,
+   "detail": "JS 13 vehicles 1106.1 km; Python 13 vehicles 1106.1 km; with 2-opt 1086.2 km"
+  },
+  {
+   "check": "demo has no external resources",
+   "ok": true,
+   "detail": "0 external script/link/img tags"
+  },
+  {
+   "check": "app.py live solve = routing.solve",
+   "ok": true,
+   "detail": "13 vehicles 1086.2 km in 91 ms"
+  },
+  {
+   "check": "demo embeds this registry",
+   "ok": true,
+   "detail": "2026-10-19T18:22:44"
+  },
+  {
+   "check": "Spearman recomputes",
+   "ok": true,
+   "detail": "0.232"
+  }
+ ]
+}

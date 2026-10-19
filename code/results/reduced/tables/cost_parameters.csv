@@ -1,0 +1,7 @@
+parameter,value,unit
+fuel per km,350.0,KRW/km
+vehicle monthly cost,5500000.0,KRW/month
+spot-truck daily rate,550000.0,KRW/day
+late-delivery penalty,120000.0,KRW
+stock-out penalty,500000.0,KRW
+vehicle capacity,48,roll cages

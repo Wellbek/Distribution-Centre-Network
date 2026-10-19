@@ -1,0 +1,2001 @@
+store_id,region,lat,lon,store_type,opened_on,closed_on,current_dc_id
+ST00002,Ulsan,35.52949,129.27223,mixed,,,DC11
+ST00004,Gyeonggi,37.48438,126.7797,residential,,,DC02
+ST00007,Gyeonggi,37.4526,127.14606,residential,2026-07-29,,DC04
+ST00008,Ulsan,35.55114,129.23487,roadside,,,DC11
+ST00016,North Gyeongsang,36.09507,128.1651,mixed,,2026-06-14,DC10
+ST00019,Gyeonggi,37.56448,127.21627,office,2026-07-05,,DC04
+ST00024,Gyeonggi,37.39357,127.18586,residential,2026-01-02,,DC01
+ST00028,Gyeonggi,37.68015,126.87238,residential,,,DC03
+ST00032,South Chungcheong,36.36708,127.5219,mixed,,,DC06
+ST00035,Gyeonggi,37.70818,126.9232,residential,,,DC03
+ST00041,Gyeonggi,37.27865,127.22363,residential,,,DC01
+ST00044,Daejeon,36.38295,127.35723,mixed,2026-04-10,,DC06
+ST00045,Gyeonggi,37.69503,126.98866,mixed,,,DC03
+ST00057,Gyeonggi,37.18089,127.0864,residential,,,DC01
+ST00059,Gyeonggi,37.75962,126.79475,mixed,,,DC03
+ST00063,South Gyeongsang,35.2568,128.87841,roadside,,,DC11
+ST00066,North Chungcheong,36.63414,127.57519,mixed,,,DC06
+ST00067,North Gyeongsang,35.75394,128.61606,mixed,,,DC10
+ST00072,North Gyeongsang,35.86244,129.2549,office,,,DC11
+ST00080,Gyeonggi,37.3068,126.86081,mixed,,,DC01
+ST00086,Gangwon,37.34264,127.90178,mixed,,,DC07
+ST00094,Gyeonggi,37.62675,127.06229,residential,,,DC04
+ST00095,Gyeonggi,37.73226,126.85508,mixed,,,DC03
+ST00099,South Gyeongsang,35.22317,128.58658,residential,,,DC11
+ST00100,Gyeonggi,37.6434,126.97229,residential,2026-02-03,,DC03
+ST00106,North Chungcheong,37.1131,128.18942,residential,,,DC07
+ST00110,North Gyeongsang,36.15911,128.33648,residential,,,DC10
+ST00113,North Chungcheong,36.98453,127.86485,mixed,,,DC07
+ST00115,Gyeonggi,37.42067,126.92797,roadside,,,DC01
+ST00123,Gyeonggi,37.16716,126.8902,residential,,,DC01
+ST00130,Gyeonggi,37.42891,126.9728,mixed,2025-12-17,,DC04
+ST00139,Gyeonggi,37.51719,126.8755,residential,,,DC02
+ST00141,Gyeonggi,37.30077,127.41333,office,,,DC01
+ST00144,Gyeonggi,37.68274,127.08641,mixed,,,DC03
+ST00145,South Chungcheong,36.89515,126.66596,mixed,,,DC05
+ST00148,Ulsan,35.58374,129.21775,residential,,,DC11
+ST00152,Ulsan,35.52065,129.25768,residential,2026-03-11,,DC11
+ST00161,North Chungcheong,36.98377,127.93519,residential,,,DC07
+ST00169,Gyeonggi,37.23151,127.0346,residential,,,DC01
+ST00172,Gyeonggi,37.64498,126.69508,residential,,,DC02
+ST00176,South Chungcheong,36.84118,127.13042,residential,,,DC05
+ST00180,Gyeonggi,37.72622,126.99606,residential,,,DC03
+ST00186,Gyeonggi,37.38359,126.90489,residential,,,DC01
+ST00189,Gyeonggi,37.2675,127.02514,residential,,,DC01
+ST00190,North Jeolla,35.94863,126.94137,residential,,,DC08
+ST00194,Gyeonggi,37.47676,126.99873,residential,,,DC04
+ST00197,Gyeonggi,37.70102,126.82215,residential,,,DC02
+ST00205,Incheon,37.51345,126.7021,residential,,,DC02
+ST00207,Gyeonggi,37.78267,127.03941,office,,,DC03
+ST00220,Gyeonggi,37.43041,126.84787,mixed,,,DC02
+ST00225,Gyeonggi,37.69944,127.09436,residential,2026-09-09,,DC03
+ST00231,Gyeonggi,37.18035,127.22088,residential,,,DC01
+ST00232,Gyeonggi,37.50216,127.06432,residential,,,DC04
+ST00248,Gyeonggi,37.45684,127.25279,office,,,DC04
+ST00256,South Gyeongsang,35.2693,128.66177,residential,,,DC11
+ST00257,Gyeonggi,37.47183,127.07943,residential,,,DC04
+ST00258,South Jeolla,35.17455,126.8099,residential,,,DC09
+ST00271,Incheon,37.40648,126.70424,residential,,,DC02
+ST00279,North Gyeongsang,35.90527,128.59255,office,,,DC10
+ST00280,Gyeonggi,37.69805,127.02616,residential,,,DC03
+ST00294,Gyeonggi,37.69524,126.99561,residential,,,DC03
+ST00310,Busan,35.13244,129.07731,residential,,,DC11
+ST00312,North Gyeongsang,36.08217,128.31394,residential,,,DC10
+ST00318,Incheon,37.44419,126.63904,residential,,,DC02
+ST00320,Gyeonggi,37.5324,126.98341,residential,,,DC04
+ST00322,Gyeonggi,36.98703,127.25921,residential,,,DC05
+ST00324,Gyeonggi,37.2049,127.14185,residential,,,DC01
+ST00327,South Jeolla,35.20508,126.90643,mixed,,,DC09
+ST00331,Daejeon,36.32255,127.3826,residential,,,DC06
+ST00333,South Gyeongsang,35.26112,129.19497,residential,,,DC11
+ST00337,Busan,35.13471,129.05308,mixed,,,DC11
+ST00340,Busan,35.20417,129.02956,mixed,,,DC11
+ST00356,Ulsan,35.54943,129.35384,residential,,,DC11
+ST00363,Gangwon,38.13865,127.31874,residential,,,DC03
+ST00365,Gyeonggi,37.5484,126.84151,mixed,,,DC02
+ST00369,Gyeonggi,37.38043,126.84702,residential,,,DC02
+ST00374,Gyeonggi,37.69511,126.78122,residential,,,DC02
+ST00382,South Gyeongsang,35.27313,128.6757,residential,,,DC11
+ST00391,Gyeonggi,37.3761,126.90404,mixed,,,DC01
+ST00397,Gyeonggi,37.35108,126.81369,residential,,,DC02
+ST00408,South Jeolla,35.17463,126.7417,residential,2025-10-08,,DC09
+ST00409,Gyeonggi,37.38058,126.94896,residential,,,DC01
+ST00410,Gyeonggi,37.50631,127.07128,residential,,,DC04
+ST00413,Gyeonggi,37.61356,126.90317,residential,,,DC02
+ST00415,Busan,35.17195,129.08447,mixed,,,DC11
+ST00418,Gyeonggi,37.46801,127.20738,residential,,,DC04
+ST00419,Gyeonggi,37.35722,126.80297,residential,,,DC02
+ST00422,Gyeonggi,37.82826,127.02052,residential,,,DC03
+ST00425,North Jeolla,35.84014,127.20786,residential,2025-11-02,,DC08
+ST00433,Gyeonggi,37.29468,126.99292,mixed,,,DC01
+ST00436,Ulsan,35.56876,129.30283,roadside,,,DC11
+ST00437,Gyeonggi,37.49912,126.89492,office,,,DC02
+ST00451,Gyeonggi,37.51163,127.12889,residential,,,DC04
+ST00460,South Gyeongsang,35.1314,128.72495,residential,,,DC11
+ST00463,Busan,35.16884,129.12923,roadside,,,DC11
+ST00468,Ulsan,35.57284,129.30683,residential,,,DC11
+ST00469,North Gyeongsang,36.57132,128.71096,mixed,2026-01-28,,DC10
+ST00481,Gyeonggi,37.66386,126.81857,residential,,,DC02
+ST00489,South Jeolla,34.99667,127.44453,residential,,,DC09
+ST00491,Incheon,37.39514,126.75005,mixed,,,DC02
+ST00496,Gyeonggi,37.78711,126.94517,residential,,,DC03
+ST00502,Gyeonggi,37.67321,127.05927,residential,,,DC03
+ST00508,Gyeonggi,37.52577,127.00659,office,,,DC04
+ST00511,Gyeonggi,37.54415,126.97224,residential,,,DC04
+ST00523,Gyeonggi,37.08368,127.05891,residential,,,DC01
+ST00530,Incheon,37.47413,126.65104,residential,2026-07-24,,DC02
+ST00534,North Chungcheong,36.64139,127.39018,residential,,,DC06
+ST00542,Gyeonggi,37.63101,127.23972,residential,,,DC04
+ST00547,Incheon,37.46567,126.75972,residential,,,DC02
+ST00555,Gyeonggi,37.42872,126.87726,mixed,,,DC02
+ST00565,Busan,35.07271,129.00836,residential,,,DC11
+ST00568,North Jeolla,35.81747,127.12436,residential,,,DC08
+ST00581,Incheon,37.4331,126.76555,roadside,,,DC02
+ST00586,Gyeonggi,37.54572,126.88606,residential,,,DC02
+ST00588,Gyeonggi,37.60788,126.7256,residential,,,DC02
+ST00591,Gyeonggi,37.69369,127.19702,residential,,,DC04
+ST00596,Gyeonggi,37.67522,127.17229,residential,,,DC04
+ST00597,South Gyeongsang,35.35132,128.98028,residential,,,DC11
+ST00601,Gyeonggi,37.51083,126.84003,residential,,,DC02
+ST00602,Gyeonggi,37.47466,126.78038,residential,,,DC02
+ST00604,Gyeonggi,37.40629,127.09781,residential,,,DC01
+ST00610,Gyeonggi,37.23988,127.13061,residential,,,DC01
+ST00611,Gyeonggi,37.67715,126.80098,residential,,,DC02
+ST00613,Gyeonggi,37.62475,126.86975,residential,,,DC02
+ST00615,Gyeonggi,37.34188,126.78394,roadside,,,DC02
+ST00618,Gyeonggi,37.27054,127.2417,residential,,,DC01
+ST00619,South Chungcheong,36.75913,126.99955,roadside,,,DC05
+ST00631,South Gyeongsang,35.25473,129.2354,residential,,,DC11
+ST00632,South Gyeongsang,35.49022,128.7139,residential,,,DC11
+ST00641,Gyeonggi,37.19919,126.82688,mixed,,,DC01
+ST00642,South Jeolla,35.19663,126.8455,roadside,,,DC09
+ST00644,South Chungcheong,36.76024,127.13239,residential,,,DC05
+ST00646,Gyeonggi,37.23741,127.04203,residential,,,DC01
+ST00651,Gyeonggi,37.1621,127.20029,residential,,,DC01
+ST00652,Ulsan,35.50749,129.28687,residential,,,DC11
+ST00655,Gyeonggi,37.31972,127.02855,mixed,,,DC01
+ST00661,Gangwon,37.33082,127.84844,mixed,2026-08-31,,DC07
+ST00666,Gyeonggi,37.53929,127.02661,office,,,DC04
+ST00675,North Gyeongsang,35.87355,128.58936,residential,,,DC10
+ST00679,North Gyeongsang,36.14301,128.30324,mixed,,,DC10
+ST00682,Gyeonggi,37.50251,127.04445,residential,,,DC04
+ST00685,Gangwon,37.86629,127.72066,residential,,,DC04
+ST00688,Gyeonggi,37.66005,126.86617,mixed,,,DC02
+ST00689,North Gyeongsang,35.90773,128.50868,residential,,,DC10
+ST00700,Gyeonggi,37.49033,126.78865,residential,,,DC02
+ST00722,Daejeon,36.40553,127.29441,residential,,,DC06
+ST00723,Gyeonggi,37.64737,127.04775,residential,,,DC03
+ST00724,Gangwon,37.0359,129.38871,mixed,,,DC12
+ST00726,North Gyeongsang,36.01667,129.39378,residential,2026-02-23,,DC10
+ST00729,Gyeonggi,37.58968,127.08303,residential,,,DC04
+ST00730,South Gyeongsang,35.3187,129.04135,residential,,,DC11
+ST00734,South Gyeongsang,35.2067,129.18014,mixed,,,DC11
+ST00742,Gyeonggi,37.49041,126.77712,mixed,,,DC02
+ST00744,Gyeonggi,37.62036,126.67244,residential,,,DC02
+ST00747,Gyeonggi,37.45413,127.24835,mixed,,,DC04
+ST00750,North Gyeongsang,36.5786,128.18236,residential,2025-11-28,,DC10
+ST00754,Gyeonggi,37.44568,127.05804,roadside,,,DC04
+ST00755,South Gyeongsang,35.2834,128.43354,mixed,,,DC11
+ST00756,Gyeonggi,37.61643,127.08684,residential,,,DC04
+ST00760,North Gyeongsang,35.88096,129.17984,residential,,,DC10
+ST00763,North Gyeongsang,36.37906,129.37339,residential,,2025-11-27,DC10
+ST00764,Gyeonggi,37.52539,126.75216,residential,,,DC02
+ST00772,Gangwon,37.35017,127.95527,residential,,,DC07
+ST00775,Gyeonggi,37.56221,126.99014,residential,,,DC04
+ST00777,Busan,35.18172,129.01175,mixed,,,DC11
+ST00779,Gyeonggi,37.66551,126.93747,residential,,,DC03
+ST00780,South Gyeongsang,35.12159,128.94354,mixed,,,DC11
+ST00788,Gyeonggi,37.16794,127.09618,roadside,,,DC01
+ST00801,Gyeonggi,37.493,127.10359,residential,,,DC04
+ST00818,North Gyeongsang,35.76449,128.7101,residential,,,DC10
+ST00819,Busan,35.18098,129.03308,residential,,,DC11
+ST00828,Gyeonggi,37.591,126.7617,mixed,,,DC02
+ST00830,South Gyeongsang,35.34825,129.01699,residential,,2026-01-20,DC11
+ST00839,South Jeolla,34.96124,126.64643,mixed,,,DC09
+ST00842,Gyeonggi,37.43379,126.87698,residential,,,DC02
+ST00861,North Gyeongsang,36.57937,128.21445,residential,,,DC10
+ST00862,South Jeolla,35.02587,126.70666,mixed,2025-10-18,,DC09
+ST00865,Gyeonggi,37.62168,127.23138,mixed,,,DC04
+ST00867,South Chungcheong,36.86522,127.16788,mixed,,,DC05
+ST00869,Gyeonggi,37.33011,126.88214,residential,,,DC01
+ST00872,Incheon,37.47017,126.64433,residential,,,DC02
+ST00873,Gyeonggi,37.75121,127.05852,residential,2025-10-26,,DC03
+ST00874,Gyeonggi,37.39852,126.99915,office,,,DC01
+ST00876,Gyeonggi,37.68671,127.08252,residential,,,DC03
+ST00881,Incheon,37.45471,126.73685,office,,,DC02
+ST00882,North Gyeongsang,36.13966,128.30396,residential,,,DC10
+ST00884,Gyeonggi,37.64048,126.8173,residential,,,DC02
+ST00892,South Jeolla,35.22068,126.79589,residential,,,DC09
+ST00905,Incheon,37.41559,126.76483,residential,,,DC02
+ST00927,Gyeonggi,37.49245,126.98612,mixed,,,DC04
+ST00949,North Jeolla,35.55792,126.89538,residential,,,DC09
+ST00950,Gyeonggi,37.61148,127.07344,residential,,,DC04
+ST00963,Gangwon,37.35656,127.94753,residential,,,DC07
+ST00965,Gyeonggi,37.6493,126.81738,mixed,,,DC02
+ST00966,Incheon,37.43562,126.78424,residential,,,DC02
+ST00976,Gyeonggi,37.61271,126.88106,residential,,,DC02
+ST00994,Busan,35.13374,129.11728,residential,,,DC11
+ST00996,South Gyeongsang,35.22414,128.62411,residential,,,DC11
+ST00998,Gyeonggi,37.24013,126.75532,residential,,,DC01
+ST00999,Gyeonggi,37.67472,127.24884,residential,,,DC04
+ST01006,Gyeonggi,37.62959,127.17971,mixed,,,DC04
+ST01018,North Gyeongsang,35.88587,128.55409,residential,,,DC10
+ST01021,North Gyeongsang,35.90228,128.66265,residential,,,DC10
+ST01027,Gyeonggi,37.55546,127.06854,mixed,,2025-11-22,DC04
+ST01028,Gyeonggi,37.37493,126.96224,roadside,,,DC01
+ST01029,Gyeonggi,37.5269,126.88224,residential,,,DC02
+ST01034,Gyeonggi,37.63383,126.98102,residential,2025-11-10,,DC03
+ST01044,Busan,35.2377,129.05381,mixed,,,DC11
+ST01045,South Gyeongsang,35.27145,128.67542,mixed,,,DC11
+ST01053,North Gyeongsang,35.82973,128.68271,roadside,,,DC10
+ST01055,Gyeonggi,37.47612,126.83247,residential,,,DC02
+ST01056,Incheon,37.54983,126.69968,roadside,,,DC02
+ST01057,Gyeonggi,37.63526,126.92465,roadside,,,DC03
+ST01058,North Jeolla,35.82487,127.09914,mixed,,,DC08
+ST01059,South Chungcheong,36.43388,127.16578,residential,,,DC06
+ST01064,South Gyeongsang,35.28154,129.02676,residential,,,DC11
+ST01084,South Jeolla,34.76443,127.67431,residential,,2026-08-31,DC09
+ST01087,Gyeonggi,37.25619,127.00949,office,,,DC01
+ST01095,South Gyeongsang,35.24807,128.63238,residential,,,DC11
+ST01103,Gyeonggi,37.26656,127.09598,mixed,,,DC01
+ST01111,North Gyeongsang,36.12106,128.16606,mixed,,,DC10
+ST01120,Gyeonggi,37.17979,126.83273,residential,,,DC01
+ST01121,Gyeonggi,37.3929,126.96412,residential,,,DC01
+ST01126,Gyeonggi,37.62262,126.91549,residential,,,DC02
+ST01134,Gyeonggi,37.56561,127.16602,residential,,,DC04
+ST01136,Gyeonggi,37.61784,127.01549,residential,,,DC04
+ST01141,Gyeonggi,37.73423,127.1052,mixed,,,DC03
+ST01142,Daejeon,36.46155,127.25627,mixed,,,DC06
+ST01145,Busan,35.13991,128.98301,mixed,,,DC11
+ST01148,Busan,35.16072,129.08358,office,,,DC11
+ST01149,North Chungcheong,36.9627,127.93449,mixed,,,DC07
+ST01166,South Gyeongsang,35.22664,128.65266,office,,,DC11
+ST01167,Gyeonggi,37.4761,126.85261,residential,,,DC02
+ST01171,Gyeonggi,37.28826,127.06046,residential,,,DC01
+ST01173,Gyeonggi,37.63616,127.10934,roadside,,,DC04
+ST01179,Gyeonggi,37.2482,127.02156,office,,,DC01
+ST01185,North Gyeongsang,35.87163,128.49584,residential,,2025-11-19,DC10
+ST01187,Gyeonggi,37.02551,127.2804,residential,,,DC05
+ST01210,Gyeonggi,37.47511,126.94207,roadside,,,DC04
+ST01211,Gyeonggi,37.50009,127.16071,mixed,,,DC04
+ST01213,Gyeonggi,37.41804,127.12738,residential,,,DC04
+ST01222,Gyeonggi,37.42342,127.11719,office,,,DC04
+ST01223,North Gyeongsang,35.96259,128.59963,mixed,,,DC10
+ST01225,Gyeonggi,37.63744,126.94175,mixed,,,DC03
+ST01226,Gyeonggi,37.51455,126.83858,residential,,,DC02
+ST01228,Gyeonggi,37.36192,126.96192,residential,,,DC01
+ST01229,South Jeolla,35.17555,126.8631,residential,,,DC09
+ST01234,Incheon,37.45581,126.74244,office,,,DC02
+ST01235,Gyeonggi,37.35169,126.93691,roadside,,,DC01
+ST01236,Gyeonggi,37.13548,126.86279,roadside,,,DC01
+ST01238,North Chungcheong,36.63498,127.48293,residential,,,DC06
+ST01249,Gyeonggi,37.61037,126.69837,residential,,,DC02
+ST01251,North Gyeongsang,35.93981,128.58958,mixed,,,DC10
+ST01269,Busan,35.17327,129.10937,office,2026-03-27,,DC11
+ST01270,North Chungcheong,37.015,127.89373,residential,,,DC07
+ST01277,Gyeonggi,37.62687,126.97422,mixed,,,DC03
+ST01281,Incheon,37.42477,126.69885,mixed,2026-01-20,,DC02
+ST01283,South Chungcheong,36.82126,127.08086,residential,,,DC05
+ST01287,Gyeonggi,37.17608,126.82616,mixed,,,DC01
+ST01291,South Jeolla,35.03645,126.89554,residential,,,DC09
+ST01297,Incheon,37.42744,126.7473,office,2025-12-23,,DC02
+ST01301,Gyeonggi,37.48873,126.78302,roadside,,,DC02
+ST01303,North Gyeongsang,35.74844,128.60937,mixed,,,DC10
+ST01314,Daejeon,36.36905,127.42468,residential,,,DC06
+ST01316,Gyeonggi,37.61068,126.8729,mixed,,,DC02
+ST01327,South Jeolla,35.11549,126.82039,mixed,2025-10-11,,DC09
+ST01342,North Gyeongsang,35.94021,128.65375,roadside,,,DC10
+ST01359,Gyeonggi,37.66457,126.96301,residential,,,DC03
+ST01362,North Gyeongsang,36.5963,128.19183,residential,,,DC10
+ST01367,North Gyeongsang,35.83092,128.54882,residential,,,DC10
+ST01372,Gyeonggi,37.25725,126.81337,residential,,,DC01
+ST01379,South Chungcheong,36.16205,127.10956,residential,,,DC08
+ST01380,Gyeonggi,37.57547,127.13904,residential,,,DC04
+ST01397,Gyeonggi,37.41061,126.94591,residential,,,DC01
+ST01402,North Jeolla,35.8458,127.21439,residential,,,DC08
+ST01417,Gyeonggi,37.58574,126.87903,residential,,,DC02
+ST01418,Gyeonggi,37.58358,127.07545,residential,,,DC04
+ST01419,North Gyeongsang,35.79487,128.63474,residential,,,DC10
+ST01421,North Chungcheong,36.66191,127.52507,mixed,,,DC06
+ST01422,Gyeonggi,37.63594,127.02836,residential,,,DC03
+ST01429,Incheon,37.47492,126.70908,residential,,,DC02
+ST01430,Gangwon,37.37727,127.94602,residential,2025-11-21,,DC07
+ST01432,Gyeonggi,37.55366,126.76434,residential,,,DC02
+ST01442,Gyeonggi,37.61332,127.0606,mixed,,,DC04
+ST01443,Busan,35.14968,128.97814,office,,,DC11
+ST01449,Gyeonggi,37.43772,127.05328,roadside,,,DC04
+ST01450,Incheon,37.39356,126.63251,residential,2025-12-29,,DC02
+ST01451,Gyeonggi,37.47016,127.04498,residential,,,DC04
+ST01453,South Gyeongsang,35.18953,128.67717,mixed,,,DC11
+ST01461,Gyeonggi,37.18293,126.82701,office,2025-10-26,,DC01
+ST01462,Gyeonggi,37.255,127.05012,mixed,,,DC01
+ST01481,Gyeonggi,37.18399,126.83696,mixed,,,DC01
+ST01497,North Gyeongsang,36.11218,128.34092,residential,,,DC10
+ST01498,Gyeonggi,37.3856,126.9147,residential,,,DC01
+ST01505,North Chungcheong,36.86141,127.42505,residential,,,DC05
+ST01510,South Chungcheong,36.89291,126.664,mixed,,,DC05
+ST01513,Gyeonggi,37.47432,126.7989,residential,,,DC02
+ST01518,North Gyeongsang,35.85031,129.21918,mixed,,,DC11
+ST01521,Gyeonggi,37.56127,126.77184,residential,,,DC02
+ST01523,Gyeonggi,37.01243,127.13661,mixed,,,DC05
+ST01532,South Gyeongsang,35.24871,129.17017,mixed,,,DC11
+ST01537,Gyeonggi,37.53193,126.89381,mixed,,,DC02
+ST01541,Gyeonggi,37.58261,127.08208,residential,,,DC04
+ST01546,South Chungcheong,36.8647,126.60232,residential,,,DC05
+ST01548,North Gyeongsang,35.82792,128.47625,residential,,,DC10
+ST01551,Daejeon,36.26995,127.38594,residential,,,DC06
+ST01553,South Jeolla,35.14666,126.87562,residential,,,DC09
+ST01559,Gyeonggi,37.33399,126.80681,roadside,,,DC01
+ST01573,Gyeonggi,37.55574,127.19628,roadside,,,DC04
+ST01575,Gyeonggi,37.39019,126.83787,residential,,,DC02
+ST01578,South Chungcheong,36.78945,126.46252,residential,2026-02-02,,DC05
+ST01579,South Chungcheong,36.6225,126.63227,residential,,,DC05
+ST01582,South Chungcheong,36.85057,127.09739,mixed,,,DC05
+ST01594,North Gyeongsang,35.83941,128.62217,residential,,,DC10
+ST01596,South Gyeongsang,35.19549,129.17159,residential,,,DC11
+ST01599,Gyeonggi,37.53396,127.09653,mixed,,,DC04
+ST01606,North Gyeongsang,35.95641,128.69924,residential,,,DC10
+ST01617,Gyeonggi,37.30573,126.84337,residential,,,DC01
+ST01619,Gyeonggi,37.47269,126.90279,office,,,DC02
+ST01622,Gyeonggi,37.67068,126.89863,residential,,,DC03
+ST01630,South Jeolla,34.91906,127.50325,residential,,,DC09
+ST01631,Gyeonggi,37.67852,127.18338,residential,,,DC04
+ST01642,Ulsan,35.54267,129.32292,residential,,,DC11
+ST01644,Gangwon,38.15033,127.3145,mixed,,,DC03
+ST01650,Gyeonggi,37.64458,126.90248,residential,,,DC02
+ST01653,South Gyeongsang,35.50392,128.69783,residential,,,DC11
+ST01672,North Gyeongsang,35.90458,128.62106,mixed,,,DC10
+ST01673,North Gyeongsang,35.79055,128.67994,residential,,,DC10
+ST01677,Gyeonggi,37.3821,126.96723,mixed,,,DC01
+ST01679,North Gyeongsang,35.8583,128.63353,office,,,DC10
+ST01680,Gyeonggi,37.63542,127.34307,residential,,,DC04
+ST01694,Gyeonggi,37.57451,127.1026,residential,,,DC04
+ST01695,Gyeonggi,37.37906,126.75134,mixed,,,DC02
+ST01701,North Gyeongsang,35.835,129.23864,office,,,DC11
+ST01709,Gyeonggi,37.63427,126.72236,residential,,,DC02
+ST01716,Gyeonggi,37.60899,126.93852,residential,,,DC02
+ST01727,Gyeonggi,37.57611,127.01475,office,,,DC04
+ST01732,North Jeolla,35.55972,126.86159,residential,,,DC09
+ST01738,Gyeonggi,37.61623,126.94439,residential,,,DC03
+ST01739,North Jeolla,35.78702,127.09658,residential,,,DC08
+ST01746,Gyeonggi,36.98197,127.30785,residential,,,DC05
+ST01748,Gyeonggi,37.22316,127.03709,residential,,,DC01
+ST01750,Gyeonggi,37.7231,126.79587,residential,,,DC02
+ST01752,North Gyeongsang,35.84125,128.49226,residential,,,DC10
+ST01761,North Jeolla,35.80508,127.1375,roadside,2026-06-29,,DC08
+ST01764,Incheon,37.50305,126.73074,residential,,2026-01-10,DC02
+ST01776,South Chungcheong,36.74531,127.20591,residential,,,DC05
+ST01778,Daejeon,36.32795,127.46032,residential,,,DC06
+ST01784,Daejeon,36.44477,127.26584,residential,,,DC06
+ST01786,South Jeolla,34.94133,127.54444,residential,,,DC09
+ST01787,South Gyeongsang,35.19072,128.08518,office,,,DC11
+ST01790,Gyeonggi,37.35629,126.80759,residential,,,DC02
+ST01793,Busan,35.17808,129.01603,mixed,2025-12-04,,DC11
+ST01804,Gyeonggi,37.51157,126.92038,residential,,,DC02
+ST01806,Gyeonggi,37.43936,126.88159,roadside,2026-03-09,,DC02
+ST01815,North Gyeongsang,36.12623,128.34223,residential,,,DC10
+ST01834,North Chungcheong,36.56845,127.51401,roadside,,,DC06
+ST01836,Gyeonggi,37.2623,127.07367,residential,,,DC01
+ST01840,South Gyeongsang,35.19751,128.05708,mixed,,,DC11
+ST01847,Gyeonggi,37.66121,126.72464,residential,,,DC02
+ST01848,South Gyeongsang,35.18857,128.84767,roadside,,,DC11
+ST01849,South Gyeongsang,35.25107,129.00685,mixed,,,DC11
+ST01850,North Gyeongsang,36.09626,128.35774,roadside,,,DC10
+ST01862,Gyeonggi,37.40122,127.12734,office,,,DC01
+ST01865,North Chungcheong,36.64836,127.42582,residential,,,DC06
+ST01866,Gyeonggi,37.27836,126.98137,residential,,,DC01
+ST01867,Gyeonggi,37.55467,127.11623,residential,,2026-05-31,DC04
+ST01869,North Gyeongsang,36.4226,128.18938,mixed,,,DC10
+ST01873,Gyeonggi,37.5797,126.94732,mixed,,,DC02
+ST01874,Busan,35.12832,129.07698,residential,,,DC11
+ST01878,Gyeonggi,37.03674,127.04768,residential,,,DC05
+ST01879,North Chungcheong,37.0207,127.93247,residential,,,DC07
+ST01882,Gyeonggi,37.56155,126.89082,residential,,,DC02
+ST01883,Busan,35.23003,129.02916,mixed,,,DC11
+ST01890,Gyeonggi,37.52138,127.0743,residential,2026-06-17,,DC04
+ST01895,Gyeonggi,37.78939,126.99175,mixed,,,DC03
+ST01902,Gyeonggi,37.59765,127.19463,residential,,,DC04
+ST01903,North Chungcheong,36.98239,127.89274,mixed,,,DC07
+ST01905,Gyeonggi,37.54106,126.72765,residential,,,DC02
+ST01909,South Chungcheong,36.84338,127.05549,residential,,,DC05
+ST01910,North Gyeongsang,35.84067,128.72968,mixed,,,DC10
+ST01912,Ulsan,35.4979,129.27551,residential,,,DC11
+ST01913,Gyeonggi,37.67155,127.15988,roadside,2026-08-23,,DC04
+ST01919,Gyeonggi,37.62291,126.9788,mixed,,,DC03
+ST01923,Gyeonggi,37.40653,126.95786,residential,,,DC01
+ST01924,Gyeonggi,37.43935,127.00329,residential,,,DC04
+ST01925,Gyeonggi,37.39827,127.04234,residential,,,DC01
+ST01926,Gyeonggi,37.02908,127.25431,residential,,,DC05
+ST01931,North Jeolla,35.85752,127.10555,residential,,,DC08
+ST01933,Gangwon,37.87118,127.68197,residential,,,DC04
+ST01937,South Jeolla,35.18517,126.94972,residential,,,DC09
+ST01940,South Gyeongsang,35.32185,129.10273,residential,,,DC11
+ST01945,Gyeonggi,37.66683,126.79021,mixed,,,DC02
+ST01946,North Jeolla,35.56679,126.85448,residential,,,DC09
+ST01949,Gangwon,37.31956,127.90035,residential,,,DC07
+ST01952,Busan,35.24864,129.09931,residential,,,DC11
+ST01954,South Jeolla,35.16906,126.74978,office,,,DC09
+ST01957,Daejeon,36.46922,127.28901,mixed,,,DC06
+ST01959,North Gyeongsang,35.79312,128.5106,residential,,,DC10
+ST01960,Gyeonggi,37.35225,127.03794,roadside,2026-03-09,,DC01
+ST01961,South Jeolla,35.17733,126.81109,office,,,DC09
+ST01965,Gyeonggi,37.43251,127.01312,roadside,,,DC04
+ST01971,Gyeonggi,37.43393,127.10852,office,,,DC04
+ST01987,North Gyeongsang,35.84396,129.20971,residential,,,DC11
+ST01994,Gyeonggi,37.40392,126.98345,residential,,,DC01
+ST01999,North Jeolla,35.84404,127.09109,mixed,,,DC08
+ST02002,Gyeonggi,37.00855,127.29407,mixed,,,DC05
+ST02006,Gyeonggi,37.56644,126.93737,office,,,DC02
+ST02008,North Gyeongsang,36.02931,129.37655,mixed,,,DC10
+ST02009,Gyeonggi,37.58897,127.14139,residential,2026-04-27,,DC04
+ST02014,Gyeonggi,37.26935,127.03447,office,,,DC01
+ST02025,South Chungcheong,36.27187,126.57836,residential,,,DC08
+ST02031,Gyeonggi,37.5947,126.94426,residential,,,DC02
+ST02033,Gyeonggi,37.48063,126.94066,mixed,,,DC04
+ST02039,Gyeonggi,37.43433,127.21999,office,,,DC04
+ST02049,Busan,35.18505,129.10247,residential,,,DC11
+ST02054,Gyeonggi,37.15507,127.19499,residential,,,DC01
+ST02056,South Gyeongsang,35.66573,127.9136,mixed,,,DC10
+ST02058,Gyeonggi,37.4783,126.84533,mixed,,,DC02
+ST02063,South Gyeongsang,35.26397,128.74806,residential,,,DC11
+ST02071,Gyeonggi,37.51254,126.94758,residential,,,DC04
+ST02072,South Jeolla,34.95891,127.47527,residential,,,DC09
+ST02080,Incheon,37.44901,126.73001,mixed,,,DC02
+ST02093,Gyeonggi,37.75927,127.16196,residential,,,DC03
+ST02098,Gyeonggi,37.55973,126.98109,residential,,,DC04
+ST02100,South Jeolla,35.23703,126.90557,mixed,,,DC09
+ST02101,South Chungcheong,36.86786,127.0959,office,,,DC05
+ST02107,North Gyeongsang,35.88398,128.59097,mixed,,,DC10
+ST02113,Gyeonggi,37.56123,126.98292,residential,,,DC04
+ST02125,Daejeon,36.45307,127.27586,mixed,,,DC06
+ST02133,South Jeolla,34.96136,127.69392,residential,,,DC09
+ST02135,North Chungcheong,36.94881,127.70467,mixed,,,DC07
+ST02136,North Gyeongsang,35.87815,128.57648,office,,,DC10
+ST02146,Gyeonggi,37.49051,126.7967,residential,,,DC02
+ST02147,Gyeonggi,37.64133,127.03585,office,,,DC03
+ST02149,Gyeonggi,37.41074,126.96726,residential,,,DC01
+ST02158,North Jeolla,35.92609,127.12551,residential,,,DC08
+ST02161,Gyeonggi,37.38818,127.11099,residential,,,DC01
+ST02169,North Gyeongsang,36.59856,128.66404,office,,,DC10
+ST02170,Gyeonggi,37.55308,126.93333,mixed,,,DC02
+ST02172,Gyeonggi,37.48681,127.25208,residential,,,DC04
+ST02174,Gyeonggi,37.36171,126.95047,roadside,,,DC01
+ST02182,Gyeonggi,37.29386,127.0589,residential,,,DC01
+ST02189,Gyeonggi,37.716,127.10432,residential,,,DC03
+ST02225,Gyeonggi,37.50136,126.97089,residential,,,DC04
+ST02232,Gyeonggi,37.76335,126.74274,residential,,,DC02
+ST02244,North Gyeongsang,35.91105,128.63772,residential,,,DC10
+ST02251,Gyeonggi,37.57912,127.00576,residential,,,DC04
+ST02253,Gyeonggi,37.50286,127.03892,residential,,,DC04
+ST02259,Gyeonggi,37.50898,127.17059,residential,,,DC04
+ST02267,North Gyeongsang,35.88234,128.61772,mixed,,,DC10
+ST02269,South Gyeongsang,35.21858,128.71366,office,,,DC11
+ST02270,South Gyeongsang,35.28548,128.6655,residential,,,DC11
+ST02286,Gyeonggi,37.31131,126.7755,residential,,,DC01
+ST02290,Daejeon,36.44704,127.23272,residential,,,DC06
+ST02302,South Gyeongsang,34.8311,128.63091,residential,,,DC11
+ST02307,Gyeonggi,37.22864,127.10855,office,,,DC01
+ST02313,Gyeonggi,37.55099,126.75155,residential,,,DC02
+ST02314,North Gyeongsang,35.99264,129.29795,residential,,,DC10
+ST02318,Gyeonggi,37.69845,127.058,residential,,,DC03
+ST02320,Gyeonggi,37.63828,126.72152,residential,,,DC02
+ST02330,Gyeonggi,37.53236,126.94369,office,,,DC04
+ST02331,Gyeonggi,37.44289,126.84544,residential,,,DC02
+ST02352,South Chungcheong,36.89552,126.65284,residential,,,DC05
+ST02364,South Gyeongsang,35.30795,128.9888,residential,,,DC11
+ST02367,Gyeonggi,36.99581,127.11291,residential,,,DC05
+ST02369,Gyeonggi,37.31525,126.79455,mixed,,,DC01
+ST02370,Gyeonggi,37.29375,127.15375,mixed,,,DC01
+ST02372,Gyeonggi,37.6663,127.02842,mixed,,,DC03
+ST02374,North Gyeongsang,35.98853,129.30739,mixed,,,DC10
+ST02375,South Gyeongsang,34.82848,127.87814,residential,,,DC11
+ST02377,Gyeonggi,37.59912,126.71841,roadside,,,DC02
+ST02389,Gyeonggi,37.1633,126.9169,residential,,,DC01
+ST02390,South Jeolla,35.14347,126.88626,residential,,,DC09
+ST02396,South Jeolla,34.95585,127.67477,roadside,,,DC09
+ST02399,North Gyeongsang,35.85379,128.69516,mixed,,,DC10
+ST02401,Gyeonggi,37.66113,127.21902,residential,,,DC04
+ST02402,North Gyeongsang,35.79233,128.54192,residential,,,DC10
+ST02406,South Gyeongsang,35.24905,128.94304,residential,,,DC11
+ST02414,North Chungcheong,36.67561,127.52694,residential,,,DC06
+ST02424,South Gyeongsang,35.27379,128.87374,residential,,,DC11
+ST02429,Gyeonggi,37.46032,127.03939,mixed,,,DC04
+ST02432,Gyeonggi,37.56345,126.99614,residential,,2026-06-25,DC04
+ST02440,Gyeonggi,37.73987,126.95629,residential,,,DC03
+ST02445,Gangwon,37.34977,127.97498,residential,,,DC07
+ST02450,Gyeonggi,37.19063,126.87534,residential,,,DC01
+ST02451,Daejeon,36.31829,127.32602,mixed,,,DC06
+ST02460,South Chungcheong,36.13916,127.08529,residential,,,DC08
+ST02462,South Gyeongsang,35.19771,128.91569,residential,,,DC11
+ST02466,South Gyeongsang,35.18854,128.92362,mixed,,,DC11
+ST02474,Gyeonggi,37.49978,126.82423,residential,,,DC02
+ST02478,Gyeonggi,37.36243,126.81737,residential,,,DC02
+ST02488,Gyeonggi,37.26256,127.14087,residential,,,DC01
+ST02489,North Gyeongsang,35.85257,129.29252,residential,,,DC11
+ST02499,Gyeonggi,37.47385,126.93713,residential,,,DC04
+ST02501,Gyeonggi,37.37515,127.02738,residential,,,DC01
+ST02503,Gyeonggi,37.50501,126.79537,residential,,,DC02
+ST02505,Gyeonggi,37.71034,126.83781,residential,,,DC02
+ST02507,South Gyeongsang,35.25203,128.90993,residential,,,DC11
+ST02525,Gyeonggi,37.52685,127.24435,residential,,,DC04
+ST02531,North Jeolla,35.97485,126.74339,residential,,,DC08
+ST02533,Gyeonggi,37.24868,127.03298,office,,,DC01
+ST02536,North Gyeongsang,36.10935,128.36014,mixed,,,DC10
+ST02538,Gyeonggi,37.57495,127.21566,mixed,,,DC04
+ST02560,Incheon,37.47979,126.74978,residential,,,DC02
+ST02561,Gyeonggi,37.45009,126.8144,roadside,,,DC02
+ST02580,Gyeonggi,37.59451,126.90393,mixed,,,DC02
+ST02582,North Gyeongsang,36.16658,128.08921,residential,,,DC10
+ST02593,Gyeonggi,37.01182,127.31953,residential,,,DC05
+ST02597,Gyeonggi,37.68139,127.1186,residential,,,DC03
+ST02598,North Jeolla,35.56201,126.86511,residential,,,DC09
+ST02609,North Chungcheong,36.51762,127.38585,residential,,,DC06
+ST02619,South Jeolla,34.76353,127.68358,residential,,,DC09
+ST02631,South Jeolla,34.9699,126.47222,residential,,,DC09
+ST02633,Gyeonggi,37.58989,126.88191,mixed,,,DC02
+ST02640,South Jeolla,34.95858,127.40603,mixed,,,DC09
+ST02641,South Jeolla,35.15944,126.83753,office,,,DC09
+ST02643,South Gyeongsang,35.20599,128.94344,residential,,,DC11
+ST02663,Gyeonggi,37.58917,127.21491,office,,,DC04
+ST02672,South Gyeongsang,35.2728,128.88889,office,,,DC11
+ST02683,Ulsan,35.53143,129.31309,office,2026-02-01,,DC11
+ST02710,South Jeolla,35.17254,126.75194,residential,,,DC09
+ST02711,Incheon,37.47024,126.71322,residential,,,DC02
+ST02716,Gangwon,37.32672,127.85914,residential,,,DC07
+ST02717,North Gyeongsang,36.03854,129.33671,residential,,,DC10
+ST02720,Daejeon,36.39501,127.30879,roadside,,,DC06
+ST02724,North Gyeongsang,35.82719,128.51425,residential,,,DC10
+ST02729,Gyeonggi,37.73062,127.0235,residential,,,DC03
+ST02732,Incheon,37.388,126.64755,mixed,,,DC02
+ST02736,Gyeonggi,37.68512,127.04429,mixed,,,DC03
+ST02741,Gyeonggi,37.52006,127.12443,mixed,,,DC04
+ST02744,North Gyeongsang,35.83653,128.72874,mixed,,,DC10
+ST02745,South Chungcheong,36.78534,127.00233,residential,,,DC05
+ST02747,Gyeonggi,37.44373,127.14986,mixed,,,DC04
+ST02748,Gangwon,37.189,128.49061,residential,2025-10-19,,DC07
+ST02753,North Gyeongsang,36.09223,128.35305,mixed,,,DC10
+ST02758,Gyeonggi,37.69161,126.85885,mixed,,,DC03
+ST02759,North Gyeongsang,35.97833,129.35624,mixed,,,DC10
+ST02766,North Gyeongsang,35.82705,129.21069,office,,,DC11
+ST02779,Gyeonggi,37.63937,126.82649,residential,,,DC02
+ST02780,South Gyeongsang,35.22888,128.88595,residential,,,DC11
+ST02791,Daejeon,36.36328,127.4243,mixed,,,DC06
+ST02793,North Gyeongsang,35.88445,128.6765,mixed,,,DC10
+ST02795,South Gyeongsang,35.14541,128.06678,residential,,,DC11
+ST02796,Gyeonggi,37.46375,127.17303,residential,,,DC04
+ST02800,Gyeonggi,37.75848,127.22393,mixed,,,DC03
+ST02802,Gyeonggi,37.46588,126.93934,residential,,,DC04
+ST02810,Gyeonggi,37.67607,126.77797,roadside,2025-12-22,,DC02
+ST02817,Gyeonggi,37.73065,126.79657,residential,,2026-02-19,DC02
+ST02828,Gyeonggi,37.50238,126.9776,residential,2026-08-02,,DC04
+ST02829,Gyeonggi,37.39635,126.94295,residential,,,DC01
+ST02833,South Gyeongsang,35.2222,128.84422,mixed,,,DC11
+ST02834,North Gyeongsang,35.82055,128.64508,residential,,,DC10
+ST02840,Gyeonggi,37.63516,126.85581,residential,2025-11-01,,DC02
+ST02843,North Chungcheong,36.40389,127.48054,residential,,,DC06
+ST02853,Gyeonggi,37.53294,127.0187,mixed,,,DC04
+ST02857,Daejeon,36.40799,127.35762,residential,,,DC06
+ST02858,Gyeonggi,37.70505,127.0517,mixed,,,DC03
+ST02863,Gyeonggi,37.55486,126.78696,residential,,,DC02
+ST02872,Ulsan,35.53312,129.28387,mixed,,,DC11
+ST02881,Gyeonggi,37.58374,127.19436,residential,,,DC04
+ST02886,Gyeonggi,37.59537,126.97198,residential,,,DC04
+ST02889,North Chungcheong,36.63101,127.51007,office,,,DC06
+ST02890,Gyeonggi,37.38569,126.96123,residential,,,DC01
+ST02892,South Gyeongsang,35.21974,129.00363,residential,,,DC11
+ST02894,Gyeonggi,37.63622,126.81536,residential,,,DC02
+ST02895,Busan,35.14888,129.05506,mixed,2026-04-21,,DC11
+ST02896,Gyeonggi,37.73063,126.79093,roadside,,,DC02
+ST02902,Busan,35.1542,129.10882,residential,,,DC11
+ST02905,Gyeonggi,37.48543,127.26786,residential,,,DC04
+ST02916,Gyeonggi,37.53171,127.09742,mixed,,,DC04
+ST02923,Gyeonggi,37.40792,127.13245,office,,,DC04
+ST02924,Incheon,37.52687,126.68401,mixed,,,DC02
+ST02925,Busan,35.25331,129.11025,residential,,,DC11
+ST02926,Busan,35.19909,129.03523,roadside,,,DC11
+ST02933,Gyeonggi,37.55648,126.96073,office,,,DC04
+ST02935,Gyeonggi,37.78445,126.97601,mixed,,,DC03
+ST02943,Incheon,37.487,126.7474,mixed,,,DC02
+ST02944,Gyeonggi,37.40792,126.94443,mixed,,,DC01
+ST02951,South Gyeongsang,35.27201,128.69345,mixed,,,DC11
+ST02959,Gyeonggi,37.64473,126.94491,residential,,,DC03
+ST02961,North Chungcheong,37.00574,127.95971,residential,,,DC07
+ST02971,Gyeonggi,37.3413,126.7999,mixed,,,DC02
+ST02972,Gyeonggi,37.45282,126.94235,mixed,,,DC04
+ST02978,Busan,35.15978,129.07673,office,,,DC11
+ST02981,Gangwon,37.32755,127.95263,residential,,,DC07
+ST02988,Gyeonggi,37.19188,126.83574,residential,,,DC01
+ST02996,North Chungcheong,36.63619,127.46999,office,,,DC06
+ST02997,Gyeonggi,37.69572,126.81738,residential,,,DC02
+ST02999,Gyeonggi,37.48257,127.06997,office,,,DC04
+ST03004,North Gyeongsang,35.81105,128.54222,residential,,,DC10
+ST03007,Gyeonggi,37.52131,126.79636,mixed,,,DC02
+ST03010,North Gyeongsang,35.89717,128.50155,residential,,,DC10
+ST03011,Gyeonggi,37.38498,126.88467,residential,,,DC01
+ST03012,Gyeonggi,37.23828,127.03891,mixed,,,DC01
+ST03014,Gyeonggi,37.52916,127.02705,mixed,2025-12-06,,DC04
+ST03019,Gyeonggi,37.67563,126.84212,mixed,,,DC02
+ST03028,North Gyeongsang,36.1176,128.35162,mixed,,,DC10
+ST03034,North Gyeongsang,35.91126,128.67746,mixed,,,DC10
+ST03038,South Chungcheong,36.61057,126.65476,residential,,,DC05
+ST03047,Gyeonggi,37.6631,126.93885,residential,,,DC03
+ST03058,South Jeolla,35.12859,126.81847,residential,,,DC09
+ST03076,Gyeonggi,37.43962,127.14894,mixed,,,DC04
+ST03078,North Chungcheong,36.28712,127.56667,residential,,,DC06
+ST03079,Gyeonggi,37.55783,126.93155,office,,2026-04-20,DC02
+ST03084,Gyeonggi,37.65477,127.00434,residential,,,DC03
+ST03093,Gyeonggi,37.00258,127.12258,mixed,,,DC05
+ST03095,Incheon,37.54041,126.6673,residential,,,DC02
+ST03097,Incheon,37.42096,126.74635,residential,,,DC02
+ST03100,Gyeonggi,37.56462,126.79979,residential,,,DC02
+ST03107,Gyeonggi,37.52255,127.26268,roadside,,,DC04
+ST03115,South Jeolla,35.16983,126.88288,mixed,,,DC09
+ST03122,South Jeolla,35.14604,126.72451,mixed,,2026-03-05,DC09
+ST03123,Gyeonggi,37.44174,126.93495,roadside,,,DC04
+ST03125,Gyeonggi,37.65091,127.22476,mixed,,,DC04
+ST03128,North Gyeongsang,35.84734,128.64221,residential,,,DC10
+ST03140,Gyeonggi,37.40965,127.04907,residential,,,DC01
+ST03141,Incheon,37.46094,126.68383,residential,,,DC02
+ST03145,North Gyeongsang,35.81529,128.774,residential,,,DC10
+ST03153,South Chungcheong,36.78339,126.95592,mixed,,,DC05
+ST03156,Gyeonggi,37.43799,127.30058,roadside,,,DC04
+ST03166,Incheon,37.3867,126.72986,mixed,,,DC02
+ST03175,Gyeonggi,37.29563,126.84091,residential,,,DC01
+ST03179,Gyeonggi,37.76919,126.75748,mixed,,,DC02
+ST03183,Gyeonggi,37.66312,126.74433,residential,,,DC02
+ST03188,Gyeonggi,37.42146,127.20825,residential,,,DC04
+ST03190,Gyeonggi,37.3156,127.66432,residential,,,DC07
+ST03191,Gyeonggi,37.63738,126.79902,residential,,,DC02
+ST03200,North Jeolla,35.95768,126.80401,residential,,,DC08
+ST03203,Gyeonggi,37.46483,126.82222,mixed,,,DC02
+ST03204,Gyeonggi,37.51304,127.05627,residential,,,DC04
+ST03205,South Jeolla,34.982,126.4967,residential,,,DC09
+ST03209,North Gyeongsang,35.83658,128.63258,mixed,,,DC10
+ST03211,Gyeonggi,37.68763,127.03437,mixed,,,DC03
+ST03212,Gangwon,37.8717,127.74146,residential,2026-02-08,,DC04
+ST03216,South Gyeongsang,35.32614,129.08795,residential,,,DC11
+ST03223,Gyeonggi,37.81978,126.92593,roadside,2025-10-17,,DC03
+ST03225,South Gyeongsang,35.17872,128.69903,mixed,,,DC11
+ST03227,Gyeonggi,37.40629,126.89215,mixed,,,DC02
+ST03229,Gyeonggi,37.26068,127.12044,mixed,,,DC01
+ST03233,Gyeonggi,37.24534,127.22039,residential,,,DC01
+ST03234,South Chungcheong,36.80669,127.08362,mixed,,,DC05
+ST03241,Gyeonggi,37.58934,127.06558,residential,,,DC04
+ST03242,Gyeonggi,37.22886,127.28156,residential,,,DC01
+ST03247,Busan,35.17485,129.18611,residential,,,DC11
+ST03249,South Gyeongsang,35.32095,129.05015,mixed,,,DC11
+ST03251,South Jeolla,35.13559,126.81157,mixed,2026-09-02,,DC09
+ST03253,Gyeonggi,37.48887,126.8583,roadside,,,DC02
+ST03254,Gyeonggi,37.77228,126.79059,residential,,2026-03-20,DC03
+ST03255,North Gyeongsang,35.84311,129.16168,residential,,,DC11
+ST03256,Gyeonggi,37.6639,126.90745,residential,,,DC03
+ST03258,South Gyeongsang,35.21146,128.94249,mixed,,,DC11
+ST03274,North Gyeongsang,35.77489,128.67778,mixed,,,DC10
+ST03281,Gyeonggi,37.75702,126.8719,residential,,,DC03
+ST03282,Gyeonggi,37.22782,127.19116,office,,,DC01
+ST03285,Gyeonggi,37.00416,127.08453,office,,,DC05
+ST03289,North Gyeongsang,35.91951,128.64449,residential,,,DC10
+ST03297,Gyeonggi,37.45714,127.05729,mixed,,,DC04
+ST03303,Ulsan,35.48356,129.30665,mixed,,,DC11
+ST03308,Busan,35.14694,129.01732,residential,,2025-11-29,DC11
+ST03317,Gyeonggi,37.71173,126.91538,office,,,DC03
+ST03318,Gyeonggi,37.36474,126.71425,residential,,,DC02
+ST03321,North Gyeongsang,35.91157,128.52204,mixed,,,DC10
+ST03323,Gyeonggi,37.62726,126.86249,residential,,,DC02
+ST03325,Gyeonggi,37.45996,126.99229,roadside,,,DC04
+ST03331,North Gyeongsang,35.82514,128.67731,residential,,,DC10
+ST03348,Daejeon,36.29273,127.379,residential,,,DC06
+ST03361,Gyeonggi,37.0027,127.27696,mixed,,,DC05
+ST03369,Gyeonggi,37.24531,126.73813,residential,,,DC01
+ST03373,Gyeonggi,37.35437,126.80323,residential,,,DC02
+ST03376,North Jeolla,35.97471,126.71379,residential,,,DC08
+ST03381,Gyeonggi,37.37557,126.99375,residential,,,DC01
+ST03383,North Gyeongsang,35.83819,128.58968,mixed,2026-02-24,,DC10
+ST03388,Gyeonggi,37.5669,126.92281,office,,,DC02
+ST03395,Gyeonggi,37.58712,127.09268,residential,,,DC04
+ST03403,Daejeon,36.45914,127.34358,mixed,,,DC06
+ST03404,South Jeolla,35.17714,126.85404,residential,,,DC09
+ST03405,Gyeonggi,36.9833,127.08639,residential,,,DC05
+ST03416,Gyeonggi,37.21981,126.91395,residential,,,DC01
+ST03417,Ulsan,35.53309,129.30398,residential,,,DC11
+ST03419,South Gyeongsang,35.24589,128.70477,residential,,,DC11
+ST03427,Gyeonggi,37.37728,126.90881,residential,,2026-07-02,DC01
+ST03429,South Chungcheong,36.0201,126.73114,residential,,,DC08
+ST03432,Gyeonggi,37.63067,126.90351,residential,,,DC02
+ST03433,Incheon,37.49619,126.68416,mixed,,,DC02
+ST03441,Gyeonggi,37.57672,127.12983,mixed,,,DC04
+ST03442,Incheon,37.41681,126.69374,residential,,,DC02
+ST03464,Daejeon,36.33553,127.4275,residential,,,DC06
+ST03469,Gyeonggi,37.53109,127.22754,mixed,,,DC04
+ST03470,North Jeolla,35.82282,127.15217,residential,,,DC08
+ST03473,South Chungcheong,36.83988,127.04644,mixed,,,DC05
+ST03476,North Gyeongsang,35.90212,128.70218,mixed,,,DC10
+ST03483,Gyeonggi,37.72826,126.97646,mixed,,,DC03
+ST03487,South Gyeongsang,35.25874,129.16645,residential,,,DC11
+ST03488,Gangwon,37.18451,129.00228,residential,,,DC12
+ST03517,North Gyeongsang,35.77916,128.73555,residential,,,DC10
+ST03520,Gyeonggi,37.64278,127.00825,residential,,,DC03
+ST03521,Ulsan,35.56337,129.32004,residential,,,DC11
+ST03531,Gyeonggi,37.07436,127.08266,residential,,,DC01
+ST03534,North Gyeongsang,35.92299,128.64562,mixed,,,DC10
+ST03537,South Chungcheong,36.37916,127.27495,office,,,DC06
+ST03543,Gyeonggi,37.59506,127.23879,mixed,,,DC04
+ST03547,Gyeonggi,37.44994,127.08858,residential,,,DC04
+ST03560,Gyeonggi,37.61521,127.01112,mixed,,,DC04
+ST03561,Gyeonggi,37.51323,126.76841,residential,,,DC02
+ST03562,South Jeolla,35.13493,126.89443,mixed,,,DC09
+ST03565,Gyeonggi,37.37306,126.8227,residential,,,DC02
+ST03579,Busan,35.24577,129.09782,residential,,,DC11
+ST03581,South Jeolla,34.76823,127.67615,residential,,,DC09
+ST03584,Gyeonggi,37.52444,126.79892,residential,,,DC02
+ST03585,South Gyeongsang,35.33493,129.02361,office,,,DC11
+ST03586,Gyeonggi,37.31669,126.79285,residential,2026-04-13,,DC01
+ST03589,Gangwon,37.16432,128.45291,residential,,,DC07
+ST03596,Gyeonggi,37.20829,127.02841,residential,,,DC01
+ST03598,Gyeonggi,37.26034,127.1876,mixed,,,DC01
+ST03600,Gyeonggi,37.73479,126.7606,residential,,,DC02
+ST03610,Gyeonggi,37.04067,127.11928,residential,,,DC05
+ST03613,Gyeonggi,37.69269,127.23767,residential,,,DC04
+ST03617,Gyeonggi,37.52373,126.95622,residential,,,DC04
+ST03618,Gyeonggi,37.50234,127.23285,mixed,,,DC04
+ST03620,Gyeonggi,37.29605,126.9952,residential,,,DC01
+ST03634,Gyeonggi,37.41448,127.0303,residential,,,DC01
+ST03638,South Gyeongsang,35.27797,128.99625,mixed,2025-11-25,,DC11
+ST03649,Gyeonggi,37.55676,126.77503,residential,,,DC02
+ST03654,Busan,35.16325,129.13511,residential,,,DC11
+ST03663,Gyeonggi,37.37653,126.98795,residential,2025-12-07,,DC01
+ST03669,Incheon,37.53264,126.71364,mixed,,,DC02
+ST03672,Gyeonggi,37.53467,126.95653,residential,,,DC04
+ST03673,Gyeonggi,37.45168,126.78984,residential,,,DC02
+ST03684,Gyeonggi,37.61121,127.01308,mixed,,,DC04
+ST03685,Gyeonggi,37.52336,126.88154,mixed,,,DC02
+ST03687,Gyeonggi,37.57601,126.95847,mixed,,2026-05-28,DC04
+ST03695,South Jeolla,34.92289,127.48204,residential,,,DC09
+ST03696,South Chungcheong,36.61069,126.67329,office,,,DC05
+ST03699,Gyeonggi,37.5368,127.27731,residential,,,DC04
+ST03702,Gyeonggi,37.59497,126.87144,mixed,,,DC02
+ST03706,Daejeon,36.3892,127.39758,residential,,,DC06
+ST03711,Daejeon,36.34706,127.41143,office,,2025-12-22,DC06
+ST03714,Gyeonggi,36.95216,127.08185,residential,,,DC05
+ST03746,Gyeonggi,37.62954,126.94031,residential,,,DC03
+ST03764,Gyeonggi,37.40224,126.97989,mixed,,,DC01
+ST03765,Gyeonggi,37.26351,127.2695,residential,,,DC01
+ST03768,Gyeonggi,37.75481,127.09395,residential,,,DC03
+ST03774,North Chungcheong,36.60726,127.49657,residential,,,DC06
+ST03775,Daejeon,36.47142,127.3425,residential,,,DC06
+ST03790,North Chungcheong,36.98186,127.91398,residential,,,DC07
+ST03800,Gyeonggi,37.43365,127.01158,mixed,,,DC04
+ST03813,North Jeolla,35.79189,127.10248,residential,,,DC08
+ST03819,North Gyeongsang,35.88408,128.61001,residential,,,DC10
+ST03824,Gyeonggi,37.2211,126.74477,residential,,,DC01
+ST03828,South Gyeongsang,35.26876,128.98168,residential,,,DC11
+ST03832,South Chungcheong,36.72332,126.99654,residential,,,DC05
+ST03833,South Chungcheong,36.80875,126.46967,residential,,,DC05
+ST03834,Gyeonggi,37.69947,126.83514,residential,,,DC02
+ST03838,Gyeonggi,37.38397,126.78815,residential,,,DC02
+ST03840,South Jeolla,35.18435,126.75941,mixed,,,DC09
+ST03846,South Chungcheong,36.86659,127.05056,residential,,,DC05
+ST03862,Gyeonggi,37.75786,127.04185,residential,2026-04-27,,DC03
+ST03868,Gyeonggi,37.18635,127.14026,residential,,,DC01
+ST03882,Gyeonggi,37.38401,126.93849,mixed,,,DC01
+ST03889,Gyeonggi,37.62228,127.03941,residential,,,DC04
+ST03891,North Gyeongsang,35.94276,128.60731,residential,,,DC10
+ST03903,North Jeolla,35.9274,126.97976,mixed,,,DC08
+ST03917,Gyeonggi,37.71525,126.7566,residential,,,DC02
+ST03923,Gyeonggi,37.56169,126.76463,mixed,,,DC02
+ST03927,North Gyeongsang,35.88523,128.53628,mixed,,,DC10
+ST03942,Gyeonggi,37.28753,126.94733,residential,,,DC01
+ST03943,Gyeonggi,37.70034,126.84772,residential,,,DC02
+ST03950,Gyeonggi,37.4992,126.91193,residential,,,DC02
+ST03951,Incheon,37.46422,126.75322,residential,,,DC02
+ST03968,Incheon,37.42233,126.70608,office,,,DC02
+ST03969,Gyeonggi,37.62761,126.8873,residential,,,DC02
+ST03974,North Gyeongsang,35.87604,128.6196,residential,2026-07-02,,DC10
+ST03994,Gyeonggi,37.60721,126.67727,mixed,,,DC02
+ST04007,Gyeonggi,37.39169,127.12721,residential,,,DC01
+ST04008,Gyeonggi,37.25841,127.39707,mixed,,,DC01
+ST04022,North Chungcheong,36.61024,127.62285,residential,,,DC06
+ST04025,Gyeonggi,37.64997,126.95905,residential,,,DC03
+ST04037,Incheon,37.48461,126.70303,office,,,DC02
+ST04042,Gyeonggi,37.45875,126.93671,residential,,,DC04
+ST04053,South Gyeongsang,35.2273,128.15194,residential,,,DC11
+ST04064,North Gyeongsang,36.09246,128.3336,residential,,,DC10
+ST04068,Gangwon,37.70584,128.87025,office,,,DC12
+ST04070,Gyeonggi,37.51342,126.83403,office,,,DC02
+ST04080,South Gyeongsang,35.22915,128.70803,office,,,DC11
+ST04082,Gyeonggi,37.67851,127.19364,residential,,,DC04
+ST04086,Daejeon,36.30798,127.39852,office,,,DC06
+ST04088,South Chungcheong,36.81443,127.11836,mixed,,,DC05
+ST04099,North Gyeongsang,35.88718,128.6102,office,,,DC10
+ST04102,Gyeonggi,37.60474,126.92307,mixed,,,DC02
+ST04130,Gyeonggi,37.2187,127.07395,mixed,,,DC01
+ST04132,Gyeonggi,37.54999,127.06583,residential,,,DC04
+ST04138,South Jeolla,34.6142,127.31041,residential,,,DC09
+ST04139,Gyeonggi,37.2571,127.37892,roadside,,,DC01
+ST04150,Daejeon,36.33246,127.34732,mixed,2026-05-31,,DC06
+ST04152,North Gyeongsang,36.58016,128.16118,residential,,,DC06
+ST04153,Gyeonggi,37.4484,126.9511,mixed,,,DC04
+ST04156,Gyeonggi,37.62081,126.87737,mixed,,,DC02
+ST04157,South Gyeongsang,35.30184,129.02309,residential,,,DC11
+ST04161,North Gyeongsang,35.85096,128.73359,residential,,2025-12-02,DC10
+ST04162,Gyeonggi,37.51243,127.19108,residential,,,DC04
+ST04167,Gyeonggi,37.67635,127.08264,residential,,,DC03
+ST04178,Gangwon,37.73055,128.86539,residential,,,DC12
+ST04186,Gyeonggi,37.61665,126.73147,residential,,,DC02
+ST04191,North Gyeongsang,35.84581,128.48243,residential,,,DC10
+ST04197,Gyeonggi,36.9726,127.04903,office,2026-08-29,,DC05
+ST04204,Gyeonggi,37.32525,126.7862,residential,,,DC02
+ST04207,Gyeonggi,37.5827,127.26732,residential,,,DC04
+ST04213,Gyeonggi,37.661,127.16451,roadside,,,DC04
+ST04216,South Jeolla,34.9337,127.45138,residential,,,DC09
+ST04217,Gyeonggi,37.02984,127.08491,roadside,,,DC05
+ST04227,Gyeonggi,37.67436,126.85558,residential,,,DC02
+ST04228,South Gyeongsang,35.24911,129.01389,residential,,,DC11
+ST04233,South Chungcheong,36.61618,126.63183,mixed,,,DC05
+ST04234,Busan,35.10065,129.10466,residential,,,DC11
+ST04236,Gyeonggi,37.54773,127.19976,residential,,,DC04
+ST04241,Gyeonggi,37.39752,126.8218,roadside,,,DC02
+ST04242,Gyeonggi,37.1953,126.75932,residential,,,DC01
+ST04248,Gyeonggi,37.63958,127.02598,residential,,,DC03
+ST04249,Ulsan,35.57329,129.29563,residential,,,DC11
+ST04252,Gyeonggi,37.58985,127.07736,mixed,,,DC04
+ST04256,Gyeonggi,37.62026,126.91165,residential,,,DC02
+ST04259,South Chungcheong,36.81815,127.06433,mixed,,,DC05
+ST04260,Gyeonggi,37.42887,126.86825,residential,,,DC02
+ST04269,Gangwon,37.5287,129.12237,residential,2026-04-27,,DC12
+ST04273,North Gyeongsang,35.8416,128.71215,mixed,,,DC10
+ST04279,Ulsan,35.54984,129.3089,mixed,,,DC11
+ST04286,South Gyeongsang,35.28286,128.65859,residential,,,DC11
+ST04297,North Gyeongsang,35.80986,128.79921,residential,,,DC10
+ST04299,Gyeonggi,37.4369,126.92532,residential,,,DC02
+ST04308,Daejeon,36.33908,127.35741,office,,,DC06
+ST04310,Gyeonggi,37.36568,127.00816,residential,,,DC01
+ST04311,Incheon,37.40168,126.70775,mixed,,,DC02
+ST04312,North Gyeongsang,35.81507,128.74302,mixed,,,DC10
+ST04320,Gyeonggi,37.10419,127.02768,mixed,,,DC01
+ST04326,North Chungcheong,36.92909,127.63779,residential,,,DC05
+ST04330,Gyeonggi,37.56736,127.29342,residential,,,DC04
+ST04336,Gyeonggi,37.65926,127.19724,residential,2026-08-09,,DC04
+ST04337,North Gyeongsang,35.86547,128.5105,residential,,,DC10
+ST04338,Gyeonggi,37.79449,127.0502,mixed,,2026-02-10,DC03
+ST04348,Daejeon,36.35031,127.37636,residential,,,DC06
+ST04356,South Chungcheong,36.77989,127.03167,residential,,,DC05
+ST04358,South Chungcheong,36.88372,126.64924,residential,,,DC05
+ST04360,Gyeonggi,37.2265,127.21526,mixed,,,DC01
+ST04378,South Gyeongsang,35.17604,128.71271,residential,,,DC11
+ST04379,North Jeolla,35.7775,127.09344,mixed,,,DC08
+ST04382,Busan,35.16038,129.10756,office,,,DC11
+ST04387,Gyeonggi,37.24985,126.75762,residential,,,DC01
+ST04388,Gyeonggi,37.66484,127.01869,residential,,,DC03
+ST04397,Gyeonggi,37.66141,127.31285,mixed,,,DC04
+ST04398,Incheon,37.42605,126.70503,office,2026-08-03,,DC02
+ST04399,Gyeonggi,37.41474,126.83953,mixed,,,DC02
+ST04409,Gyeonggi,37.69404,127.03378,residential,,,DC03
+ST04410,Gyeonggi,37.705,126.88549,office,,,DC03
+ST04414,Gyeonggi,37.15414,126.9025,residential,,,DC01
+ST04416,Gyeonggi,37.146,127.22761,mixed,,,DC01
+ST04425,Gyeonggi,37.5441,126.81998,residential,,,DC02
+ST04426,Ulsan,35.54692,129.27815,residential,,,DC11
+ST04431,Gyeonggi,37.42645,127.15629,mixed,,,DC04
+ST04439,Sejong,36.50743,127.29113,residential,,,DC06
+ST04442,South Chungcheong,36.7303,127.01874,mixed,,,DC05
+ST04446,Gyeonggi,37.57422,126.74018,residential,,,DC02
+ST04449,Gyeonggi,37.49654,126.95662,mixed,,,DC04
+ST04451,North Gyeongsang,35.92427,128.58761,residential,,,DC10
+ST04454,Gyeonggi,37.63935,126.79803,mixed,,,DC02
+ST04458,North Gyeongsang,36.14192,128.14198,mixed,,,DC10
+ST04464,South Gyeongsang,35.23034,128.62237,residential,,,DC11
+ST04466,South Gyeongsang,35.30296,128.6692,office,,,DC11
+ST04468,Gyeonggi,37.4777,126.80349,residential,,,DC02
+ST04483,Gyeonggi,37.47475,127.021,residential,,,DC04
+ST04488,Ulsan,35.5669,129.39762,residential,,,DC11
+ST04491,North Chungcheong,36.61277,127.51984,residential,,,DC06
+ST04496,Sejong,36.48091,127.3188,residential,,,DC06
+ST04501,South Gyeongsang,35.22891,128.82115,mixed,2026-04-27,,DC11
+ST04509,Incheon,37.46399,126.69608,residential,,,DC02
+ST04510,South Chungcheong,36.90304,126.68181,mixed,,,DC05
+ST04524,Gyeonggi,37.47549,126.96087,office,,,DC04
+ST04525,Ulsan,35.53606,129.33708,residential,,,DC11
+ST04536,South Gyeongsang,35.31951,129.0353,residential,,,DC11
+ST04538,South Jeolla,35.1897,126.83534,mixed,,,DC09
+ST04542,North Gyeongsang,35.78971,128.6084,residential,,,DC10
+ST04543,North Chungcheong,36.69877,127.41616,office,,,DC05
+ST04552,South Chungcheong,36.77841,127.10671,residential,,,DC05
+ST04555,Gyeonggi,37.02392,127.12121,residential,,,DC05
+ST04559,North Gyeongsang,35.92255,128.66951,mixed,,,DC10
+ST04564,South Gyeongsang,35.17773,128.10116,residential,,,DC11
+ST04569,Gangwon,37.89487,127.71578,mixed,,,DC04
+ST04576,South Chungcheong,36.41347,127.15573,mixed,,,DC06
+ST04578,Gyeonggi,37.56175,127.18895,residential,,,DC04
+ST04581,Gyeonggi,37.63084,126.62522,residential,,,DC02
+ST04584,Gyeonggi,37.18759,127.22623,residential,,,DC01
+ST04592,Gyeonggi,37.5852,127.23926,residential,,,DC04
+ST04606,North Gyeongsang,36.00063,129.29492,mixed,,,DC10
+ST04610,Gyeonggi,37.72593,126.96233,residential,,,DC03
+ST04612,Gyeonggi,37.62758,126.71772,residential,,,DC02
+ST04618,Gyeonggi,37.69223,126.84493,residential,,,DC02
+ST04622,Gyeonggi,37.4265,126.87398,residential,,,DC02
+ST04630,North Chungcheong,36.66795,127.50031,residential,,,DC06
+ST04643,Gyeonggi,37.57772,127.17789,mixed,,,DC04
+ST04647,Gyeonggi,37.63167,127.15919,residential,,,DC04
+ST04656,Gyeonggi,37.48434,127.05523,mixed,,,DC04
+ST04658,Gyeonggi,37.64137,127.01271,mixed,,,DC03
+ST04663,Gyeonggi,37.46133,127.20355,residential,,,DC04
+ST04669,North Gyeongsang,35.85048,128.73786,residential,,,DC10
+ST04683,Incheon,37.4309,126.7544,residential,,,DC02
+ST04687,Incheon,37.48926,126.71994,mixed,,,DC02
+ST04690,North Chungcheong,36.62718,127.45343,roadside,,,DC06
+ST04692,Gyeonggi,37.5926,126.92294,office,,,DC02
+ST04702,South Jeolla,34.99759,126.47875,residential,,,DC09
+ST04703,North Gyeongsang,35.91718,128.57687,residential,,,DC10
+ST04704,North Gyeongsang,35.98035,128.93856,office,,,DC10
+ST04706,South Gyeongsang,35.25362,128.71565,residential,,,DC11
+ST04707,North Gyeongsang,35.9319,128.60634,residential,,,DC10
+ST04711,North Gyeongsang,35.75841,128.61653,residential,,,DC10
+ST04719,Gyeonggi,37.6246,127.03329,roadside,,,DC04
+ST04720,North Gyeongsang,35.92548,129.26427,residential,,,DC10
+ST04724,Busan,35.12419,129.04491,residential,,,DC11
+ST04729,Gyeonggi,37.54569,126.84864,residential,,,DC02
+ST04730,Gyeonggi,37.3904,126.81828,mixed,,,DC02
+ST04744,Ulsan,35.5592,129.33194,residential,,,DC11
+ST04749,South Jeolla,35.18785,126.8857,residential,,,DC09
+ST04750,Gyeonggi,37.6559,126.86517,residential,,,DC02
+ST04753,Gyeonggi,37.35453,126.96124,residential,,,DC01
+ST04758,Gyeonggi,37.21558,126.86618,office,,,DC01
+ST04762,Gyeonggi,37.00771,127.216,mixed,,,DC05
+ST04773,North Gyeongsang,35.81077,128.7816,residential,,,DC10
+ST04774,Gyeonggi,37.23871,127.18657,office,,,DC01
+ST04780,Daejeon,36.30341,127.34696,residential,,,DC06
+ST04781,Gyeonggi,37.3406,126.86301,residential,,,DC01
+ST04782,Gyeonggi,37.6137,126.89615,mixed,,,DC02
+ST04786,Gyeonggi,37.44287,127.24202,residential,,,DC04
+ST04795,Gyeonggi,37.16527,127.20571,residential,,,DC01
+ST04797,South Gyeongsang,35.08541,127.75586,roadside,,,DC09
+ST04800,Gyeonggi,37.49613,126.76852,residential,,,DC02
+ST04803,North Jeolla,35.87608,127.07367,mixed,,,DC08
+ST04805,South Jeolla,35.0244,126.70522,residential,,,DC09
+ST04807,Gangwon,37.88042,127.75626,mixed,,,DC04
+ST04809,Gyeonggi,37.51015,126.85151,mixed,,,DC02
+ST04811,Gyeonggi,37.39418,126.88613,mixed,,,DC01
+ST04812,Gyeonggi,37.54094,127.14894,residential,,,DC04
+ST04817,North Gyeongsang,35.80825,128.65246,roadside,,,DC10
+ST04821,Gyeonggi,37.46972,127.10946,office,,,DC04
+ST04823,Gyeonggi,37.40335,126.84559,residential,,,DC02
+ST04824,Gyeonggi,37.36843,126.85015,residential,,,DC01
+ST04831,North Chungcheong,37.09204,128.21708,residential,,,DC07
+ST04834,North Gyeongsang,35.84439,128.60887,residential,,,DC10
+ST04838,Gyeonggi,37.24177,127.16273,residential,,,DC01
+ST04849,Gyeonggi,37.53339,127.24311,office,,,DC04
+ST04860,Gyeonggi,37.6175,126.934,residential,,,DC03
+ST04862,Daejeon,36.39404,127.3723,mixed,,,DC06
+ST04866,South Gyeongsang,35.3187,129.15087,mixed,,,DC11
+ST04874,North Gyeongsang,35.83,128.49562,residential,,,DC10
+ST04878,Sejong,36.54238,127.29553,residential,,,DC06
+ST04880,South Chungcheong,36.83081,127.16532,residential,,,DC05
+ST04882,Gyeonggi,37.55786,127.16855,mixed,2026-01-31,,DC04
+ST04883,Gyeonggi,37.77614,127.04863,residential,,,DC03
+ST04887,Gyeonggi,37.42996,126.93335,residential,,,DC01
+ST04888,Incheon,37.41882,126.76609,residential,,,DC02
+ST04889,South Chungcheong,36.39363,127.52801,residential,,,DC06
+ST04890,Gyeonggi,37.58121,126.92055,office,,,DC02
+ST04894,South Chungcheong,36.84752,127.09333,mixed,,,DC05
+ST04899,North Jeolla,35.97042,126.68681,residential,,,DC08
+ST04903,Incheon,37.42098,126.706,roadside,,,DC02
+ST04906,South Gyeongsang,35.48521,128.76627,residential,,,DC11
+ST04909,South Gyeongsang,35.19165,128.86254,residential,,,DC11
+ST04911,North Gyeongsang,35.91023,128.52494,mixed,,,DC10
+ST04914,South Jeolla,35.12718,126.82104,residential,,,DC09
+ST04927,Ulsan,35.56809,129.26899,mixed,,,DC11
+ST04931,North Gyeongsang,35.86344,128.50956,residential,,,DC10
+ST04935,South Jeolla,34.97808,127.68786,residential,,,DC09
+ST04939,Gyeonggi,37.44417,127.1524,mixed,,,DC04
+ST04946,Gyeonggi,37.68189,127.00796,roadside,,,DC03
+ST04947,Incheon,37.44412,126.65784,residential,,,DC02
+ST04951,Gyeonggi,37.61452,126.74537,residential,,,DC02
+ST04954,South Jeolla,35.16951,126.82571,mixed,,,DC09
+ST04960,Gyeonggi,37.39628,126.80362,residential,,,DC02
+ST04971,North Gyeongsang,35.97656,128.97972,residential,,,DC10
+ST04975,South Chungcheong,36.7898,126.42498,residential,,,DC05
+ST04978,Gyeonggi,37.74435,127.00718,residential,,,DC03
+ST04981,Gyeonggi,37.65427,127.21772,residential,,,DC04
+ST04987,Gyeonggi,37.19257,126.88111,mixed,,,DC01
+ST04994,Gyeonggi,37.64573,126.87343,residential,,,DC02
+ST04996,North Chungcheong,36.61595,127.49737,residential,,,DC06
+ST04999,Busan,35.21312,129.10311,mixed,,2026-04-28,DC11
+ST05000,Gyeonggi,37.5743,126.92825,office,,,DC02
+ST05002,South Chungcheong,36.83612,127.11952,mixed,,2026-08-26,DC05
+ST05004,Gyeonggi,37.28986,127.0435,mixed,,,DC01
+ST05009,Gyeonggi,37.36248,126.89826,mixed,,,DC01
+ST05014,Busan,35.0914,129.00773,residential,,,DC11
+ST05018,North Gyeongsang,35.78398,128.71058,mixed,,,DC10
+ST05019,Gyeonggi,37.32295,126.93957,residential,,,DC01
+ST05030,South Chungcheong,36.80266,127.12598,residential,,,DC05
+ST05033,Gyeonggi,37.21192,127.46866,residential,,,DC01
+ST05053,South Gyeongsang,35.23714,128.98422,residential,,,DC11
+ST05055,North Jeolla,35.97384,126.965,mixed,,,DC08
+ST05057,Gyeonggi,37.56539,127.13427,residential,,,DC04
+ST05058,Gyeonggi,37.28273,126.88613,roadside,,,DC01
+ST05059,Daejeon,36.45535,127.32601,residential,,,DC06
+ST05061,Gyeonggi,37.63345,127.09409,residential,,2026-06-28,DC04
+ST05062,South Jeolla,35.22815,126.86902,residential,,,DC09
+ST05066,Incheon,37.39052,126.71712,residential,,,DC02
+ST05072,Gyeonggi,37.57503,127.08885,residential,,,DC04
+ST05073,Gyeonggi,37.59292,126.85303,office,,,DC02
+ST05079,Gyeonggi,37.63822,126.84806,residential,,,DC02
+ST05088,North Gyeongsang,35.86127,129.2433,residential,,,DC11
+ST05091,Gyeonggi,37.62727,126.86565,mixed,,,DC02
+ST05093,Sejong,36.45293,127.13735,office,,2026-09-08,DC06
+ST05098,Ulsan,35.57279,129.33649,residential,,,DC11
+ST05102,Busan,35.20907,129.07197,office,,,DC11
+ST05103,Gyeonggi,37.21411,127.24311,residential,,,DC01
+ST05104,Gyeonggi,37.61094,126.8032,roadside,,,DC02
+ST05107,Busan,35.1112,129.01898,residential,,,DC11
+ST05108,Incheon,37.49133,126.73245,residential,,,DC02
+ST05111,Gyeonggi,37.60776,126.76425,residential,,,DC02
+ST05119,Gyeonggi,37.12819,127.03671,mixed,,,DC01
+ST05120,Gyeonggi,37.6081,126.69758,mixed,,,DC02
+ST05121,Gyeonggi,37.74216,126.77743,residential,2026-01-16,,DC02
+ST05124,North Jeolla,35.97622,126.73027,residential,,,DC08
+ST05128,Gangwon,37.75071,128.85942,residential,,,DC12
+ST05131,South Chungcheong,36.79639,126.44539,mixed,,,DC05
+ST05134,Gangwon,37.91696,127.7923,residential,,,DC04
+ST05146,Gyeonggi,37.60636,127.03787,residential,,,DC04
+ST05148,South Jeolla,34.74917,127.66442,residential,,,DC09
+ST05159,Gyeonggi,37.51978,126.98389,office,,,DC04
+ST05161,South Jeolla,34.76047,126.41564,mixed,,,DC09
+ST05162,Gyeonggi,37.58021,126.90631,residential,,,DC02
+ST05172,Gyeonggi,37.69522,126.98689,residential,,,DC03
+ST05183,South Jeolla,35.23336,126.87469,roadside,,,DC09
+ST05185,Gyeonggi,37.59998,126.84993,residential,,,DC02
+ST05187,Gyeonggi,37.55465,126.96346,office,,,DC04
+ST05188,North Gyeongsang,36.03568,129.3364,residential,,,DC10
+ST05194,Gangwon,37.55379,129.09998,residential,,,DC12
+ST05200,Gyeonggi,37.66234,127.03461,residential,,,DC03
+ST05201,Gyeonggi,37.56869,127.09442,residential,,,DC04
+ST05202,Gyeonggi,37.55228,127.07801,residential,,,DC04
+ST05204,Gyeonggi,37.57477,126.79908,mixed,,,DC02
+ST05205,North Jeolla,35.82085,127.19253,residential,,,DC08
+ST05206,North Jeolla,35.8264,127.09452,mixed,,,DC08
+ST05221,North Gyeongsang,36.00529,129.39505,residential,,,DC10
+ST05224,South Jeolla,34.91732,127.43748,roadside,,,DC09
+ST05243,Gyeonggi,37.68464,126.85212,residential,,,DC02
+ST05244,Gyeonggi,37.31055,127.06541,mixed,,,DC01
+ST05246,Gyeonggi,37.35296,126.9231,residential,,,DC01
+ST05248,Incheon,37.45942,126.76816,residential,,,DC02
+ST05249,Gyeonggi,37.49661,127.16747,residential,,,DC04
+ST05256,Gyeonggi,37.5179,126.74695,mixed,,,DC02
+ST05261,Gyeonggi,37.37694,126.95149,residential,,,DC01
+ST05262,Gyeonggi,37.58045,126.93173,residential,,,DC02
+ST05270,South Chungcheong,36.7899,127.07183,residential,,,DC05
+ST05276,North Gyeongsang,35.91468,128.741,residential,,,DC10
+ST05292,Gyeonggi,37.38738,126.91852,residential,,,DC01
+ST05305,Sejong,36.48505,127.22774,residential,,,DC06
+ST05309,South Gyeongsang,35.18986,128.91933,residential,,,DC11
+ST05318,Gyeonggi,37.65945,127.02411,roadside,,,DC03
+ST05323,North Gyeongsang,36.81738,128.6526,mixed,,,DC07
+ST05332,Gyeonggi,37.5138,126.96283,residential,,,DC04
+ST05339,Gyeonggi,37.5594,127.01467,residential,,,DC04
+ST05342,South Gyeongsang,35.28855,128.81276,residential,,2026-02-17,DC11
+ST05349,Incheon,37.4782,126.71542,mixed,,,DC02
+ST05357,Ulsan,35.51536,129.31994,office,,,DC11
+ST05363,North Jeolla,35.94381,126.95155,residential,,,DC08
+ST05367,Gyeonggi,37.69684,127.01704,residential,,,DC03
+ST05371,Gyeonggi,37.46726,126.94204,residential,,,DC04
+ST05376,Gyeonggi,37.40727,126.85361,residential,,,DC02
+ST05380,Gyeonggi,37.03333,127.28582,mixed,,,DC05
+ST05382,North Gyeongsang,35.96562,128.56801,residential,,,DC10
+ST05384,Gyeonggi,37.79759,126.99239,mixed,,,DC03
+ST05393,South Gyeongsang,35.16234,128.13911,residential,,,DC11
+ST05398,Gyeonggi,37.55851,126.94453,mixed,,,DC02
+ST05400,South Gyeongsang,35.16211,128.94423,residential,,,DC11
+ST05421,Busan,35.11709,129.01931,residential,,,DC11
+ST05422,Gyeonggi,37.67112,126.9327,residential,,,DC03
+ST05423,North Gyeongsang,35.94159,128.55833,mixed,,,DC10
+ST05428,Sejong,36.51623,127.25913,residential,,,DC06
+ST05431,North Jeolla,35.82907,127.14365,residential,,,DC08
+ST05433,Gyeonggi,37.684,126.81198,residential,,,DC02
+ST05434,Gyeonggi,37.65503,126.67904,residential,,,DC02
+ST05436,Busan,35.15718,129.0191,residential,,,DC11
+ST05437,Gyeonggi,37.64465,126.87263,roadside,,2026-07-08,DC02
+ST05443,Gyeonggi,36.94852,127.0563,residential,,,DC05
+ST05444,Gyeonggi,37.32711,126.85009,residential,,,DC01
+ST05448,Gyeonggi,37.76868,127.06416,residential,,,DC03
+ST05460,Gyeonggi,37.45965,126.90829,residential,,,DC02
+ST05464,North Gyeongsang,35.86422,128.7086,residential,,,DC10
+ST05477,Gyeonggi,37.21497,126.86963,residential,,,DC01
+ST05485,Gyeonggi,37.55486,127.10719,mixed,,,DC04
+ST05490,North Gyeongsang,35.80167,128.67235,residential,,,DC10
+ST05496,Gyeonggi,37.54787,126.8054,mixed,,,DC02
+ST05497,North Jeolla,35.96641,126.95511,mixed,,,DC08
+ST05499,South Jeolla,35.16261,126.85465,residential,,,DC09
+ST05504,Gyeonggi,37.63402,126.73062,roadside,,,DC02
+ST05505,Ulsan,35.53771,129.37638,residential,,,DC11
+ST05506,Daejeon,36.30805,127.45041,residential,,2026-06-02,DC06
+ST05512,Gyeonggi,37.57668,126.99925,office,,,DC04
+ST05515,North Chungcheong,36.65748,127.39606,residential,,,DC06
+ST05521,Gyeonggi,37.72071,126.80873,residential,,,DC02
+ST05523,Gyeonggi,37.25342,127.14859,mixed,,,DC01
+ST05524,Gyeonggi,37.62139,127.1242,roadside,,,DC04
+ST05526,Incheon,37.43781,126.75365,residential,,,DC02
+ST05533,Gyeonggi,37.215,126.76573,mixed,,,DC01
+ST05535,South Jeolla,35.14274,126.86496,office,,,DC09
+ST05536,Daejeon,36.40785,127.36236,residential,,,DC06
+ST05537,North Jeolla,35.60006,126.82506,residential,,,DC08
+ST05546,Incheon,37.47486,126.70275,residential,,,DC02
+ST05552,South Gyeongsang,35.20124,128.72247,residential,,,DC11
+ST05554,South Jeolla,35.14649,126.82134,residential,,,DC09
+ST05558,Gyeonggi,37.72997,126.77866,residential,,,DC02
+ST05559,Gyeonggi,37.48893,127.11538,residential,,,DC04
+ST05564,North Gyeongsang,35.83908,128.63732,roadside,,,DC10
+ST05566,North Chungcheong,36.6001,127.47763,residential,,,DC06
+ST05567,North Jeolla,35.8297,127.12859,mixed,,,DC08
+ST05572,Gyeonggi,37.51686,127.1384,mixed,,,DC04
+ST05587,Gyeonggi,37.59866,126.7821,residential,,,DC02
+ST05589,South Gyeongsang,35.38247,128.98851,residential,,,DC11
+ST05593,South Gyeongsang,35.32224,129.00474,residential,,,DC11
+ST05597,North Gyeongsang,35.79837,128.61973,mixed,,,DC10
+ST05600,Gyeonggi,37.1793,126.96593,mixed,,,DC01
+ST05606,Busan,35.18237,129.11068,mixed,,,DC11
+ST05607,Gangwon,37.74073,128.93042,residential,,,DC12
+ST05623,North Chungcheong,36.64376,127.50105,residential,,,DC06
+ST05624,Incheon,37.48523,126.71212,mixed,,,DC02
+ST05627,Gyeonggi,37.52962,126.78944,mixed,,,DC02
+ST05632,South Gyeongsang,35.04616,127.75228,residential,,,DC09
+ST05636,Gyeonggi,37.42373,126.88661,mixed,,,DC02
+ST05638,Gyeonggi,37.2387,127.24082,residential,,,DC01
+ST05640,Gyeonggi,37.61391,126.83094,mixed,2025-11-22,,DC02
+ST05642,North Gyeongsang,35.97689,129.39812,residential,,,DC10
+ST05644,Gyeonggi,37.7379,126.71735,residential,,,DC02
+ST05654,Gyeonggi,37.22521,126.83187,roadside,,,DC01
+ST05655,Gangwon,37.7458,128.89278,residential,,,DC12
+ST05668,Gyeonggi,37.53555,127.07204,mixed,,,DC04
+ST05676,South Chungcheong,36.76942,127.10915,residential,,,DC05
+ST05689,Gyeonggi,37.44972,126.80617,residential,,,DC02
+ST05699,North Jeolla,35.80111,127.12852,office,2026-06-16,,DC08
+ST05712,South Gyeongsang,35.21338,128.92497,roadside,,,DC11
+ST05716,North Chungcheong,36.47233,127.37612,residential,,,DC06
+ST05717,Gangwon,37.38241,127.99123,residential,,,DC07
+ST05722,Gyeonggi,37.63503,126.98924,residential,,,DC03
+ST05723,South Gyeongsang,35.22961,128.88667,residential,,,DC11
+ST05729,Gyeonggi,37.55376,126.82874,residential,,,DC02
+ST05735,Incheon,37.48773,126.65903,residential,,,DC02
+ST05737,South Gyeongsang,35.24006,129.17723,mixed,2025-10-23,,DC11
+ST05755,Gyeonggi,37.64988,127.27393,residential,,,DC04
+ST05758,Gyeonggi,37.35353,126.70958,roadside,,,DC02
+ST05778,Busan,35.1875,129.0986,residential,,,DC11
+ST05781,North Chungcheong,36.65098,127.50049,residential,,,DC06
+ST05785,Gyeonggi,37.43154,126.93587,residential,,,DC01
+ST05786,North Gyeongsang,35.8203,128.75166,mixed,,,DC10
+ST05788,North Gyeongsang,36.56899,128.74983,residential,,,DC10
+ST05802,Gyeonggi,37.36189,126.97983,residential,,,DC01
+ST05806,Gangwon,37.84346,127.6738,mixed,,,DC04
+ST05812,Gyeonggi,37.40462,126.91124,residential,2026-08-12,,DC01
+ST05813,Gyeonggi,37.75064,126.79023,roadside,,,DC02
+ST05814,Gyeonggi,37.68047,126.83079,residential,,,DC02
+ST05819,Gyeonggi,37.72231,126.79964,residential,,,DC02
+ST05823,Daejeon,36.32687,127.37857,residential,,,DC06
+ST05825,Gyeonggi,37.47573,126.82126,mixed,,,DC02
+ST05835,South Gyeongsang,35.203,128.8712,residential,,,DC11
+ST05838,Gyeonggi,37.66655,126.97511,residential,,,DC03
+ST05849,Gyeonggi,37.42873,127.11482,office,,,DC04
+ST05850,South Gyeongsang,35.286,129.10679,mixed,,,DC11
+ST05856,Gyeonggi,37.5093,127.00526,mixed,,2026-04-26,DC04
+ST05857,Gyeonggi,37.18447,127.10814,residential,,,DC01
+ST05864,Incheon,37.48187,126.68022,residential,,,DC02
+ST05873,Gyeonggi,37.58201,126.74846,roadside,,,DC02
+ST05875,Incheon,37.4305,126.71397,mixed,,,DC02
+ST05877,South Jeolla,34.99399,126.68183,residential,,,DC09
+ST05879,Gyeonggi,37.41826,126.98272,residential,,,DC01
+ST05882,South Jeolla,35.14095,126.85953,residential,,2025-12-05,DC09
+ST05884,North Jeolla,35.80026,127.09996,roadside,,,DC08
+ST05889,Daejeon,36.38907,127.41283,mixed,,,DC06
+ST05891,Gyeonggi,37.62832,126.67306,mixed,,,DC02
+ST05893,Gyeonggi,37.26662,127.14044,residential,,,DC01
+ST05897,Gyeonggi,37.51697,126.81881,residential,,,DC02
+ST05901,Ulsan,35.52029,129.2502,roadside,,,DC11
+ST05904,Gyeonggi,37.49982,126.79304,residential,,,DC02
+ST05912,North Gyeongsang,36.01964,129.35607,mixed,,,DC10
+ST05914,North Gyeongsang,35.93302,128.5901,roadside,,,DC10
+ST05917,Gyeonggi,37.6007,127.17444,mixed,,,DC04
+ST05918,Ulsan,35.54093,129.30529,mixed,,,DC11
+ST05919,Gyeonggi,37.23245,127.06147,residential,,,DC01
+ST05924,Gyeonggi,37.43793,126.97712,residential,,2026-06-03,DC04
+ST05925,Busan,35.1449,129.04266,mixed,,,DC11
+ST05929,North Gyeongsang,36.81403,128.66221,mixed,,,DC07
+ST05930,North Jeolla,35.78844,127.18412,mixed,,,DC08
+ST05934,Gyeonggi,37.50198,126.96347,mixed,,,DC04
+ST05937,Busan,35.16297,129.1058,office,,,DC11
+ST05939,South Jeolla,35.12587,126.86877,mixed,,,DC09
+ST05946,South Gyeongsang,35.2829,129.14772,mixed,,,DC11
+ST05951,Gyeonggi,37.56757,126.73099,residential,,2026-02-02,DC02
+ST05955,Gyeonggi,37.32168,127.08302,residential,,,DC01
+ST05958,Gyeonggi,37.47882,127.00104,residential,,,DC04
+ST05967,Gyeonggi,37.16824,126.926,mixed,,,DC01
+ST05969,Ulsan,35.4597,129.31698,residential,,,DC11
+ST05978,Gangwon,38.19973,128.59227,mixed,,,DC12
+ST05979,South Chungcheong,36.82431,127.09524,residential,,,DC05
+ST05981,Gyeonggi,37.58859,126.74611,residential,,,DC02
+ST05984,Gyeonggi,37.55734,127.18239,roadside,,,DC04
+ST05989,North Gyeongsang,35.82305,128.62172,mixed,,,DC10
+ST05990,South Jeolla,35.07784,126.83359,office,,,DC09
+ST05997,Gyeonggi,37.70606,127.05397,mixed,,,DC03
+ST06001,Gyeonggi,37.48285,126.79681,office,,,DC02
+ST06009,Gyeonggi,37.46918,126.8038,residential,,,DC02
+ST06016,Gyeonggi,37.43715,126.82876,residential,,,DC02
+ST06019,South Gyeongsang,35.37946,129.07599,residential,,,DC11
+ST06023,South Gyeongsang,35.24097,129.00241,residential,,,DC11
+ST06025,Busan,35.13174,129.11114,residential,,,DC11
+ST06029,Gyeonggi,37.60985,127.15108,mixed,,,DC04
+ST06035,North Gyeongsang,36.58037,128.71085,residential,,,DC10
+ST06039,Incheon,37.48672,126.64265,residential,,,DC02
+ST06046,Gyeonggi,37.59809,126.84942,residential,,,DC02
+ST06051,Gyeonggi,37.41516,126.8337,residential,,,DC02
+ST06052,Gyeonggi,37.70858,126.97196,residential,,,DC03
+ST06058,North Gyeongsang,35.9236,128.57002,residential,,,DC10
+ST06060,South Gyeongsang,35.26218,128.93933,residential,,,DC11
+ST06063,Gyeonggi,37.60869,126.94484,mixed,,,DC03
+ST06069,South Gyeongsang,35.2728,129.01467,roadside,,,DC11
+ST06076,Gyeonggi,37.46039,126.96918,residential,,,DC04
+ST06085,Busan,35.1006,129.02442,residential,,,DC11
+ST06086,South Chungcheong,36.85664,127.10569,residential,,,DC05
+ST06088,South Gyeongsang,35.25517,128.84286,residential,,,DC11
+ST06089,North Chungcheong,36.85095,127.47604,residential,,,DC05
+ST06093,South Gyeongsang,35.20315,128.10851,residential,,,DC11
+ST06111,Gyeonggi,37.40663,126.78847,residential,,,DC02
+ST06113,Sejong,36.50934,127.22647,residential,,,DC06
+ST06114,Gyeonggi,37.60243,126.96134,office,,,DC03
+ST06116,Gyeonggi,37.45852,126.96808,mixed,,,DC04
+ST06120,North Jeolla,35.7536,127.14619,residential,,,DC08
+ST06124,Gangwon,38.23208,128.56377,residential,,,DC12
+ST06132,Gyeonggi,37.46542,126.84221,residential,,,DC02
+ST06136,North Gyeongsang,36.56985,128.72584,roadside,,,DC10
+ST06141,Gyeonggi,37.64095,126.84924,residential,2025-10-04,,DC02
+ST06162,Gyeonggi,37.23671,127.07371,residential,,,DC01
+ST06172,Gyeonggi,37.54678,127.02891,residential,,,DC04
+ST06174,Gyeonggi,37.72902,127.24984,residential,2025-12-10,,DC04
+ST06176,North Jeolla,35.94155,126.72343,residential,,,DC08
+ST06196,North Gyeongsang,35.97652,128.38619,residential,,,DC10
+ST06206,Gyeonggi,37.40322,127.25288,mixed,,,DC04
+ST06209,North Gyeongsang,35.81176,128.63822,mixed,,,DC10
+ST06213,North Jeolla,35.81428,127.11708,residential,,,DC08
+ST06222,Gyeonggi,37.60383,127.2322,residential,,,DC04
+ST06235,Gyeonggi,37.23755,127.02631,residential,,,DC01
+ST06243,Ulsan,35.55287,129.35357,residential,,,DC11
+ST06246,South Gyeongsang,34.9627,128.07649,mixed,,,DC11
+ST06255,Gyeonggi,37.61723,126.94849,residential,,,DC03
+ST06256,Gyeonggi,37.52791,127.0677,residential,,,DC04
+ST06271,Gyeonggi,37.26654,126.88836,residential,,,DC01
+ST06280,Gyeonggi,37.70909,126.98993,residential,,,DC03
+ST06283,Gyeonggi,37.66641,126.73307,residential,,2026-07-03,DC02
+ST06285,Gyeonggi,37.65162,127.08329,residential,,,DC04
+ST06286,North Jeolla,35.83845,126.91328,residential,,,DC08
+ST06293,South Gyeongsang,35.27963,128.73267,residential,,,DC11
+ST06300,Gyeonggi,37.53952,127.2566,residential,,,DC04
+ST06306,Daejeon,36.32736,127.37462,residential,,,DC06
+ST06308,Gyeonggi,37.46209,126.86736,residential,,,DC02
+ST06317,Gyeonggi,37.19116,126.8532,office,,,DC01
+ST06318,South Gyeongsang,35.50343,128.77512,residential,,,DC11
+ST06329,Gyeonggi,37.61881,127.0394,residential,,,DC04
+ST06337,Busan,35.12581,129.11945,residential,,,DC11
+ST06344,Gyeonggi,37.26346,127.46217,residential,,,DC01
+ST06353,Gyeonggi,37.6524,127.11493,residential,,,DC04
+ST06355,Gyeonggi,37.6968,127.0989,mixed,,,DC03
+ST06365,Ulsan,35.52287,129.26667,residential,,,DC11
+ST06369,North Jeolla,35.83249,127.20375,residential,,,DC08
+ST06373,Gangwon,38.17371,127.31272,residential,,,DC03
+ST06379,Gyeonggi,37.25414,127.22713,residential,,,DC01
+ST06381,Gyeonggi,37.51314,126.95495,mixed,,,DC04
+ST06384,Gangwon,37.78113,128.83221,residential,,,DC12
+ST06388,Gyeonggi,37.43918,127.25715,residential,,,DC04
+ST06390,Gyeonggi,37.57582,126.76134,roadside,,,DC02
+ST06396,South Gyeongsang,35.24858,128.73097,mixed,,2026-04-20,DC11
+ST06400,Gyeonggi,37.20745,127.22303,residential,,,DC01
+ST06407,Gyeonggi,37.56997,126.91348,office,,,DC02
+ST06411,Incheon,37.49139,126.71004,residential,,,DC02
+ST06419,South Chungcheong,36.86152,127.09318,roadside,,,DC05
+ST06420,Gyeonggi,37.2633,127.10621,mixed,,,DC01
+ST06434,North Chungcheong,36.65338,127.36715,mixed,2026-09-07,,DC06
+ST06436,Gyeonggi,37.33126,126.93029,residential,,,DC01
+ST06439,Incheon,37.4632,126.73464,office,,,DC02
+ST06441,South Gyeongsang,35.20374,128.65871,roadside,,2026-01-30,DC11
+ST06443,Busan,35.24163,129.09168,roadside,,,DC11
+ST06450,Gyeonggi,37.45233,126.983,mixed,,,DC04
+ST06451,South Gyeongsang,35.51579,128.76612,residential,,,DC11
+ST06452,North Gyeongsang,35.88633,128.64412,residential,,,DC10
+ST06460,Incheon,37.49972,126.6903,residential,,,DC02
+ST06462,Gyeonggi,37.59506,126.84528,residential,,,DC02
+ST06465,South Gyeongsang,35.3147,128.99943,residential,,,DC11
+ST06466,Gyeonggi,37.33776,126.99924,residential,,,DC01
+ST06469,Gyeonggi,36.99132,127.13536,residential,,,DC05
+ST06476,Gyeonggi,37.45699,127.08811,residential,,,DC04
+ST06477,Gyeonggi,37.16083,127.10132,residential,,,DC01
+ST06480,South Gyeongsang,35.29662,129.08225,office,,,DC11
+ST06483,Busan,35.17754,129.06555,office,,,DC11
+ST06484,Incheon,37.47666,126.70453,office,,,DC02
+ST06493,Incheon,37.52241,126.73102,roadside,,,DC02
+ST06496,Gyeonggi,37.45632,126.81083,residential,,,DC02
+ST06509,Busan,35.15374,129.03986,mixed,,,DC11
+ST06515,South Gyeongsang,35.26315,128.70387,residential,,,DC11
+ST06535,North Chungcheong,36.60747,127.4118,residential,,,DC06
+ST06537,South Jeolla,35.13486,126.96372,roadside,,,DC09
+ST06543,Gyeonggi,37.63565,126.79177,mixed,,,DC02
+ST06545,Busan,35.05102,128.99603,residential,,,DC11
+ST06561,Gyeonggi,37.23387,127.17678,office,,,DC01
+ST06564,Gyeonggi,37.54234,126.95738,residential,,,DC04
+ST06570,Gyeonggi,37.57759,127.02963,office,,,DC04
+ST06582,South Gyeongsang,35.19197,128.9654,residential,,,DC11
+ST06587,Incheon,37.4054,126.68044,mixed,,,DC02
+ST06590,Daejeon,36.33048,127.34198,residential,,,DC06
+ST06597,Gyeonggi,37.39374,127.12187,mixed,,,DC01
+ST06598,Gyeonggi,37.66038,126.99801,office,,,DC03
+ST06600,Incheon,37.49361,126.66429,residential,,,DC02
+ST06601,North Gyeongsang,35.8595,128.61177,residential,,,DC10
+ST06604,Gyeonggi,37.60313,127.13388,residential,,,DC04
+ST06608,Busan,35.17741,129.03917,residential,,,DC11
+ST06612,Gyeonggi,37.50609,126.81724,mixed,,,DC02
+ST06614,Daejeon,36.45959,127.34771,residential,,,DC06
+ST06616,Incheon,37.51519,126.67925,residential,,,DC02
+ST06617,South Gyeongsang,35.20832,128.63686,mixed,,,DC11
+ST06619,Gyeonggi,37.69552,126.97923,residential,,,DC03
+ST06620,South Gyeongsang,35.13519,128.1098,roadside,,,DC11
+ST06621,Gyeonggi,37.70775,127.00074,mixed,,2025-12-29,DC03
+ST06630,South Gyeongsang,35.13323,128.13958,roadside,,,DC11
+ST06637,North Gyeongsang,35.87782,128.64095,residential,2026-03-18,,DC10
+ST06646,Gyeonggi,37.61644,127.208,residential,2025-10-20,,DC04
+ST06647,North Gyeongsang,35.85744,128.75237,residential,,,DC10
+ST06648,Gyeonggi,37.2702,126.99383,mixed,,,DC01
+ST06654,Gyeonggi,37.49588,126.89331,residential,2025-11-02,,DC02
+ST06659,South Gyeongsang,35.20513,128.7201,residential,,,DC11
+ST06666,Gyeonggi,37.5883,126.64395,residential,,,DC02
+ST06674,North Jeolla,35.90584,126.75874,residential,,,DC08
+ST06682,Gyeonggi,37.69355,126.87027,residential,,,DC03
+ST06686,Gyeonggi,36.99447,127.08274,office,,,DC05
+ST06690,Gyeonggi,37.61711,127.19113,residential,,,DC04
+ST06693,South Jeolla,35.12914,126.89157,residential,,,DC09
+ST06702,Gyeonggi,37.12763,126.85015,residential,,,DC01
+ST06706,Gyeonggi,37.63806,127.22218,roadside,2026-08-12,,DC04
+ST06709,North Gyeongsang,35.82155,128.59798,office,,,DC10
+ST06712,Gyeonggi,37.18084,127.18607,residential,,,DC01
+ST06714,Gyeonggi,37.311,126.91333,residential,2025-12-20,,DC01
+ST06717,South Gyeongsang,35.24804,128.72184,office,,,DC11
+ST06718,Gyeonggi,37.54096,126.90032,mixed,,,DC02
+ST06719,Incheon,37.4477,126.74466,office,,,DC02
+ST06734,Ulsan,35.6011,129.27395,roadside,,,DC11
+ST06740,South Jeolla,34.9697,126.68124,residential,,,DC09
+ST06741,Gyeonggi,37.7663,127.00482,residential,,,DC03
+ST06753,South Chungcheong,36.29484,126.64629,residential,,,DC08
+ST06754,Gyeonggi,37.70687,126.96214,residential,,,DC03
+ST06758,Sejong,36.49625,127.15005,mixed,2026-07-29,,DC06
+ST06762,Busan,35.26468,129.093,mixed,,,DC11
+ST06768,Daejeon,36.4738,127.3144,residential,,,DC06
+ST06771,Gyeonggi,37.75353,127.08679,residential,,,DC03
+ST06772,Gyeonggi,37.44753,127.06166,mixed,,,DC04
+ST06778,Gyeonggi,37.69867,126.85625,residential,2025-12-11,,DC03
+ST06780,Gyeonggi,37.2065,126.9723,roadside,,,DC01
+ST06785,Gyeonggi,37.22122,127.04281,mixed,,,DC01
+ST06790,Busan,35.15917,129.08118,residential,,,DC11
+ST06792,North Gyeongsang,35.84282,128.6019,office,2025-10-28,,DC10
+ST06795,Gyeonggi,37.6707,126.70822,residential,2026-02-07,,DC02
+ST06796,Gangwon,37.90548,127.73638,residential,,,DC04
+ST06798,Ulsan,35.52965,129.34199,residential,,,DC11
+ST06811,Daejeon,36.34253,127.40528,office,,,DC06
+ST06813,Gyeonggi,37.65109,126.74696,residential,,,DC02
+ST06814,Gyeonggi,37.41846,127.01213,mixed,,,DC01
+ST06818,Incheon,37.40747,126.67142,residential,,,DC02
+ST06823,Gyeonggi,37.7221,127.0226,residential,,,DC03
+ST06824,Gangwon,37.74029,128.88557,residential,,,DC12
+ST06825,Gyeonggi,37.45274,127.26406,residential,,,DC04
+ST06829,Gyeonggi,37.3821,127.10224,residential,,,DC01
+ST06834,South Jeolla,35.11092,126.86644,residential,,,DC09
+ST06839,Gangwon,37.48189,129.11773,residential,,,DC12
+ST06852,Gyeonggi,37.65911,126.92675,residential,2026-01-04,,DC03
+ST06859,Gyeonggi,37.48225,127.03623,residential,,,DC04
+ST06915,North Gyeongsang,36.15264,128.09541,residential,,,DC10
+ST06918,North Jeolla,35.39387,127.42862,office,,,DC08
+ST06920,North Gyeongsang,35.82572,128.6914,office,,,DC10
+ST06923,North Gyeongsang,35.87404,128.6319,residential,,,DC10
+ST06925,Gyeonggi,37.58698,126.93832,residential,,,DC02
+ST06938,Gyeonggi,37.62062,126.84177,residential,,,DC02
+ST06958,Gyeonggi,37.58093,127.21056,mixed,,,DC04
+ST06966,North Gyeongsang,36.40818,128.13516,residential,,,DC10
+ST06970,Ulsan,35.55833,129.28381,residential,,,DC11
+ST06972,Daejeon,36.41859,127.28484,office,,,DC06
+ST06974,Gyeonggi,37.41763,126.99218,mixed,,,DC01
+ST06978,South Chungcheong,36.57137,126.64615,residential,,,DC05
+ST06987,Gyeonggi,37.29306,126.9692,residential,,,DC01
+ST06989,North Chungcheong,36.72564,127.50034,residential,,,DC05
+ST06991,South Jeolla,34.70718,127.63836,residential,,,DC09
+ST07002,North Jeolla,35.81375,126.87593,residential,,,DC08
+ST07005,Gyeonggi,37.63861,127.11469,mixed,,,DC04
+ST07009,Incheon,37.48009,126.67362,residential,,2025-11-26,DC02
+ST07012,Daejeon,36.30657,127.38027,roadside,,,DC06
+ST07014,Gyeonggi,37.38992,126.81857,residential,,,DC02
+ST07017,Gyeonggi,37.57391,126.8676,residential,,,DC02
+ST07022,Gyeonggi,37.17956,126.87907,residential,,,DC01
+ST07023,Gyeonggi,37.26837,127.42585,residential,,,DC01
+ST07027,South Chungcheong,36.76135,126.48219,residential,2026-04-11,,DC05
+ST07031,South Jeolla,35.1057,126.82469,residential,,,DC09
+ST07039,South Jeolla,35.01048,126.67743,residential,,,DC09
+ST07046,Gyeonggi,37.60906,127.10902,residential,,,DC04
+ST07049,Busan,35.2272,129.05189,residential,2026-06-08,,DC11
+ST07052,North Gyeongsang,36.14256,128.30012,mixed,,,DC10
+ST07053,Gyeonggi,37.41503,127.04366,mixed,,,DC01
+ST07057,Gyeonggi,37.33832,126.82545,mixed,,,DC01
+ST07059,Gyeonggi,37.6912,126.84698,residential,,,DC02
+ST07063,North Gyeongsang,35.84262,128.557,mixed,,,DC10
+ST07069,Gyeonggi,37.56507,126.97865,mixed,,,DC04
+ST07070,Gyeonggi,37.66481,126.87868,residential,,,DC02
+ST07072,Gangwon,37.33989,127.91603,residential,,,DC07
+ST07074,Gyeonggi,37.4658,126.92181,office,,,DC02
+ST07079,South Gyeongsang,35.34303,129.09254,residential,,,DC11
+ST07083,Gyeonggi,37.33838,126.82735,residential,,,DC01
+ST07086,Gyeonggi,37.35896,126.97409,mixed,,,DC01
+ST07087,Busan,35.24279,129.11204,roadside,,,DC11
+ST07098,South Chungcheong,36.77011,127.01219,residential,,,DC05
+ST07109,Busan,35.22767,129.09244,residential,,,DC11
+ST07110,Incheon,37.49539,126.65525,mixed,,,DC02
+ST07112,South Chungcheong,36.34418,127.28374,residential,,,DC06
+ST07115,Gyeonggi,37.58597,127.22513,mixed,,,DC04
+ST07117,South Jeolla,35.17265,126.90748,residential,,,DC09
+ST07122,Busan,35.18443,129.00783,mixed,,,DC11
+ST07124,Gyeonggi,37.39137,126.77108,residential,,,DC02
+ST07127,Gyeonggi,37.60807,127.11747,mixed,,,DC04
+ST07135,Gangwon,37.85372,127.7358,residential,,,DC04
+ST07136,Daejeon,36.3359,127.34486,office,,,DC06
+ST07142,South Jeolla,35.00028,126.69608,mixed,,,DC09
+ST07143,Gyeonggi,37.56788,126.97142,office,,,DC04
+ST07152,North Jeolla,35.93062,126.93668,residential,,,DC08
+ST07167,North Gyeongsang,36.05324,129.32718,residential,,,DC10
+ST07174,Gyeonggi,37.53896,127.27482,mixed,,,DC04
+ST07185,Gangwon,37.88456,127.74918,residential,,,DC04
+ST07191,Gyeonggi,37.67937,126.88527,residential,,,DC03
+ST07202,Gyeonggi,37.38389,126.97098,mixed,2026-03-02,,DC01
+ST07203,Gyeonggi,37.57128,127.0607,residential,,,DC04
+ST07206,Gyeonggi,37.5518,126.80841,residential,,,DC02
+ST07211,Gyeonggi,37.6041,127.00725,office,,,DC04
+ST07217,North Jeolla,35.92957,126.73786,residential,,,DC08
+ST07219,Gyeonggi,37.53537,126.94547,office,,,DC04
+ST07220,Gyeonggi,37.45982,127.17335,mixed,,,DC04
+ST07234,Gyeonggi,37.63686,127.20412,mixed,,,DC04
+ST07235,Incheon,37.46152,126.76895,mixed,,,DC02
+ST07239,Gyeonggi,37.72706,127.00415,mixed,,,DC03
+ST07252,Gyeonggi,37.54208,126.72177,residential,,,DC02
+ST07254,North Chungcheong,36.28488,127.57454,mixed,,,DC06
+ST07256,Gyeonggi,37.4371,126.99418,residential,,,DC04
+ST07259,Ulsan,35.48837,129.30568,residential,,,DC11
+ST07262,Gyeonggi,37.45632,127.02177,residential,,,DC04
+ST07265,Gyeonggi,37.30294,126.94501,residential,,,DC01
+ST07267,Gyeonggi,37.58898,126.76833,residential,,,DC02
+ST07270,South Gyeongsang,35.29834,129.08505,residential,,,DC11
+ST07275,Gyeonggi,37.64285,126.88435,residential,,,DC02
+ST07285,Busan,35.16767,129.00876,residential,,,DC11
+ST07300,Daejeon,36.37499,127.32569,residential,,,DC06
+ST07307,Gyeonggi,37.57663,126.77142,residential,,,DC02
+ST07308,Gyeonggi,37.23144,127.01336,mixed,,,DC01
+ST07314,Busan,35.25056,129.06518,residential,,,DC11
+ST07316,Gyeonggi,37.60723,126.6751,roadside,,,DC02
+ST07325,Gyeonggi,37.4212,127.27371,residential,,,DC04
+ST07327,South Chungcheong,36.3406,126.58739,residential,,,DC08
+ST07331,South Jeolla,34.9103,127.47969,residential,,,DC09
+ST07333,Gyeonggi,37.49803,126.80874,residential,,,DC02
+ST07341,South Gyeongsang,35.2172,128.65199,residential,,,DC11
+ST07343,Gyeonggi,37.57086,127.00758,residential,,,DC04
+ST07346,Sejong,36.53787,127.32264,roadside,,,DC06
+ST07353,Gyeonggi,37.23201,126.87204,residential,,,DC01
+ST07362,Gyeonggi,37.52035,126.77046,residential,,,DC02
+ST07369,Gangwon,37.31315,127.85303,residential,,,DC07
+ST07371,Gyeonggi,37.47456,127.01591,mixed,2025-11-12,,DC04
+ST07372,Gyeonggi,37.60353,127.06194,residential,,,DC04
+ST07376,South Chungcheong,36.15732,127.14953,residential,,,DC08
+ST07378,Busan,35.17616,129.11549,office,,,DC11
+ST07383,South Gyeongsang,35.15718,128.68296,mixed,,,DC11
+ST07404,Gyeonggi,37.58481,126.76747,residential,,,DC02
+ST07413,Gyeonggi,37.87735,127.27029,mixed,,,DC03
+ST07417,North Gyeongsang,35.86677,128.56572,office,,,DC10
+ST07428,Gyeonggi,37.36162,126.98454,mixed,,,DC01
+ST07429,North Chungcheong,36.61159,127.51258,residential,,,DC06
+ST07435,Busan,35.21426,129.06136,residential,,,DC11
+ST07442,South Gyeongsang,35.26813,128.93492,residential,,,DC11
+ST07443,Gyeonggi,37.32173,126.99299,residential,,,DC01
+ST07444,South Jeolla,34.95252,127.47331,residential,,,DC09
+ST07446,North Gyeongsang,35.99757,129.39074,residential,,,DC10
+ST07447,North Jeolla,35.84065,127.11119,residential,,,DC08
+ST07457,Ulsan,35.54414,129.26036,residential,,,DC11
+ST07461,Gyeonggi,37.69766,126.81768,mixed,,,DC02
+ST07463,Gangwon,37.71653,128.87469,residential,,2026-04-26,DC12
+ST07466,South Gyeongsang,35.18793,128.98331,residential,,,DC11
+ST07470,Gyeonggi,37.75467,127.01932,office,,,DC03
+ST07473,South Gyeongsang,35.19358,128.89856,mixed,,,DC11
+ST07474,South Jeolla,34.57468,126.57524,residential,,,DC09
+ST07476,Gyeonggi,37.37867,127.18904,residential,,,DC01
+ST07480,Gyeonggi,37.39106,126.81914,mixed,,,DC02
+ST07487,South Gyeongsang,35.2815,128.99602,mixed,,,DC11
+ST07488,North Chungcheong,36.61051,127.47239,residential,2025-11-13,,DC06
+ST07489,Incheon,37.4927,126.70615,residential,,,DC02
+ST07493,South Gyeongsang,35.2539,128.92885,roadside,,,DC11
+ST07502,Gyeonggi,37.61899,127.02113,mixed,,,DC04
+ST07504,North Jeolla,35.9459,126.72926,residential,,,DC08
+ST07514,Gyeonggi,37.55087,127.04914,mixed,,,DC04
+ST07518,Gyeonggi,37.25497,126.8858,mixed,,,DC01
+ST07529,Gyeonggi,37.70833,126.94853,residential,,,DC03
+ST07547,Busan,35.25807,129.1116,residential,,,DC11
+ST07549,Gyeonggi,37.1748,127.18804,residential,,,DC01
+ST07556,Gyeonggi,37.57672,126.95971,mixed,,,DC04
+ST07566,South Chungcheong,36.74615,126.48453,residential,,,DC05
+ST07583,South Chungcheong,36.76703,126.42729,mixed,,,DC05
+ST07588,Gangwon,37.49568,129.11423,residential,,,DC12
+ST07590,South Gyeongsang,35.28842,129.06589,mixed,,,DC11
+ST07607,South Jeolla,35.18253,126.82477,mixed,,,DC09
+ST07609,Gyeonggi,37.23403,126.83269,roadside,,,DC01
+ST07616,Gyeonggi,37.33068,127.60791,residential,,,DC07
+ST07617,Gangwon,37.85036,127.71423,residential,,,DC04
+ST07619,North Gyeongsang,36.58384,128.18369,mixed,,,DC10
+ST07621,South Jeolla,35.03735,126.66451,residential,,,DC09
+ST07627,Gyeonggi,37.21886,126.90398,residential,,,DC01
+ST07629,North Gyeongsang,35.90981,128.70998,residential,,,DC10
+ST07633,Gyeonggi,37.12833,127.07943,mixed,,,DC01
+ST07634,Busan,35.15188,129.03359,mixed,,,DC11
+ST07638,Gyeonggi,37.60129,127.17139,residential,,,DC04
+ST07639,Gyeonggi,37.5958,126.67519,mixed,,,DC02
+ST07647,Gyeonggi,37.56294,126.87091,residential,,,DC02
+ST07655,Gyeonggi,37.44266,126.98673,residential,,,DC04
+ST07662,Gyeonggi,37.40588,127.21994,residential,,,DC04
+ST07673,Gyeonggi,37.56842,126.76933,residential,,,DC02
+ST07681,South Gyeongsang,35.20213,128.08758,residential,,,DC11
+ST07688,Incheon,37.44313,126.7064,office,,,DC02
+ST07691,Ulsan,35.56886,129.31889,residential,,,DC11
+ST07692,Gyeonggi,37.37011,127.11604,mixed,2026-07-01,,DC01
+ST07700,South Gyeongsang,35.16351,128.68215,residential,,,DC11
+ST07706,Gyeonggi,37.27771,127.49883,residential,,,DC07
+ST07707,South Jeolla,35.1497,126.79551,residential,,,DC09
+ST07712,Gyeonggi,37.50815,126.84745,residential,,,DC02
+ST07715,Gyeonggi,37.72521,127.01716,residential,,,DC03
+ST07721,Gyeonggi,37.34527,126.79963,mixed,2026-05-23,,DC02
+ST07723,North Chungcheong,36.93971,127.7191,roadside,,,DC07
+ST07727,Gyeonggi,37.34086,126.72684,office,,,DC02
+ST07730,Ulsan,35.51264,129.28377,residential,,,DC11
+ST07749,South Gyeongsang,35.30776,129.01743,residential,,,DC11
+ST07750,Gyeonggi,37.23045,126.764,mixed,,,DC01
+ST07774,Gyeonggi,37.67658,127.13796,mixed,,,DC04
+ST07776,South Jeolla,34.775,127.72529,residential,,,DC09
+ST07781,North Gyeongsang,36.066,128.33991,residential,,,DC10
+ST07784,South Gyeongsang,35.51215,128.76272,residential,,,DC11
+ST07786,Gyeonggi,37.51502,126.80681,mixed,,,DC02
+ST07791,Gyeonggi,37.63712,127.19581,office,,,DC04
+ST07799,Gyeonggi,37.23218,127.04151,residential,,,DC01
+ST07811,Busan,35.22017,129.07909,residential,,,DC11
+ST07819,Gyeonggi,37.56905,127.2136,residential,,,DC04
+ST07823,Busan,35.15722,129.11051,mixed,,,DC11
+ST07825,South Jeolla,35.12168,126.79442,residential,,,DC09
+ST07827,Incheon,37.40017,126.73752,residential,,,DC02
+ST07831,North Jeolla,35.79638,126.87575,mixed,,,DC08
+ST07833,North Gyeongsang,36.42763,128.1484,office,,,DC10
+ST07838,Gyeonggi,37.26836,127.45692,mixed,,,DC01
+ST07846,Gyeonggi,37.45241,127.09622,roadside,,,DC04
+ST07854,South Jeolla,35.17139,126.93278,mixed,,,DC09
+ST07855,Gyeonggi,37.57569,126.84586,mixed,,,DC02
+ST07857,Gyeonggi,37.441,126.95245,roadside,,,DC04
+ST07867,North Gyeongsang,36.40259,128.17262,residential,,,DC10
+ST07868,Gyeonggi,37.46265,126.87122,residential,,,DC02
+ST07869,South Chungcheong,36.78649,126.93161,residential,,,DC05
+ST07878,Gangwon,37.37099,127.93355,residential,,,DC07
+ST07879,Incheon,37.41659,126.68913,roadside,,,DC02
+ST07880,Gyeonggi,37.18591,126.89762,residential,,,DC01
+ST07881,Busan,35.25141,129.07647,mixed,,,DC11
+ST07883,Gyeonggi,37.36048,127.01691,mixed,,,DC01
+ST07903,Gyeonggi,37.73508,126.77352,residential,,,DC02
+ST07904,Gyeonggi,37.69247,127.10747,mixed,,,DC03
+ST07908,Daejeon,36.28964,127.41202,residential,,,DC06
+ST07910,South Chungcheong,36.83171,127.13049,residential,,,DC05
+ST07912,Gyeonggi,37.17733,127.23115,residential,,,DC01
+ST07922,South Gyeongsang,35.27449,129.05177,mixed,,,DC11
+ST07926,Gyeonggi,37.62189,127.06815,residential,,,DC04
+ST07927,Gyeonggi,37.52819,126.95415,residential,,,DC04
+ST07934,Gyeonggi,37.36772,126.79012,office,,,DC02
+ST07935,Daejeon,36.40304,127.26564,residential,,2026-09-10,DC06
+ST07936,Gyeonggi,37.6694,126.90402,residential,,,DC03
+ST07939,Gyeonggi,37.66401,126.77299,residential,,,DC02
+ST07942,South Chungcheong,36.90971,126.64898,residential,,,DC05
+ST07943,North Gyeongsang,35.86022,128.54417,mixed,,,DC10
+ST07948,Gangwon,37.86115,127.73131,residential,,,DC04
+ST07954,Gyeonggi,37.47169,126.85003,residential,,,DC02
+ST07955,Busan,35.2422,129.03415,residential,,,DC11
+ST07964,Gyeonggi,37.6908,127.1677,residential,,,DC04
+ST07965,South Gyeongsang,35.42098,129.00993,residential,,,DC11
+ST07967,North Jeolla,35.84101,127.0783,residential,,,DC08
+ST07971,North Chungcheong,36.64466,127.4968,office,,,DC06
+ST07972,Gyeonggi,37.59228,126.94844,residential,,2026-09-03,DC02
+ST07973,Daejeon,36.36495,127.39825,office,,2026-09-05,DC06
+ST07977,Gyeonggi,37.66515,127.00033,residential,,,DC03
+ST07985,North Gyeongsang,35.85051,128.684,mixed,,,DC10
+ST07986,Gyeonggi,37.22929,126.9592,residential,,,DC01
+ST07990,Gyeonggi,37.22386,126.79741,residential,,,DC01
+ST07993,Gyeonggi,37.49269,127.00203,mixed,,,DC04
+ST08003,Gyeonggi,37.72948,126.88022,roadside,,,DC03
+ST08004,Gyeonggi,36.97236,127.13391,mixed,,,DC05
+ST08006,Gyeonggi,37.17745,127.1707,office,,,DC01
+ST08014,Gyeonggi,37.36229,126.74538,residential,,,DC02
+ST08015,Gyeonggi,37.31973,127.03384,residential,,,DC01
+ST08027,Gyeonggi,37.24114,127.13621,mixed,,,DC01
+ST08036,Gyeonggi,37.59681,127.14959,residential,,,DC04
+ST08037,Gyeonggi,37.27242,127.10344,residential,,,DC01
+ST08038,Gyeonggi,37.53214,127.12552,mixed,,,DC04
+ST08039,Daejeon,36.35231,127.33187,residential,,,DC06
+ST08046,Gangwon,37.80904,127.7026,residential,,,DC04
+ST08052,Gyeonggi,37.69399,126.88652,residential,,,DC03
+ST08054,South Gyeongsang,34.99366,128.06118,mixed,,,DC11
+ST08059,Gyeonggi,37.22916,127.08466,residential,,,DC01
+ST08063,South Jeolla,34.7201,127.7055,mixed,,,DC09
+ST08068,Gyeonggi,37.37192,127.20825,office,,,DC01
+ST08075,Gyeonggi,37.33892,126.81721,residential,,,DC01
+ST08078,South Gyeongsang,35.32648,129.09219,residential,,,DC11
+ST08079,Busan,35.17896,129.09521,office,,,DC11
+ST08085,Gyeonggi,37.55299,127.01629,residential,2025-11-30,,DC04
+ST08086,Gangwon,37.83913,127.74437,office,,,DC04
+ST08090,Gyeonggi,37.17356,127.12263,roadside,,,DC01
+ST08093,Gyeonggi,37.58122,127.06051,roadside,2026-01-09,,DC04
+ST08094,Ulsan,35.52402,129.3418,residential,,,DC11
+ST08099,North Gyeongsang,35.78514,128.58903,residential,,,DC10
+ST08100,South Jeolla,35.17778,126.79789,residential,,,DC09
+ST08125,North Gyeongsang,35.99618,129.30172,mixed,,,DC10
+ST08136,South Gyeongsang,35.22793,128.76767,residential,,,DC11
+ST08153,South Gyeongsang,34.88418,128.58404,residential,,,DC11
+ST08156,Gyeonggi,37.14858,127.0141,residential,,,DC01
+ST08168,Busan,35.1813,129.08891,office,,,DC11
+ST08178,Gangwon,37.76462,128.89242,residential,,,DC12
+ST08179,South Jeolla,34.58876,126.60426,mixed,,,DC09
+ST08204,Gyeonggi,37.54634,126.8272,residential,2026-04-22,,DC02
+ST08206,Gyeonggi,37.60675,126.72955,roadside,,,DC02
+ST08211,Gyeonggi,37.21054,126.74155,mixed,,,DC01
+ST08216,Busan,35.12032,128.9925,residential,,,DC11
+ST08219,Incheon,37.51066,126.6499,office,,2026-09-14,DC02
+ST08227,Daejeon,36.40766,127.46957,residential,,,DC06
+ST08230,Gangwon,37.6985,127.88179,residential,,,DC07
+ST08239,Gyeonggi,37.39277,126.85305,residential,,,DC02
+ST08244,Incheon,37.46987,126.76361,residential,,,DC02
+ST08246,Gyeonggi,37.59713,127.0223,mixed,,,DC04
+ST08252,Daejeon,36.39083,127.34963,residential,,,DC06
+ST08259,Gyeonggi,37.6141,126.88488,residential,,,DC02
+ST08260,Busan,35.18276,129.05288,office,,,DC11
+ST08269,South Gyeongsang,35.1401,128.11625,residential,,,DC11
+ST08271,North Chungcheong,36.66576,127.49027,residential,,,DC06
+ST08276,Gyeonggi,37.39173,127.00599,residential,,,DC01
+ST08277,Gyeonggi,36.95237,127.10152,residential,,,DC05
+ST08295,Gyeonggi,37.61583,127.1387,residential,,,DC04
+ST08297,South Jeolla,35.17806,126.97889,residential,,,DC09
+ST08301,Gyeonggi,37.00719,127.13707,residential,2026-08-24,,DC05
+ST08302,Gyeonggi,37.45825,127.07932,residential,,,DC04
+ST08307,Gyeonggi,37.69263,126.84328,mixed,,,DC02
+ST08308,South Jeolla,34.7631,127.64967,residential,,,DC09
+ST08309,Gyeonggi,37.6622,126.96137,residential,,,DC03
+ST08319,Gyeonggi,37.66511,126.85614,office,,,DC02
+ST08333,Gyeonggi,37.24935,127.14996,mixed,,,DC01
+ST08339,Gyeonggi,37.51082,127.12903,roadside,,,DC04
+ST08340,Gyeonggi,37.32404,126.75283,residential,,,DC02
+ST08342,Gyeonggi,37.69883,126.80576,residential,,,DC02
+ST08347,Gyeonggi,37.18558,126.94559,residential,,,DC01
+ST08351,Gyeonggi,37.47911,126.79019,residential,,,DC02
+ST08359,Gyeonggi,37.53704,127.22344,residential,,,DC04
+ST08360,North Gyeongsang,35.96621,128.57466,residential,,,DC10
+ST08364,Gangwon,37.31865,127.99065,mixed,,,DC07
+ST08366,Gyeonggi,37.75795,127.05582,residential,,,DC03
+ST08367,South Gyeongsang,35.24915,128.88737,mixed,,,DC11
+ST08372,Gyeonggi,37.57053,126.94152,office,2026-01-12,,DC02
+ST08373,Gyeonggi,37.53308,127.03875,residential,,,DC04
+ST08375,North Gyeongsang,36.10005,128.37656,office,,,DC10
+ST08377,Busan,35.12192,129.07856,mixed,,,DC11
+ST08378,South Gyeongsang,35.27576,128.48985,mixed,,,DC11
+ST08380,Gangwon,37.17734,128.99655,residential,,,DC12
+ST08384,South Chungcheong,36.38102,127.12736,roadside,,,DC06
+ST08386,North Gyeongsang,36.7751,128.56995,residential,,,DC10
+ST08396,Incheon,37.38181,126.72997,office,2025-10-30,,DC02
+ST08397,Gyeonggi,37.52483,126.77667,residential,,,DC02
+ST08398,South Gyeongsang,35.2687,128.87147,roadside,,,DC11
+ST08404,South Gyeongsang,35.28425,128.73997,residential,2026-08-14,,DC11
+ST08405,Gyeonggi,37.50569,127.24495,mixed,,,DC04
+ST08409,Gyeonggi,37.77154,127.00191,mixed,,,DC03
+ST08413,Gyeonggi,37.57384,126.99478,residential,,,DC04
+ST08418,Gangwon,37.31791,127.88657,roadside,2026-03-25,,DC07
+ST08420,Ulsan,35.57362,129.30672,mixed,,,DC11
+ST08422,Gyeonggi,37.79719,126.94789,residential,,,DC03
+ST08423,Gyeonggi,37.65794,127.02377,mixed,,,DC03
+ST08429,Gyeonggi,37.333,127.67555,residential,,,DC07
+ST08433,Daejeon,36.41768,127.41482,residential,,,DC06
+ST08453,Gyeonggi,37.33012,126.81584,residential,,2026-09-07,DC01
+ST08460,South Gyeongsang,35.20303,128.84494,residential,,,DC11
+ST08461,South Gyeongsang,35.15937,128.95838,residential,,,DC11
+ST08462,Gyeonggi,37.23509,127.15767,residential,,,DC01
+ST08468,South Gyeongsang,35.18953,128.56713,residential,,,DC11
+ST08470,Gyeonggi,37.34748,126.84902,mixed,,,DC01
+ST08472,Gyeonggi,37.59778,126.7388,residential,,,DC02
+ST08473,Gyeonggi,37.32027,127.38909,mixed,,,DC01
+ST08474,Gyeonggi,37.53275,127.00848,residential,,,DC04
+ST08475,Gyeonggi,37.60126,127.0773,mixed,,,DC04
+ST08483,Gyeonggi,37.71055,127.20183,residential,,,DC04
+ST08490,Gyeonggi,37.66126,127.22372,office,,,DC04
+ST08497,Gyeonggi,37.57761,127.17674,mixed,,,DC04
+ST08498,Daejeon,36.3661,127.3332,mixed,,,DC06
+ST08508,North Gyeongsang,35.84056,128.54584,residential,,,DC10
+ST08510,South Gyeongsang,35.26484,129.01301,residential,,,DC11
+ST08511,Gyeonggi,37.70902,127.04927,mixed,,,DC03
+ST08513,Gyeonggi,37.68458,126.86791,residential,,,DC03
+ST08514,Gyeonggi,37.58945,126.70815,residential,,2025-12-01,DC02
+ST08515,Gyeonggi,37.29021,126.87301,residential,,,DC01
+ST08518,Gyeonggi,37.1826,126.85933,residential,2026-05-17,,DC01
+ST08526,Gyeonggi,37.60393,126.90366,mixed,,,DC02
+ST08531,Gyeonggi,37.57364,126.8821,residential,,,DC02
+ST08534,Gyeonggi,37.45345,127.0329,residential,,,DC04
+ST08550,South Gyeongsang,35.31774,129.0504,mixed,,,DC11
+ST08551,Gyeonggi,37.5001,126.77799,residential,,,DC02
+ST08555,Gyeonggi,37.66502,127.09731,office,,,DC04
+ST08562,North Gyeongsang,36.07842,128.35857,residential,,,DC10
+ST08566,Gangwon,37.56008,129.1173,residential,,,DC12
+ST08572,Gyeonggi,37.65219,127.27135,residential,,,DC04
+ST08576,North Gyeongsang,35.86323,128.71125,residential,,,DC10
+ST08581,Gyeonggi,37.37091,126.94895,mixed,,,DC01
+ST08586,Gyeonggi,37.73098,127.0701,mixed,,,DC03
+ST08587,Gyeonggi,37.42409,127.15371,office,,,DC04
+ST08588,Gyeonggi,37.37637,126.97844,residential,,,DC01
+ST08592,Gangwon,37.50762,129.14062,residential,,,DC12
+ST08594,Gyeonggi,37.56689,127.00849,office,,,DC04
+ST08599,Gyeonggi,37.53173,126.75961,residential,,,DC02
+ST08605,North Gyeongsang,36.08766,128.32406,residential,,,DC10
+ST08612,Gyeonggi,37.32257,127.12043,residential,,,DC01
+ST08615,Gyeonggi,37.49641,126.92283,residential,,,DC02
+ST08627,Incheon,37.46871,126.67185,office,,,DC02
+ST08636,Gyeonggi,37.56192,126.94542,residential,,,DC02
+ST08642,North Jeolla,35.61243,126.8687,residential,,,DC08
+ST08643,Gyeonggi,37.4766,126.98179,roadside,,,DC04
+ST08645,North Jeolla,35.98004,126.73752,residential,,,DC08
+ST08648,Gyeonggi,37.55365,127.17538,residential,,,DC04
+ST08650,North Gyeongsang,35.84193,128.48404,mixed,,,DC10
+ST08674,Gyeonggi,37.67393,126.88077,office,,,DC03
+ST08681,Gyeonggi,37.69633,126.87297,residential,,,DC03
+ST08683,Gyeonggi,37.5692,127.06421,residential,2026-08-06,,DC04
+ST08684,Gyeonggi,37.28386,127.10347,residential,,,DC01
+ST08686,North Gyeongsang,35.89892,128.5622,mixed,,,DC10
+ST08688,Gyeonggi,37.59435,127.1601,residential,,,DC04
+ST08695,Gyeonggi,37.17962,126.9732,roadside,,,DC01
+ST08698,Gyeonggi,37.7166,126.96819,residential,,,DC03
+ST08703,South Gyeongsang,35.20499,128.67347,residential,,,DC11
+ST08713,Gyeonggi,37.74201,126.76994,residential,,,DC02
+ST08719,Gyeonggi,37.47298,126.99912,mixed,,,DC04
+ST08725,Gyeonggi,37.33383,127.06912,residential,,,DC01
+ST08726,Gangwon,37.74446,127.89121,mixed,,,DC07
+ST08735,Gyeonggi,37.70628,126.80224,residential,2026-07-04,,DC02
+ST08738,Gangwon,37.79657,128.91479,residential,,,DC12
+ST08739,Gyeonggi,37.32627,127.03241,residential,,,DC01
+ST08743,North Chungcheong,37.13582,128.17563,residential,2026-07-23,,DC07
+ST08745,North Gyeongsang,35.91076,128.6439,residential,,,DC10
+ST08755,Gyeonggi,37.56225,126.98376,office,,,DC04
+ST08763,South Jeolla,34.7513,127.6569,mixed,,,DC09
+ST08772,Gyeonggi,37.22058,126.76813,roadside,,,DC01
+ST08773,Gyeonggi,37.71759,126.95794,residential,,,DC03
+ST08778,North Gyeongsang,35.74602,128.65815,residential,2026-01-02,,DC10
+ST08780,Gyeonggi,37.48641,126.94134,residential,,,DC04
+ST08789,Gyeonggi,37.10191,127.07466,residential,,,DC01
+ST08800,South Gyeongsang,35.2154,128.69666,office,,,DC11
+ST08809,North Gyeongsang,35.91524,128.5811,mixed,,,DC10
+ST08821,Busan,35.21283,129.08919,office,,,DC11
+ST08822,South Chungcheong,36.83463,127.11484,mixed,,,DC05
+ST08831,Gyeonggi,37.67078,126.82466,roadside,,,DC02
+ST08834,Gyeonggi,37.37067,126.96192,residential,,,DC01
+ST08835,Gyeonggi,37.59712,127.19066,residential,,,DC04
+ST08842,North Gyeongsang,35.95263,128.51593,residential,,,DC10
+ST08849,Gyeonggi,37.5805,127.19716,mixed,,,DC04
+ST08856,Gyeonggi,37.24857,127.19754,mixed,,,DC01
+ST08860,Busan,35.1567,129.07888,mixed,,,DC11
+ST08869,Gyeonggi,37.61995,126.69856,residential,,,DC02
+ST08877,Gyeonggi,37.51839,126.98174,office,,,DC04
+ST08889,Daejeon,36.39708,127.34762,mixed,,,DC06
+ST08897,Gyeonggi,37.68313,126.85457,residential,,,DC02
+ST08909,North Gyeongsang,35.82028,128.67251,mixed,,,DC10
+ST08918,Gyeonggi,37.6972,126.74997,roadside,2026-08-11,,DC02
+ST08923,Gyeonggi,37.68164,126.88522,mixed,,,DC03
+ST08931,North Gyeongsang,35.84672,128.56214,mixed,,,DC10
+ST08938,Gyeonggi,37.71467,127.03931,residential,,,DC03
+ST08947,Ulsan,35.47066,129.3176,residential,,,DC11
+ST08950,South Gyeongsang,34.85024,128.61439,residential,,,DC11
+ST08952,Gyeonggi,37.74387,126.84401,residential,,,DC03
+ST08956,Gyeonggi,37.58289,127.13577,residential,,,DC04
+ST08961,Daejeon,36.32035,127.3691,office,,,DC06
+ST08973,North Jeolla,35.79239,126.85792,residential,,,DC08
+ST08978,Gyeonggi,37.63923,127.07066,residential,,,DC04
+ST08981,North Gyeongsang,35.83655,128.57931,residential,,,DC10
+ST08983,Daejeon,36.28082,127.428,residential,,,DC06
+ST08985,North Gyeongsang,35.84879,128.71966,residential,,,DC10
+ST08993,North Jeolla,35.85059,127.05283,residential,,,DC08
+ST09000,North Gyeongsang,36.74783,128.47787,roadside,,,DC10
+ST09004,South Jeolla,35.27766,127.46722,roadside,,,DC09
+ST09005,South Jeolla,35.24929,127.47878,roadside,,2026-06-12,DC09
+ST09013,South Gyeongsang,35.23858,127.98655,residential,,,DC11
+ST09014,South Chungcheong,36.62843,126.69289,roadside,,,DC05
+ST09021,Ulsan,35.38765,129.235,residential,,,DC11
+ST09023,North Gyeongsang,35.74638,128.17919,roadside,,,DC10
+ST09027,South Gyeongsang,35.57591,127.83797,roadside,,,DC10
+ST09030,North Chungcheong,36.94243,128.07507,roadside,,,DC07
+ST09031,North Chungcheong,36.92414,128.13878,residential,,,DC07
+ST09032,North Jeolla,35.89836,127.72306,roadside,,,DC08
+ST09041,South Jeolla,34.4418,127.49142,residential,,,DC09
+ST09045,North Gyeongsang,35.81425,128.98557,residential,,,DC10
+ST09055,South Chungcheong,36.94938,126.59991,roadside,,,DC05
+ST09057,Gangwon,37.11054,128.63954,residential,,,DC12
+ST09069,Gangwon,37.6474,128.00116,roadside,,,DC07
+ST09071,Gyeonggi,37.77409,126.32912,residential,,,DC02
+ST09075,North Gyeongsang,35.91114,128.99393,roadside,,,DC10
+ST09078,South Jeolla,34.90693,126.74617,roadside,,,DC09
+ST09079,Gangwon,37.47293,128.31781,residential,,,DC07
+ST09087,Daejeon,36.46937,127.31021,residential,,,DC06
+ST09088,Gangwon,37.83945,128.01358,residential,,,DC07
+ST09092,Gangwon,37.56832,127.985,roadside,,,DC07
+ST09106,Gangwon,37.48235,128.72727,residential,,,DC12
+ST09110,North Chungcheong,36.03022,127.72847,roadside,,,DC06
+ST09111,South Gyeongsang,35.32805,127.88925,roadside,,,DC11
+ST09116,North Gyeongsang,36.52317,127.86935,roadside,,,DC06
+ST09118,Gyeonggi,37.23865,126.10697,residential,,,DC02
+ST09130,Gyeonggi,37.22761,127.40637,residential,2025-10-16,,DC01
+ST09131,Gangwon,37.31325,129.06503,residential,,,DC12
+ST09132,North Jeolla,35.81091,127.71684,residential,2026-07-23,,DC08
+ST09137,Gangwon,38.23621,127.61398,residential,,,DC03
+ST09144,South Chungcheong,36.56595,126.70907,residential,,,DC05
+ST09146,North Gyeongsang,35.72101,129.22841,roadside,,,DC11
+ST09147,Gangwon,37.40095,129.15957,roadside,,,DC12
+ST09155,North Jeolla,35.44698,126.71097,residential,,,DC09
+ST09161,South Jeolla,34.65619,126.69161,roadside,,,DC09
+ST09171,North Jeolla,35.72257,127.02811,roadside,,,DC08
+ST09172,South Gyeongsang,35.12507,128.67078,roadside,,,DC11
+ST09176,North Gyeongsang,36.50488,129.03482,residential,,,DC10
+ST09178,South Chungcheong,36.1409,126.71775,residential,,,DC08
+ST09180,Gangwon,37.87672,128.79733,roadside,,,DC12
+ST09182,Gyeonggi,37.35602,127.31039,residential,,,DC01
+ST09198,Gangwon,37.23918,128.81235,roadside,,,DC12
+ST09211,Ulsan,35.37952,129.3109,roadside,,,DC11
+ST09214,North Gyeongsang,36.51898,128.68133,roadside,,,DC10
+ST09218,South Chungcheong,36.16402,127.26245,roadside,,,DC08
+ST09219,Gangwon,37.24465,127.76081,residential,,,DC07
+ST09223,South Gyeongsang,35.2064,129.1757,residential,,,DC11
+ST09227,Gyeonggi,37.4287,127.05416,residential,,,DC04
+ST09228,North Chungcheong,36.88723,127.83879,roadside,,,DC07
+ST09230,Gangwon,37.47978,129.04071,residential,,,DC12
+ST09232,Gangwon,37.54412,128.79358,residential,,,DC12
+ST09239,North Gyeongsang,36.50576,129.12004,roadside,,,DC10
+ST09242,Gangwon,37.21287,128.80978,residential,,,DC12
+ST09243,South Gyeongsang,35.4877,128.22323,residential,,,DC11
+ST09248,Gangwon,37.18294,128.67173,roadside,,,DC12
+ST09255,Gyeonggi,37.94029,127.37329,residential,,,DC03
+ST09256,Busan,35.09167,128.98113,residential,2026-04-30,,DC11
+ST09257,North Gyeongsang,35.63997,128.94569,roadside,,,DC11
+ST09258,South Jeolla,34.69858,127.56153,residential,,,DC09
+ST09259,Gangwon,37.16024,128.43313,roadside,,,DC07
+ST09260,South Jeolla,34.98877,126.64944,residential,,,DC09
+ST09262,North Jeolla,35.74341,127.59995,residential,,,DC08
+ST09272,South Chungcheong,36.12758,127.5326,roadside,,,DC06
+ST09276,Gyeonggi,37.18554,127.59095,residential,,,DC07
+ST09279,South Gyeongsang,35.74983,128.0989,residential,,,DC10
+ST09282,North Chungcheong,36.83873,127.51837,roadside,,,DC05
+ST09283,North Chungcheong,36.61138,127.70532,roadside,2026-03-09,,DC06
+ST09288,North Chungcheong,36.9181,128.15195,residential,2025-12-13,,DC07
+ST09289,North Chungcheong,37.11799,127.60911,residential,,,DC07
+ST09294,Incheon,37.39802,126.70111,residential,,,DC02
+ST09299,Gangwon,38.1803,127.42744,residential,,,DC03
+ST09303,Gyeonggi,37.74704,127.49415,roadside,,,DC04
+ST09305,Gangwon,38.14577,127.48668,residential,,,DC03
+ST09307,Gyeonggi,37.26823,126.57521,roadside,,,DC02
+ST09309,South Jeolla,35.1238,127.19344,roadside,,,DC09
+ST09311,Gyeonggi,37.64136,127.4638,roadside,,,DC04
+ST09326,South Jeolla,35.07686,126.79392,roadside,,,DC09
+ST09342,South Jeolla,34.81245,127.18208,residential,,,DC09
+ST09350,Gyeonggi,37.58505,126.70837,roadside,,,DC02
+ST09351,North Gyeongsang,36.63472,128.20431,roadside,,,DC10
+ST09353,Gangwon,38.09044,127.37276,roadside,,,DC03
+ST09356,North Jeolla,35.74106,127.43159,roadside,,,DC08
+ST09384,North Gyeongsang,36.2127,129.36567,roadside,,,DC10
+ST09387,Gyeonggi,37.37563,127.74392,residential,,,DC07
+ST09388,Gyeonggi,38.11622,126.90561,roadside,,,DC03
+ST09403,South Gyeongsang,35.28203,128.0714,roadside,,,DC11
+ST09410,North Gyeongsang,36.47884,128.10819,residential,,,DC10
+ST09412,Gangwon,36.95345,129.2998,roadside,,,DC12
+ST09414,Gyeonggi,37.67827,126.46714,residential,,,DC02
+ST09418,South Chungcheong,36.76506,126.99452,roadside,,,DC05
+ST09425,North Gyeongsang,35.62813,128.92713,roadside,,,DC11
+ST09431,North Gyeongsang,35.63384,128.3088,roadside,,,DC10
+ST09433,North Gyeongsang,35.64835,129.06127,residential,,,DC11
+ST09436,Gangwon,38.18952,127.75919,roadside,,,DC03
+ST09438,Gangwon,37.83254,128.29486,residential,,,DC12
+ST09441,Gangwon,37.61073,127.76567,roadside,,,DC07
+ST09448,Gyeonggi,37.7048,126.76622,residential,,,DC02
+ST09449,North Gyeongsang,36.50642,128.1043,residential,,,DC06
+ST09451,Gangwon,37.67459,128.99938,roadside,,,DC12
+ST09452,Gangwon,37.14235,128.49276,residential,,,DC07
+ST09463,Gangwon,37.64163,128.93442,residential,,,DC12
+ST09465,South Jeolla,34.73874,127.03016,residential,,,DC09
+ST09474,Gangwon,37.3063,128.63165,roadside,2026-06-17,,DC12
+ST09475,South Jeolla,34.5313,127.24536,roadside,,,DC09
+ST09483,North Jeolla,36.03152,126.8497,residential,,,DC08
+ST09487,South Jeolla,34.76485,127.22066,roadside,,,DC09
+ST09490,Gyeonggi,37.5539,127.34015,roadside,,,DC04
+ST09491,South Chungcheong,36.79054,126.3137,roadside,,,DC05
+ST09498,North Jeolla,35.96912,127.75278,roadside,,,DC08
+ST09505,South Gyeongsang,34.86317,127.89048,roadside,,,DC11
+ST09508,Gangwon,37.55418,128.2542,roadside,,,DC07
+ST09511,North Gyeongsang,36.62244,129.23703,roadside,,,DC10
+ST09519,North Jeolla,35.76277,127.73545,roadside,,,DC08
+ST09526,Gangwon,37.53147,128.15131,roadside,,,DC07
+ST09532,North Gyeongsang,36.57001,128.93993,residential,,,DC10
+ST09534,Gangwon,37.38973,128.40428,residential,,,DC07
+ST09536,North Chungcheong,36.97722,128.27686,roadside,,,DC07
+ST09538,Gangwon,37.69134,128.74841,residential,,2026-02-20,DC12
+ST09541,North Gyeongsang,35.573,128.7949,roadside,,,DC11
+ST09542,Gangwon,38.27646,127.46766,residential,,,DC03
+ST09543,South Gyeongsang,35.45712,127.75306,roadside,,,DC08
+ST09544,North Gyeongsang,36.63952,128.54931,residential,,,DC10
+ST09547,South Gyeongsang,35.67982,127.91903,residential,,,DC10
+ST09549,North Jeolla,36.05093,127.13331,residential,,,DC08
+ST09550,North Chungcheong,36.27828,127.79492,roadside,,,DC06
+ST09569,Gangwon,38.41236,128.34998,roadside,,,DC12
+ST09584,Gyeonggi,37.74418,127.47304,roadside,,,DC04
+ST09586,North Gyeongsang,36.21155,128.59646,roadside,2026-08-14,,DC10
+ST09598,Gyeonggi,37.07719,127.087,residential,,,DC01
+ST09599,Gangwon,37.76288,127.7462,roadside,,,DC07
+ST09605,North Gyeongsang,36.73888,129.03071,residential,,,DC10
+ST09606,South Gyeongsang,35.5194,128.53897,roadside,,,DC11
+ST09609,South Jeolla,34.89523,126.89404,residential,,2026-07-25,DC09
+ST09612,South Chungcheong,36.24826,127.30299,residential,,,DC06
+ST09619,North Gyeongsang,36.23803,128.69128,roadside,,,DC10
+ST09625,South Chungcheong,36.57805,126.97776,roadside,2026-02-06,,DC05
+ST09627,North Gyeongsang,36.38974,128.88151,roadside,,,DC10
+ST09641,South Gyeongsang,34.77197,127.9384,residential,,,DC11
+ST09642,Gyeonggi,37.9898,127.22676,residential,,,DC03
+ST09646,South Gyeongsang,35.39807,128.75994,residential,,,DC11
+ST09657,Gangwon,38.28095,127.32809,residential,2026-03-27,,DC03
+ST09664,South Jeolla,35.35821,127.08285,residential,,,DC09
+ST09675,South Chungcheong,36.08895,127.18523,residential,,,DC08
+ST09677,North Gyeongsang,36.44592,129.10529,roadside,,,DC10
+ST09686,North Jeolla,36.02367,127.11154,roadside,,,DC08
+ST09687,Gangwon,37.55616,127.72153,residential,,,DC07
+ST09711,Gangwon,38.25755,127.96151,residential,,,DC03
+ST09714,South Chungcheong,36.14097,126.60561,residential,,,DC08
+ST09719,Gangwon,37.92442,128.1072,roadside,,,DC12
+ST09723,North Gyeongsang,36.08264,128.17121,roadside,,,DC10
+ST09724,South Chungcheong,36.35882,126.81286,roadside,,,DC06
+ST09726,South Gyeongsang,35.46498,128.99384,roadside,,,DC11
+ST09727,Gangwon,38.00548,128.02047,roadside,,,DC07
+ST09732,Gangwon,37.82659,128.07149,roadside,,,DC07
+ST09733,Gangwon,37.68555,128.03185,residential,,,DC07
+ST09738,North Jeolla,35.59274,127.56206,roadside,,,DC08
+ST09742,North Gyeongsang,36.4369,128.34012,roadside,,,DC10
+ST09744,South Gyeongsang,35.65432,127.80717,residential,,,DC08
+ST09746,North Gyeongsang,36.53056,128.11319,roadside,,,DC06
+ST09748,Gyeonggi,37.81863,127.5601,residential,2026-06-11,,DC04
+ST09749,Gangwon,38.37909,128.43021,residential,,,DC12
+ST09754,Gyeonggi,37.45503,127.24353,residential,,,DC04
+ST09766,South Jeolla,34.59451,126.29756,roadside,,,DC09
+ST09771,Gyeonggi,38.04593,126.96692,residential,,,DC03
+ST09773,North Jeolla,35.59886,126.67934,roadside,,,DC09
+ST09774,North Chungcheong,36.74865,127.68868,residential,,,DC06
+ST09791,North Gyeongsang,36.69809,128.37964,residential,,,DC10
+ST09792,North Chungcheong,36.70044,127.48099,residential,,,DC06
+ST09798,Gangwon,38.07035,128.26963,roadside,,,DC12
+ST09799,South Chungcheong,36.72994,127.16336,residential,,,DC05
+ST09801,North Gyeongsang,35.87597,128.61357,roadside,,,DC10
+ST09802,Gyeonggi,37.10637,127.03581,roadside,,,DC01
+ST09808,North Jeolla,35.43844,127.62046,roadside,,,DC08
+ST09815,Gyeonggi,37.31479,126.82966,residential,,,DC01
+ST09824,North Gyeongsang,35.99746,128.47125,residential,,,DC10
+ST09828,North Chungcheong,37.03661,128.16442,roadside,,,DC07
+ST09830,South Jeolla,34.48547,126.26838,residential,,,DC09
+ST09831,South Gyeongsang,35.26906,128.56319,roadside,,,DC11
+ST09836,South Gyeongsang,35.2649,128.81272,roadside,,,DC11
+ST09845,North Chungcheong,36.31828,127.71217,residential,,,DC06
+ST09848,South Jeolla,35.02388,127.32197,residential,,,DC09
+ST09852,Gangwon,38.22415,127.06062,residential,,,DC03
+ST09863,Gangwon,37.49975,127.84217,residential,,,DC07
+ST09871,North Jeolla,35.96656,126.85071,roadside,,,DC08
+ST09877,North Gyeongsang,36.45528,128.46354,roadside,,,DC10
+ST09885,South Gyeongsang,35.80671,127.92229,roadside,,,DC10
+ST09888,South Gyeongsang,35.42635,127.69154,roadside,2025-10-07,,DC08
+ST09895,North Gyeongsang,36.38584,129.07018,roadside,,,DC10
+ST09896,Gangwon,37.28134,127.95175,roadside,,,DC07
+ST09899,South Jeolla,35.05594,127.50529,residential,,,DC09
+ST09903,Gangwon,37.98012,127.60107,residential,,,DC03
+ST09904,Gyeonggi,37.3608,126.70596,roadside,,,DC02
+ST09905,South Gyeongsang,35.45546,128.73815,residential,,,DC11
+ST09924,Gyeonggi,37.06249,126.90658,residential,,,DC01
+ST09930,South Gyeongsang,34.78544,127.88092,residential,,,DC11
+ST09936,Gangwon,37.22662,128.98897,residential,,,DC12
+ST09939,South Gyeongsang,35.3901,127.81652,roadside,,,DC08
+ST09940,Gyeonggi,37.25529,126.5624,roadside,,,DC02
+ST09947,South Chungcheong,36.48553,126.74815,roadside,,,DC05
+ST09948,North Gyeongsang,35.82432,128.3874,roadside,,,DC10
+ST09958,North Gyeongsang,36.14404,129.02062,roadside,,,DC10
+ST09965,North Jeolla,35.39629,127.43971,roadside,,,DC08
+ST09969,North Jeolla,35.80842,126.98144,residential,,,DC08
+ST09972,South Gyeongsang,35.24019,127.77241,residential,,,DC09
+ST09973,South Jeolla,35.3042,126.74084,residential,,,DC09
+ST09977,North Jeolla,35.69708,126.57792,roadside,,,DC08
+ST09980,Gangwon,37.8393,127.85701,residential,,,DC07
+ST09995,North Jeolla,35.93842,127.3641,residential,,,DC08
+ST09996,North Jeolla,35.46366,126.74051,residential,,,DC09
+ST09998,South Jeolla,34.37233,126.58051,roadside,2026-04-18,,DC09
+ST09999,South Jeolla,35.23866,126.79724,roadside,,,DC09
