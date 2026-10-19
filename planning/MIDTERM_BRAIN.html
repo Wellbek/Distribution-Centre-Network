@@ -3180,6 +3180,15 @@ This record feeds the header line &quot;LLM tools and use&quot; and Section 7 (L
 <td>Leg coverage measured on full territories (Yongin 1,071 stores, Wonju 325); timestamp decoded from the header's protobuf field and checked as plausible against the download</td>
 <td><code>planning/WORK_LOG.md</code>, D-039, D-040</td>
 </tr>
+<tr>
+<td>2026-10-19</td>
+<td>Coding: Kontur store locations, ferry filter, current network by p-median, cache rebuild</td>
+<td>none</td>
+<td>Wrote <code>code/prep/</code> (hexagons from the Kontur GeoPackage, ferry-free road filter, p-median for the current 12), rewrote the store sampler and the historical assignment, fixed the province lookup, rebuilt the road cache through the user's tunnel</td>
+<td>User accepted Kontur (Q3) and chose the p-median baseline</td>
+<td>Province shares against Kontur population; DC loads against 500-1,400; p-median rerun as a fixed-point check; leg coverage on all 12 territories</td>
+<td>D-041 to D-046, <code>planning/WORK_LOG.md</code></td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="appendix-d">D. Rolling record: decisions</h2><p>Every decision taken along the way: what we chose, what we rejected, why, and what changed because of it (&quot;we realised X was inefficient, so we did Y&quot;).
@@ -3559,6 +3568,60 @@ Larger decisions also get an architecture decision record (<code>ecc:architectur
 <td>Accepted (review after Kontur)</td>
 <td>Distances, balance table</td>
 </tr>
+<tr>
+<td>D-041</td>
+<td>2026-10-19</td>
+<td>Stores sampled in proportion to Kontur Population (South Korea 2023-11-01, H3 resolution 8, CC BY 4.0), jittered inside the hexagon; hexagons under 500 people are rural (15% of stores); nearest city and spread only drive the store types</td>
+<td>City clusters with a uniform 10% rural background (v0.1-v0.2); OSM convenience-store points</td>
+<td>User accepted Section 23 Q3; province shares now match population within half a point</td>
+<td>Accepted</td>
+<td><code>code/dcn/world.py</code>, <code>code/prep/build_hexes.py</code></td>
+</tr>
+<tr>
+<td>D-042</td>
+<td>2026-10-19</td>
+<td>Hexagons whose centre falls just outside the coarse Natural Earth outline take the nearest outline point's province when within 5 km; farther ones and any hexagon without a ferry-free road to Seoul (OSRM, <code>exclude=ferry</code>) are dropped; distances also exclude ferries</td>
+<td>Keep all hexagons; a higher-resolution outline</td>
+<td>The coarse outline lost 1.05 M coastal people (98% within 5 km); 760 hexagons (69,429 people, 0.14%) are ferry-only islands such as Ulleungdo, which a road fleet cannot serve [ASSUMPTION]</td>
+<td>Accepted</td>
+<td><code>code/prep/</code>, <code>code/osrm/build_cache.py</code></td>
+</tr>
+<tr>
+<td>D-043</td>
+<td>2026-10-19</td>
+<td>Province lookup tests the smallest provinces first</td>
+<td>Outer rings only, in file order</td>
+<td>We realised Seoul, Daegu and Gwangju stores were labelled Gyeonggi, North Gyeongsang and South Jeolla since v0.1 (outer rings ignore holes), which also marked Daegu stores as mountain-region; the coarse Gwangju outline still labels about 90 stores South Jeolla, which changes no number</td>
+<td>Accepted</td>
+<td><code>code/dcn/geo.py</code></td>
+</tr>
+<tr>
+<td>D-044</td>
+<td>2026-10-19</td>
+<td>The 12 current DCs are the sites a capacitated p-median on demand-weighted map distance picks from the 60 (500-1,400 stores each), found by exchange search from the old 12 on 5 km cells and checked on all stores; supersedes D-020, D-024 and D-028</td>
+<td>Hand placement; keep the old 12 with the LP forcing the bounds</td>
+<td>User choice; with population-based stores five old DCs exceeded 1,400 and five fell below 500 (Gangneung 125); a map planner's network is a strong, defensible baseline; Chilgok, Gimhae, Gangneung and Wanju were replaced by Gyeongsan, Busan Gangseo, Incheon Namdong and Iksan; mean demand-weighted map distance 22.8 km</td>
+<td>Accepted</td>
+<td><code>code/dcn/geo.py</code>, <code>code/prep/current_network.py</code>, baseline</td>
+</tr>
+<tr>
+<td>D-045</td>
+<td>2026-10-19</td>
+<td>Historical assignment = the planner's capacitated map-distance assignment for stores open before the history year; stores opened during it go to the nearest DC with room; never rebalanced</td>
+<td>Nearest DC at opening</td>
+<td>The nearest-DC rule broke the 1,400 cap; every current DC now holds 499-1,327 planning stores</td>
+<td>Accepted</td>
+<td><code>code/dcn/world.py</code></td>
+</tr>
+<tr>
+<td>D-046</td>
+<td>2026-10-19</td>
+<td>The transportation LP lives in <code>world.transport_lp</code> and serves both the history and E's assignment</td>
+<td>Two copies</td>
+<td>One implementation</td>
+<td>Accepted</td>
+<td><code>code/dcn/world.py</code>, <code>code/dcn/evaluate.py</code></td>
+</tr>
 </tbody>
 </table></div>
 <h2 id="appendix-e">E. Rolling record: work log</h2><p>Append-only, dated record of what was done by hand (commands run, machines used, problems hit, results), kept as the raw material for the executive summary and Section 7 of the definition.
@@ -3692,6 +3755,98 @@ Short-range model error is driven partly by the synthetic store points that sit 
 <li>Switch store generation to Kontur H3 population, then rerun <code>build_cache.py</code> (the server stays up on the Spark) and the leg-coverage check.</li>
 <li>Rerun the reduced and full pipelines on road distances; no v0.2 number survives (D-025).</li>
 <li>Balance-table check planned: all-pairs OSRM inside the top candidates' territories against the cache plus model.</li>
+</ul>
+<h3 id="store-locations-from-population-kontur-and-a-new-current-network">Store locations from population (Kontur) and a new current network</h3>
+<p><strong>Why.</strong>
+Stores clustered around a hand-made city list are not where people live; the plan (Section 23 Q3) chose population-weighted locations.</p>
+<p><strong>Inputs.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Population</td>
+<td>Kontur Population, South Korea, 2023-11-01, H3 resolution 8 (about 0.7 km² per hexagon), CC BY 4.0, from HDX; 74,200 hexagons, 51.8 M people</td>
+</tr>
+<tr>
+<td>Outline</td>
+<td>Natural Earth via geoBoundaries ADM1 (coarse: 3,966 points; the full-resolution file is the same)</td>
+</tr>
+<tr>
+<td>Output</td>
+<td><code>code/data/kontur_hexes.npz</code>: 71,015 hexagons, 51.1 M people</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Steps.</strong></p>
+<ol>
+<li><code>prep/build_hexes.py</code>: hexagon centres from the GeoPackage envelopes; Jeju excluded; coastal hexagons within 5 km of the coarse outline kept (they held 1.05 M people).</li>
+<li>Found and fixed an old bug: Seoul, Daegu and Gwangju stores had been labelled as the surrounding province since v0.1.</li>
+<li>User chose the p-median for the current network (the old 12 broke the 500-1,400 bounds: five above, five below, Gangneung only 125 stores).</li>
+<li>User restarted the OSRM server (<code>ssh spark docker start osrm</code>) and opened the tunnel; <code>prep/road_connected.py</code> dropped 760 ferry-only hexagons (69,429 people, mostly South Jeolla islands and Ulleungdo).</li>
+<li><code>prep/current_network.py</code> (capacitated p-median, exchange search): two passes until a fixed point.</li>
+<li><code>osrm/build_cache.py</code> rebuilt the cache for the new stores with ferries excluded (188 s).</li>
+</ol>
+<p><strong>Results.</strong></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Measure</th>
+<th>Before (city clusters)</th>
+<th>Now (Kontur)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Province shares vs population</td>
+<td>not checked</td>
+<td>within 0.5 points everywhere</td>
+</tr>
+<tr>
+<td>Current DCs within 500-1,400 stores</td>
+<td>7 of 12</td>
+<td>12 of 12 (499-1,327 planning stores)</td>
+</tr>
+<tr>
+<td>Snap distance store to road, median / 99th percentile</td>
+<td>57 m / 1.25 km</td>
+<td>27 m / 0.42 km</td>
+</tr>
+<tr>
+<td>Model test error 1-10 km, median (90th percentile)</td>
+<td>25% (58%)</td>
+<td>20% (44%)</td>
+</tr>
+<tr>
+<td>Model test error 50-250 km</td>
+<td>5% (14%)</td>
+<td>4% (12%)</td>
+</tr>
+<tr>
+<td>Route legs on OSRM values</td>
+<td>93% (2 territories)</td>
+<td>89-99% (all 12 territories)</td>
+</tr>
+<tr>
+<td>Route km on model values</td>
+<td>about 12%</td>
+<td>1.6-13%, about 5% overall</td>
+</tr>
+</tbody>
+</table></div>
+<p>New current network (north to south): Yangju, Gimpo, Hanam, Incheon Namdong, Wonju, Yongin, Cheonan, Daejeon, Iksan, Gyeongsan, Gwangju, Busan Gangseo.
+Replaced: Chilgok, Gimhae, Gangneung, Wanju (they stay candidate sites).</p>
+<p><strong>What it means.</strong>
+The baseline is now the network a planner with a map and the size rules would draw, so any saving must come from what that planner ignored: road distances, the noon window and the number of DCs.
+Without an east-coast DC (Gangwon has only 253 stores, below the 500 minimum), Wonju runs 157 routes for 499 stores, many of them single-store trips to the coast: the coverage-versus-minimum-size trade-off the search has to price.</p>
+<p><strong>Open.</strong></p>
+<ul>
+<li>Rerun the reduced and full pipelines on the new world (on the Spark).</li>
+<li>District labels for the <code>stores</code> table (the brief asks for province and district).</li>
 </ul>
 
 </article>

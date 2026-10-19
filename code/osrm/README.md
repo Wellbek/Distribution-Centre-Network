@@ -17,7 +17,7 @@ The file's `meta` holds the extract timestamp, engine, profile, snap statistics,
 ## Rebuild
 
 OSRM preprocessing needs about 4 GB of memory, so it runs on a larger machine (here the DGX Spark); the queries run from the laptop through an SSH tunnel.
-Engine `ghcr.io/project-osrm/osrm-backend:v6.0.0` (amd64 and arm64), default car profile, MLD.
+Engine `ghcr.io/project-osrm/osrm-backend:v6.0.0` (amd64 and arm64), default car profile with ferries excluded, MLD.
 
 On the Spark (prefix `docker` with `sudo` if needed), after copying the extract into `~/osrm-korea/`:
 

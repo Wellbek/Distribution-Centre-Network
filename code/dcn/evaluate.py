@@ -1,12 +1,10 @@
 """Connection: E(candidate) = DC fixed + owned fleet + day-weighted operating cost from the lower level."""
 import numpy as np
-from scipy import sparse
-from scipy.optimize import linprog
 
 from . import config as C
 from . import distances
 from . import routing
-from .world import planning_mask
+from .world import planning_mask, transport_lp
 
 
 def context(world, model):
@@ -39,12 +37,8 @@ def assign_lp(ctx, open_idx):
     n, k = ctx["n"], len(open_idx)
     if k * ctx["hi"] < n or k * ctx["lo"] > n:
         return None
-    c = reach_cost(ctx, open_idx).ravel()
-    A_eq = sparse.csr_matrix((np.ones(n * k), (np.repeat(np.arange(n), k), np.arange(n * k))), shape=(n, n * k))
-    A_cap = sparse.csr_matrix((np.ones(n * k), (np.tile(np.arange(k), n), np.arange(n * k))), shape=(k, n * k))
-    res = linprog(c, A_ub=sparse.vstack([A_cap, -A_cap]), b_ub=np.r_[np.full(k, ctx["hi"]), np.full(k, -ctx["lo"])],
-                  A_eq=A_eq, b_eq=np.ones(n), bounds=(0, 1), method="highs")
-    if res.status != 0:
+    res = transport_lp(reach_cost(ctx, open_idx), ctx["lo"], ctx["hi"])
+    if res is None:
         return None
     z = res.x.reshape(n, k)
     du = res.ineqlin.marginals

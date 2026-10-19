@@ -2,6 +2,8 @@
 from datetime import date
 
 import numpy as np
+from scipy import sparse
+from scipy.optimize import linprog
 
 from . import config as C
 from . import geo
@@ -10,45 +12,43 @@ TYPES = np.array(["residential", "office", "mixed", "roadside"])
 TYPE_LEVEL = np.array([1.00, 0.95, 1.05, 1.10])
 HIST_START = date(2025, 10, 1)
 HIST_DAYS = 365
+RURAL_HEX = 500                             # people per hexagon (about 700 per km2): 15% of stores are rural
 
 
-def _sample_points(n, rng, provinces):
-    # Cluster stores around cities by population; 10% rural background; keep points on land
-    names, _, lat0, lon0, pop = zip(*[(c[0], c[1], c[2], c[3], c[4]) for c in geo.CITIES])
-    lat0, lon0, pop = np.array(lat0), np.array(lon0), np.array(pop, float)
+def transport_lp(cost, lo, hi, size=None):
+    """Capacitated transportation LP (HiGHS): rows to columns, column loads (in row sizes) within [lo, hi]; None if infeasible."""
+    n, k = cost.shape
+    size = np.ones(n) if size is None else size
+    A_eq = sparse.csr_matrix((np.ones(n * k), (np.repeat(np.arange(n), k), np.arange(n * k))), shape=(n, n * k))
+    A_cap = sparse.csr_matrix((np.repeat(size, k), (np.tile(np.arange(k), n), np.arange(n * k))), shape=(k, n * k))
+    res = linprog(cost.ravel(), A_ub=sparse.vstack([A_cap, -A_cap]), b_ub=np.r_[np.full(k, hi), np.full(k, -lo)],
+                  A_eq=A_eq, b_eq=np.ones(n), bounds=(0, 1), method="highs")
+    return res if res.status == 0 else None
+
+
+def _sample_points(n, rng):
+    # Stores in proportion to population on Kontur H3 hexagons, jittered inside the hexagon (resolution 8, edge 0.46 km);
+    # the nearest city and the distance in units of its spread only drive the store types; sparse hexagons are rural
+    h = np.load(geo.DATA / "kontur_hexes.npz")
+    k = rng.choice(len(h["pop"]), size=n, p=h["pop"] / h["pop"].sum())
+    ang, rad = rng.uniform(0, 2 * np.pi, n), 0.4 * np.sqrt(rng.random(n))
+    lat = h["lat"][k] + rad * np.sin(ang) / 111.0
+    lon = h["lon"][k] + rad * np.cos(ang) / (111.0 * np.cos(np.radians(h["lat"][k])))
+    lat0, lon0, pop = (np.array([c[i] for c in geo.CITIES], float) for i in (2, 3, 4))
     sigma = 1.5 + 0.09 * np.sqrt(pop)
-    n_rural = int(0.10 * n)
-    out_lat, out_lon, out_city, out_r = [], [], [], []
-    need = n - n_rural
-    while need > 0:
-        k = rng.choice(len(pop), size=2 * need, p=pop / pop.sum())
-        dx, dy = rng.normal(size=(2, 2 * need)) * sigma[k]
-        la = lat0[k] + dy / 111.0
-        lo = lon0[k] + dx / (111.0 * np.cos(np.radians(lat0[k])))
-        prov = geo.province_of(lo, la, provinces)
-        ok = np.flatnonzero(prov != "")[:need]
-        out_lat += list(la[ok]); out_lon += list(lo[ok]); out_city += list(k[ok])
-        out_r += list(np.hypot(dx, dy)[ok] / sigma[k[ok]])
-        need -= len(ok)
-    need = n_rural
-    while need > 0:
-        la = rng.uniform(34.3, 38.6, 4 * need)
-        lo = rng.uniform(126.1, 129.6, 4 * need)
-        prov = geo.province_of(lo, la, provinces)
-        ok = np.flatnonzero(prov != "")[:need]
-        out_lat += list(la[ok]); out_lon += list(lo[ok]); out_city += [-1] * len(ok); out_r += [9.0] * len(ok)
-        need -= len(ok)
-    lat, lon = np.array(out_lat), np.array(out_lon)
-    return lat, lon, np.array(out_city), np.array(out_r), pop
+    d = geo.haversine(lat[:, None], lon[:, None], lat0[None], lon0[None])
+    city = d.argmin(1)
+    r = d[np.arange(n), city] / sigma[city]
+    city = np.where(h["pop"][k] < RURAL_HEX, -1, city)
+    return lat, lon, h["province"][k].astype(object), city, r, pop
 
 
 def make_world(fraction=1.0, seed=C.SEED):
     """Build all input tables of brief §2.5 for one seed; fraction thins stores nationwide."""
     rng = np.random.default_rng(seed)
     provinces = geo.load_land()
-    lat, lon, city, r, pop = _sample_points(C.FULL_STORES, rng, provinces)
+    lat, lon, prov, city, r, pop = _sample_points(C.FULL_STORES, rng)
     n = len(lat)
-    prov = geo.province_of(lon, lat, provinces)
 
     # Store types from location: office near big-city centres, roadside in the countryside
     u = rng.random(n)
@@ -92,10 +92,20 @@ def make_world(fraction=1.0, seed=C.SEED):
     stores["id"] = np.array([f"ST{i:05d}" for i in keep])
     stores["full"] = keep
 
-    # Historical assignment: nearest current DC by map distance at opening, never rebalanced
+    # Historical assignment: the network planner's capacitated assignment on demand-weighted map distance for the stores
+    # open before the history year; stores opened during it go to the nearest DC with room; never rebalanced
     dlat = np.array([d["lat"] for d in dcs]); dlon = np.array([d["lon"] for d in dcs])
     dm = geo.haversine(stores["lat"][:, None], stores["lon"][:, None], dlat[None, :], dlon[None, :])
-    stores["current_dc"] = dm.argmin(1)
+    lo, hi = round(C.MIN_STORES * fraction), round(C.MAX_STORES * fraction)
+    old = stores["opened"] < 0
+    res = transport_lp(stores["rate_true"][old, None] * dm[old], lo, hi)
+    cur = np.full(len(keep), -1)
+    cur[old] = res.x.reshape(old.sum(), -1).argmax(1)
+    load = np.bincount(cur[old], minlength=len(dcs))
+    for i in np.flatnonzero(~old)[np.argsort(stores["opened"][~old], kind="stable")]:
+        j = int(np.argmin(np.where(load < hi, dm[i], np.inf)))
+        cur[i] = j; load[j] += 1
+    stores["current_dc"] = cur
 
     return dict(
         seed=seed, fraction=fraction, stores=stores, dcs=dcs, sites=sites, provinces=provinces,

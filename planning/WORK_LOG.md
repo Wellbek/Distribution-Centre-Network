@@ -67,3 +67,49 @@ Short-range model error is driven partly by the synthetic store points that sit 
 - Switch store generation to Kontur H3 population, then rerun `build_cache.py` (the server stays up on the Spark) and the leg-coverage check.
 - Rerun the reduced and full pipelines on road distances; no v0.2 number survives (D-025).
 - Balance-table check planned: all-pairs OSRM inside the top candidates' territories against the cache plus model.
+
+### Store locations from population (Kontur) and a new current network
+
+**Why.**
+Stores clustered around a hand-made city list are not where people live; the plan (Section 23 Q3) chose population-weighted locations.
+
+**Inputs.**
+
+| Item | Value |
+|---|---|
+| Population | Kontur Population, South Korea, 2023-11-01, H3 resolution 8 (about 0.7 km² per hexagon), CC BY 4.0, from HDX; 74,200 hexagons, 51.8 M people |
+| Outline | Natural Earth via geoBoundaries ADM1 (coarse: 3,966 points; the full-resolution file is the same) |
+| Output | `code/data/kontur_hexes.npz`: 71,015 hexagons, 51.1 M people |
+
+**Steps.**
+
+1. `prep/build_hexes.py`: hexagon centres from the GeoPackage envelopes; Jeju excluded; coastal hexagons within 5 km of the coarse outline kept (they held 1.05 M people).
+2. Found and fixed an old bug: Seoul, Daegu and Gwangju stores had been labelled as the surrounding province since v0.1.
+3. User chose the p-median for the current network (the old 12 broke the 500-1,400 bounds: five above, five below, Gangneung only 125 stores).
+4. User restarted the OSRM server (`ssh spark docker start osrm`) and opened the tunnel; `prep/road_connected.py` dropped 760 ferry-only hexagons (69,429 people, mostly South Jeolla islands and Ulleungdo).
+5. `prep/current_network.py` (capacitated p-median, exchange search): two passes until a fixed point.
+6. `osrm/build_cache.py` rebuilt the cache for the new stores with ferries excluded (188 s).
+
+**Results.**
+
+| Measure | Before (city clusters) | Now (Kontur) |
+|---|---|---|
+| Province shares vs population | not checked | within 0.5 points everywhere |
+| Current DCs within 500-1,400 stores | 7 of 12 | 12 of 12 (499-1,327 planning stores) |
+| Snap distance store to road, median / 99th percentile | 57 m / 1.25 km | 27 m / 0.42 km |
+| Model test error 1-10 km, median (90th percentile) | 25% (58%) | 20% (44%) |
+| Model test error 50-250 km | 5% (14%) | 4% (12%) |
+| Route legs on OSRM values | 93% (2 territories) | 89-99% (all 12 territories) |
+| Route km on model values | about 12% | 1.6-13%, about 5% overall |
+
+New current network (north to south): Yangju, Gimpo, Hanam, Incheon Namdong, Wonju, Yongin, Cheonan, Daejeon, Iksan, Gyeongsan, Gwangju, Busan Gangseo.
+Replaced: Chilgok, Gimhae, Gangneung, Wanju (they stay candidate sites).
+
+**What it means.**
+The baseline is now the network a planner with a map and the size rules would draw, so any saving must come from what that planner ignored: road distances, the noon window and the number of DCs.
+Without an east-coast DC (Gangwon has only 253 stores, below the 500 minimum), Wonju runs 157 routes for 499 stores, many of them single-store trips to the coast: the coverage-versus-minimum-size trade-off the search has to price.
+
+**Open.**
+
+- Rerun the reduced and full pipelines on the new world (on the Spark).
+- District labels for the `stores` table (the brief asks for province and district).

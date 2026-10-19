@@ -26,6 +26,7 @@ Each run writes `results/<profile>/registry.json` (every reported number), the i
 | `dcn/geo.py` | Cities, current DCs, candidate sites, land mask, map distance |
 | `dcn/distances.py` | Road km: OSRM cache (`data/road_cache.npz`) and the calibrated model for uncached pairs |
 | `osrm/` | Rebuilds the road cache from a self-hosted OSRM server (not needed to run) |
+| `prep/` | One-off inputs (not needed to run): `build_hexes.py` (Kontur population hexagons), `road_connected.py` (drops hexagons without a road to the mainland), `current_network.py` (the 12 current DCs by capacitated p-median) |
 | `dcn/world.py` | Stores, types, rates, churn, historical assignment |
 | `dcn/demand.py` | Calendar, demand history, Poisson-Gamma with exposure, day sampler |
 | `dcn/routing.py` | Lower level: savings + 2-opt with load, stops, km, shift and noon deadline |
@@ -37,4 +38,4 @@ Each run writes `results/<profile>/registry.json` (every reported number), the i
 ## Known gaps of this version
 
 Until `data/road_cache.npz` exists (see `osrm/README.md`) distances fall back to map distance x 1.30 (x 1.45 in Gangwon and North Gyeongsang); the reduced run thins stores without aggregating stops; outcome tables, the G remedy, reversal sweeps and the balance-table checks are not in yet.
-Seed 437; Korea outline from Natural Earth via geoBoundaries (public domain).
+Seed 437; Korea outline from Natural Earth via geoBoundaries (public domain); store locations sampled from Kontur Population (South Korea, 2023-11-01, H3 resolution 8, CC BY 4.0); roads from OpenStreetMap contributors (ODbL) via OSRM.

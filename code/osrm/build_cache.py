@@ -24,7 +24,7 @@ N_CAL_SRC, N_CAL_DST = 400, 10
 def table(lat, lon):
     # Symmetric road km between all points (mean of both directions) plus the snap leg at each end; NaN if unroutable
     coords = ";".join(f"{b:.6f},{a:.6f}" for a, b in zip(lat, lon))
-    with urllib.request.urlopen(f"{URL}/table/v1/driving/{coords}?annotations=distance", timeout=600) as r:
+    with urllib.request.urlopen(f"{URL}/table/v1/driving/{coords}?annotations=distance&exclude=ferry", timeout=600) as r:
         res = json.load(r)
     d = np.array([[np.nan if x is None else x for x in row] for row in res["distances"]], float)
     snap = np.array([s["distance"] for s in res["sources"]])
@@ -100,7 +100,7 @@ def main():
     # Unroutable pairs (islands without a ferry, snapping failures) fall back to the model
     dsite_map = geo.haversine(lat[:, None], lon[:, None], slat[None], slon[None])
     dnn_map = geo.haversine(lat[:, None], lon[:, None], lat[nn], lon[nn])
-    meta = dict(source=PBF, data_version=EXTRACT, engine=IMAGE, profile="car (default car.lua), MLD, distances only",
+    meta = dict(source=PBF, data_version=EXTRACT, engine=IMAGE, profile="car (default car.lua), ferries excluded, MLD, distances only",
                 symmetric="mean of both directions plus the snap leg at each end", k_nn=K_NN,
                 unroutable=dict(site=int(np.isnan(site_km).sum()), nn=int(np.isnan(nn_km).sum()), calibration=int((~np.isfinite(road)).sum())),
                 snap_m=dict(median=round(float(np.median(snap)), 1), p99=round(float(np.quantile(snap, 0.99)), 1), max=round(float(snap.max()), 1)),

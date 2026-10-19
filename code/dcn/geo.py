@@ -61,7 +61,7 @@ CITIES = [
     ("Hadong", "South Gyeongsang", 35.0674, 127.7513, 43), ("Namhae", "South Gyeongsang", 34.8377, 127.8924, 41),
 ]
 
-# Current network: sites a chain grown over decades would hold (id, name, province, lat, lon, lease expiry)
+# Current network: the 12 sites a capacitated p-median on demand-weighted map distance picks (prep/current_network.py)
 CURRENT_DCS = [
     ("DC01", "Yongin Giheung", "Gyeonggi", 37.245, 127.130, "2027-03-31"),
     ("DC02", "Gimpo Gochon", "Gyeonggi", 37.600, 126.700, "2028-06-30"),
@@ -70,11 +70,11 @@ CURRENT_DCS = [
     ("DC05", "Cheonan Seobuk", "South Chungcheong", 36.860, 127.150, "2030-03-31"),
     ("DC06", "Daejeon Daedeok", "Daejeon", 36.420, 127.420, "2028-12-31"),
     ("DC07", "Wonju Munmak", "Gangwon", 37.320, 127.820, "2031-06-30"),
-    ("DC08", "Wanju Bongdong", "North Jeolla", 35.930, 127.170, "2029-03-31"),
+    ("DC08", "Iksan Wanggung", "North Jeolla", 35.960, 127.000, "2029-03-31"),
     ("DC09", "Gwangju Pyeongdong", "Gwangju", 35.140, 126.760, "2030-09-30"),
-    ("DC10", "Chilgok Waegwan", "North Gyeongsang", 35.990, 128.400, "2027-09-30"),
-    ("DC11", "Gimhae Hallim", "South Gyeongsang", 35.300, 128.810, "2031-03-31"),
-    ("DC12", "Gangneung Gujeong", "Gangwon", 37.720, 128.870, "2028-09-30"),
+    ("DC10", "Gyeongsan Jillyang", "North Gyeongsang", 35.860, 128.790, "2027-09-30"),
+    ("DC11", "Busan Gangseo", "Busan", 35.110, 128.900, "2031-03-31"),
+    ("DC12", "Incheon Namdong", "Incheon", 37.400, 126.700, "2028-09-30"),
 ]
 
 # Further leasable sites near motorway interchanges and logistics zones (id, name, province, lat, lon)
@@ -83,7 +83,7 @@ NEW_SITES = [
     ("S15", "Anseong Wongok", "Gyeonggi", 37.040, 127.180), ("S16", "Namyangju Jingeon", "Gyeonggi", 37.660, 127.180),
     ("S17", "Paju Munsan", "Gyeonggi", 37.850, 126.790), ("S18", "Siheung Banwol", "Gyeonggi", 37.330, 126.740),
     ("S19", "Gwangju-si Opo", "Gyeonggi", 37.360, 127.230), ("S20", "Osan Gajang", "Gyeonggi", 37.170, 127.040),
-    ("S21", "Icheon Majang", "Gyeonggi", 37.235, 127.390), ("S22", "Incheon Namdong", "Incheon", 37.400, 126.700),
+    ("S21", "Icheon Majang", "Gyeonggi", 37.235, 127.390), ("S22", "Gangneung Gujeong", "Gangwon", 37.720, 128.870),
     ("S23", "Chuncheon Toegye", "Gangwon", 37.850, 127.710), ("S24", "Ulsan Onsan", "Ulsan", 35.440, 129.300),
     ("S25", "Donghae Bukpyeong", "Gangwon", 37.500, 129.080), ("S26", "Chungju Daesowon", "North Chungcheong", 37.010, 127.880),
     ("S27", "Cheongju Osong", "North Chungcheong", 36.630, 127.330), ("S28", "Eumseong Daeso", "North Chungcheong", 36.960, 127.560),
@@ -91,17 +91,17 @@ NEW_SITES = [
     ("S31", "Sejong Bugang", "Sejong", 36.530, 127.250), ("S32", "Asan Tangjeong", "South Chungcheong", 36.790, 127.050),
     ("S33", "Dangjin Songak", "South Chungcheong", 36.900, 126.720), ("S34", "Seosan Daesan", "South Chungcheong", 36.780, 126.500),
     ("S35", "Nonsan Yeonmu", "South Chungcheong", 36.170, 127.100), ("S36", "Hongseong Galsan", "South Chungcheong", 36.620, 126.610),
-    ("S37", "Iksan Wanggung", "North Jeolla", 35.960, 127.000), ("S38", "Gunsan Okseo", "North Jeolla", 35.950, 126.700),
+    ("S37", "Wanju Bongdong", "North Jeolla", 35.930, 127.170), ("S38", "Gunsan Okseo", "North Jeolla", 35.950, 126.700),
     ("S39", "Jeongeup Buk", "North Jeolla", 35.600, 126.880), ("S40", "Namwon Ijin", "North Jeolla", 35.430, 127.410),
     ("S41", "Naju Bitgaram", "South Jeolla", 35.020, 126.780), ("S42", "Muan Iljo", "South Jeolla", 34.990, 126.470),
     ("S43", "Suncheon Haeryong", "South Jeolla", 34.950, 127.540), ("S44", "Gwangyang Port", "South Jeolla", 34.920, 127.700),
     ("S45", "Jinju Sabong", "South Gyeongsang", 35.170, 128.180), ("S46", "Changwon Jinyeong", "South Gyeongsang", 35.300, 128.720),
-    ("S47", "Yangsan Sangbuk", "South Gyeongsang", 35.390, 129.050), ("S48", "Busan Gangseo", "Busan", 35.110, 128.900),
+    ("S47", "Yangsan Sangbuk", "South Gyeongsang", 35.390, 129.050), ("S48", "Gimhae Hallim", "South Gyeongsang", 35.300, 128.810),
     ("S49", "Miryang Sangnam", "South Gyeongsang", 35.480, 128.760), ("S50", "Geochang Namha", "South Gyeongsang", 35.680, 127.940),
     ("S51", "Gyeongju Oedong", "North Gyeongsang", 35.750, 129.290), ("S52", "Pohang Yeongil", "North Gyeongsang", 36.000, 129.390),
     ("S53", "Gumi Sandong", "North Gyeongsang", 36.150, 128.430), ("S54", "Gimcheon Eomo", "North Gyeongsang", 36.120, 128.150),
     ("S55", "Andong Pungsan", "North Gyeongsang", 36.590, 128.580), ("S56", "Yeongcheon Geumho", "North Gyeongsang", 35.940, 128.880),
-    ("S57", "Gyeongsan Jillyang", "North Gyeongsang", 35.860, 128.790), ("S58", "Daegu Dalseong", "Daegu", 35.770, 128.470),
+    ("S57", "Chilgok Waegwan", "North Gyeongsang", 35.990, 128.400), ("S58", "Daegu Dalseong", "Daegu", 35.770, 128.470),
     ("S59", "Sangju Cheongni", "North Gyeongsang", 36.390, 128.180), ("S60", "Yeongju Munsu", "North Gyeongsang", 36.780, 128.600),
 ]
 
@@ -148,7 +148,9 @@ def in_ring(lon, lat, ring):
 def province_of(lon, lat, provinces):
     # Province name per point, "" when at sea
     out = np.full(lon.shape, "", dtype=object)
-    for name, rings in provinces:
+    # Smallest first: the outer rings of Gyeonggi, North Gyeongsang and South Jeolla also cover Seoul, Daegu and Gwangju
+    area = lambda rings: sum(abs(np.dot(r[:, 0], np.roll(r[:, 1], 1)) - np.dot(r[:, 1], np.roll(r[:, 0], 1))) for r in rings)
+    for name, rings in sorted(provinces, key=lambda pr: area(pr[1])):
         m = np.zeros(lon.shape, bool)
         for r in rings:
             m |= in_ring(lon, lat, r)
