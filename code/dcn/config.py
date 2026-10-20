@@ -48,7 +48,7 @@ BUDGET = 40
 RELAY_DAY = VEHICLE_MONTH / (365 / 12)      # one extra driver-day, priced like an owned vehicle-day
 RELAY_SWEEP = (0.0, RELAY_DAY, 550e3)       # reversal row: free, driver-day, spot rate
 REACH_KM, FAR_KM = 55.0, 125.0              # noon reach of a full route; 250 km round trip
-DEMO_PROFILE = "reduced"                    # only this profile rebuilds ../demo.html
+DEMO_PROFILE = "full"                    # only this profile rebuilds ../demo.html
 
 # Run profiles: fraction of stores kept (fixed cost and bounds scale with it)
 REDUCED = dict(name="reduced", fraction=0.2, pool_per_k=14)
