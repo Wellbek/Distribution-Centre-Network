@@ -1,4 +1,6 @@
 """Independent checks of a run's results registry and the engines: python verify.py (about a minute)."""
+import csv
+import gzip
 import itertools
 import json
 import re
@@ -16,7 +18,7 @@ from dcn import demand, evaluate, routing
 from dcn.world import make_world
 
 ROOT = Path(__file__).resolve().parent
-PROFILE = C.REDUCED
+PROFILE = C.FULL if C.DEMO_PROFILE == "full" else C.REDUCED
 REG = json.loads((ROOT / "results" / PROFILE["name"] / "registry.json").read_text())
 checks = []
 
@@ -77,6 +79,28 @@ check("assignment LP within bounds", loads.min() >= ctx["lo"] and loads.max() <=
 days2 = demand.sample_days(model, world, 2, C.SEED + 11, ctx["mask"])
 e1 = evaluate.evaluate(ctx, rec, days2)["total"]; e2 = evaluate.evaluate(ctx, rec, days2)["total"]
 check("deterministic evaluation", e1 == e2, f"{e1 / 1e6:,.3f} M twice")
+with evaluate.workers(2):
+    e3 = evaluate.evaluate(ctx, rec, days2)["total"]
+check("worker pool = one process", e3 == e1, f"{e3 / 1e6:,.3f} M with 2 workers")
+
+# Departure waves: every store once, no wave above the dock limit except the last
+j = int(rec[0]); idx = np.flatnonzero(a["site"] == j)
+wv = routing.solve_waves(routing.territory_matrix(ctx, j, idx), days2[0]["q"][idx], p, docks=4)
+per = {t: sum(r["depart"] == t for r in wv["routes"]) for t in C.WAVES}
+served = np.sort(np.concatenate([r["seq"] for r in wv["routes"]]))
+check("departure waves", np.array_equal(served, np.arange(len(idx))) and all(per[t] <= 4 for t in C.WAVES[:-1]),
+      f"{len(idx)} stores once; departures per wave {list(per.values())} with 4 docks")
+
+# Outcome tables against the run's summary
+tab = ROOT / "results" / PROFILE["name"] / "tables"
+with gzip.open(tab / "vehicle_days.csv.gz", "rt") as f:
+    vd = list(csv.DictReader(f))
+with gzip.open(tab / "deliveries.csv.gz", "rt") as f:
+    n_del = sum(1 for _ in f) - 1
+ho = REG["history_ops"]
+km_day = sum(float(r["km_driven"]) for r in vd) / ho["days"]
+check("outcome tables", n_del == ho["deliveries"] == int((hist["y"] >= 0).sum()) and abs(km_day - ho["km_day"]) / ho["km_day"] < 1e-3,
+      f"{n_del:,} deliveries = open store-days; {len(vd):,} vehicle-days, {km_day:,.0f} km/day")
 
 # Heuristic accuracy against exact set partitioning on small instances
 rng = np.random.default_rng(7)

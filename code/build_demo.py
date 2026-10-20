@@ -1,5 +1,4 @@
 """Embed a run's results registry, formulas and verification into ../demo.html: python build_demo.py"""
-import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent

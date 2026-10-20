@@ -12,7 +12,7 @@ import numpy as np
 import scipy
 
 from . import config as C
-from . import demand, distances, evaluate, search
+from . import demand, distances, evaluate, routing, search
 from .world import HIST_DAYS, TYPES, make_world
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,14 +45,14 @@ def _spearman(a, b):
 
 def _summary(e):
     keys = ["k", "open", "total", "fixed", "fleet", "fuel", "spot", "penalty", "relay", "owned", "loads", "census",
-            "over_limit_day", "vehicles_day", "km_day", "service_min", "ok98", "lp_frac", "price_hi", "price_lo"]
+            "over_limit_day", "vehicles_day", "dock_over_day", "km_day", "service_min", "ok98", "lp_frac", "price_hi", "price_lo"]
     out = {k: e[k] for k in keys if k in e}
     out["service_mean"] = float(np.average(e["service"], weights=e["w"]))
     return out
 
 
 def write_tables(world, model, hist, out):
-    # Input tables of brief §2.5 (outcome tables follow in the next version)
+    # Input tables of brief §2.5
     st, sites = world["stores"], world["sites"]
     out.mkdir(parents=True, exist_ok=True)
     start = demand.HIST_START
@@ -62,7 +62,7 @@ def write_tables(world, model, hist, out):
         for i in range(len(st["id"])):
             op = (start + demand.timedelta(int(st["opened"][i]))).isoformat() if st["opened"][i] >= 0 else ""
             cl = (start + demand.timedelta(int(st["closed"][i]))).isoformat() if st["closed"][i] < HIST_DAYS else ""
-            w.writerow([st["id"][i], st["province"][i], round(st["lat"][i], 5), round(st["lon"][i], 5), TYPES[st["type"][i]], op, cl, world["dcs"][st["current_dc"][i]]["id"]])
+            w.writerow([st["id"][i], f"{st['province'][i]}, {st['district'][i]}", round(st["lat"][i], 5), round(st["lon"][i], 5), TYPES[st["type"][i]], op, cl, world["dcs"][st["current_dc"][i]]["id"]])
     with open(out / "dcs.csv", "w", newline="") as f:
         w = csv.writer(f); w.writerow(["dc_id", "lat", "lon", "lease_expires_on", "monthly_fixed_cost", "max_stores", "min_stores"])
         for d in world["dcs"]:
@@ -85,7 +85,63 @@ def write_tables(world, model, hist, out):
                 w.writerow([st["id"][i], hist["cal"]["date"][t], int(y[i, t])])
 
 
+def _hhmm(h):
+    m = int(round(h * 60))
+    return f"{m // 60:02d}:{m % 60:02d}"
+
+
+def write_outcomes(world, hist, out):
+    """Outcome tables of brief §2.5: the lower level run on the current network over the 365 history days."""
+    st, sites = world["stores"], world["sites"]
+    cur = [i for i, s in enumerate(sites) if s["current"]]
+    slat = np.array([s["lat"] for s in sites]); slon = np.array([s["lon"] for s in sites])
+    dsite = distances.site_km(st["full"], st["lat"], st["lon"], st["mountain"], slat, slon)
+    y, dates = hist["y"], hist["cal"]["date"]
+    p = routing.Params()
+    jobs, terr = [], []
+    for c, j in enumerate(cur):
+        idx = np.flatnonzero(st["current_dc"] == c)
+        days = []
+        for t in range(len(dates)):
+            sel = np.flatnonzero(y[idx, t] >= 0)
+            days.append((sel, y[idx[sel], t].astype(float)))
+        jobs.append(((dsite[idx, j], st["full"][idx], st["lat"][idx], st["lon"][idx], st["mountain"][idx]), days, p, None))
+        terr.append(idx)
+    res = evaluate.territories(jobs)
+    V = np.array([[r["vehicles"] for r in rs] for rs in res])
+    owned = np.ceil(np.quantile(V, C.FLEET_Q, axis=1, method="inverted_cdf")).astype(int)
+    on = tot = 0
+    with gzip.open(out / "deliveries.csv.gz", "wt", newline="") as fd, gzip.open(out / "vehicle_days.csv.gz", "wt", newline="") as fv, \
+            open(out / "spot_hires.csv", "w", newline="") as fs:
+        wd, wv, ws = csv.writer(fd), csv.writer(fv), csv.writer(fs)
+        wd.writerow(["store_id", "date", "cages_delivered", "delivered_at", "vehicle_id"])
+        wv.writerow(["vehicle_id", "dc_id", "date", "km_driven", "stops", "departed_at", "returned_at"])
+        ws.writerow(["dc_id", "date", "trucks_hired", "cost"])
+        for t, date in enumerate(dates):
+            for c, j in enumerate(cur):
+                dc, idx = world["dcs"][c]["id"], terr[c]
+                sel, q = jobs[c][1][t]
+                for n, rr in enumerate(res[c][t]["routes"]):
+                    vid = f"{dc}-V{n + 1:03d}" if n < owned[c] else f"{dc}-S{n + 1 - owned[c]:02d}"
+                    for s, a in zip(rr["seq"], rr["arr"]):
+                        wd.writerow([st["id"][idx[sel[s]]], date, int(q[s]), _hhmm(a), vid])
+                    wv.writerow([vid, dc, date, round(rr["km"], 1), len(rr["seq"]), _hhmm(p.depart), _hhmm(rr["ret"])])
+                    ok = rr["binding"] != "violates limit"
+                    on += ok * int((np.array(rr["arr"]) <= p.deadline + 1e-9).sum()); tot += len(rr["seq"])
+                hired = max(int(V[c, t]) - int(owned[c]), 0)
+                ws.writerow([dc, date, hired, int(hired * C.SPOT_DAY)])
+    km = np.array([[r["km"] for r in rs] for rs in res])
+    spot = C.SPOT_DAY * np.maximum(V - owned[:, None], 0).sum(0)
+    return dict(days=len(dates), service=on / max(tot, 1), vehicles_day=float(V.sum(0).mean()), km_day=float(km.sum(0).mean()),
+                owned=int(owned.sum()), spot_month=float(C.DAYS_MONTH * spot.mean()), deliveries=int(tot))
+
+
 def run(profile):
+    with evaluate.workers():
+        return _run(profile)
+
+
+def _run(profile):
     t0 = time.time()
     seed = C.SEED
     clock = lambda msg: print(f"[{time.time() - t0:6.1f}s] {msg}", flush=True)
@@ -96,6 +152,8 @@ def run(profile):
     m = ctx["mask"]
     clock(f"world: {ctx['n']} planning stores, {len(world['sites'])} sites; prior strength {np.round(model['b0_type'], 2)}, kappa {model['kappa']:.1f}")
     write_tables(world, model, hist, RESULTS / profile["name"] / "tables")
+    hist_ops = write_outcomes(world, hist, RESULTS / profile["name"] / "tables")
+    clock(f"outcome tables: {hist_ops['days']} history days, service {hist_ops['service']:.4f}, {hist_ops['vehicles_day']:.0f} vehicles/day")
 
     d_search = demand.sample_days(model, world, C.SEARCH_DAYS, seed + 11, m)
     d_final = demand.sample_days(model, world, C.FINAL_DAYS, seed + 12, m)
@@ -176,6 +234,38 @@ def run(profile):
     reversal = [dict(relay=r, baseline=relay_total(fb, r), recommended=relay_total(fr, r),
                      k_star=pool[int(np.argmin([relay_total(cache[tuple(p["sites"])], r) if cache[tuple(p["sites"])]["ok98"] else np.inf for p in pool]))]["k"])
                 for r in C.RELAY_SWEEP]
+
+    sweep = [dict(k=k, **{x: cache[tuple(pool[best_k(k)]["sites"])][x] for x in ["total", "fixed", "fleet", "fuel", "spot", "penalty", "relay", "owned", "ok98", "service_min", "km_day", "vehicles_day"]},
+                  evals=sum(r["k"] == k for r in log_bo), origin=pool[best_k(k)]["origin"], cand=best_k(k)) for k in ks]
+
+    def k_star(rows, key="total", ok="ok98"):
+        good = [r for r in rows if r[ok]]
+        return min(good, key=lambda r: r[key])["k"] if good else None
+
+    # Check 1: departure waves, DOCKS vehicles per hour from 04:00 to 07:00, on the best candidate of every k
+    wave_rows = []
+    for s in sweep:
+        e = evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=C.DOCKS)
+        wave_rows.append(dict(k=s["k"], total=e["total"], total_plain=s["total"], ok98=e["ok98"] and e["dock_over_day"] == 0,
+                              service_min=e["service_min"], dock_over_day=e["dock_over_day"], vehicles_day=e["vehicles_day"],
+                              vehicles_plain=s["vehicles_day"]))
+    wb = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"], docks=C.DOCKS)
+    waves = dict(docks=C.DOCKS, waves=list(C.WAVES), rows=wave_rows, baseline=_summary(wb), baseline_plain=_summary(base),
+                 k_star_plain=k_star(sweep), k_star_waves=k_star(wave_rows))
+    clock(f"departure-wave check: k* {waves['k_star_plain']} -> {waves['k_star_waves']}")
+
+    # Check 2: thinning, the reduced instance against this one (same stores, 1 in 5 kept); needs run_reduced.py first
+    thinning = None
+    other = RESULTS / "reduced" / "registry.json"
+    if profile["name"] != "reduced" and other.exists():
+        r = json.loads(other.read_text())
+        n_r = r["meta"]["stores_planning"]; by_k = {s["k"]: s for s in r["sweep"]}
+        rows = [dict(k=s["k"], full=s["total"] / ctx["n"], reduced=by_k[s["k"]]["total"] / n_r,
+                     km_full=s["km_day"] / ctx["n"], km_reduced=by_k[s["k"]].get("km_day", np.nan) / n_r) for s in sweep if s["k"] in by_k]
+        thinning = dict(fraction=r["meta"]["fraction"], stores_reduced=n_r, rows=rows, k_star_full=k_star(sweep),
+                        k_star_reduced=k_star(r["sweep"]), km_ratio_pred=float(np.sqrt(1 / r["meta"]["fraction"])),
+                        km_ratio_baseline=(r["finals"]["baseline"]["km_day"] / n_r) / (fb["km_day"] / ctx["n"]))
+        clock(f"thinning check: k* full {thinning['k_star_full']}, reduced {thinning['k_star_reduced']}")
 
     # Store-level view: who moves, who is farther, who is late
     st_b, st_r = np.array(fb["store_ontime"]), np.array(fr["store_ontime"])
@@ -265,8 +355,7 @@ def run(profile):
                    ok98=cache[tuple(p["sites"])]["ok98"]) for i, p in enumerate(pool)],
         feature_names=search.FEATURE_NAMES, top5=[dict(cand=i, k=pool[i]["k"], search_E=E_pool[i], final_E=top_final[i]["total"]) for i in top],
         log_bo=log_bo, log_random=log_rand, curve_bo=curve(log_bo), curve_random=curve(log_rand), random_band=band, pool_best=pool_best,
-        sweep=[dict(k=k, **{x: cache[tuple(pool[best_k(k)]["sites"])][x] for x in ["total", "fixed", "fleet", "fuel", "spot", "penalty", "relay", "owned", "ok98", "service_min"]},
-                    evals=sum(r["k"] == k for r in log_bo), origin=pool[best_k(k)]["origin"]) for k in ks],
+        sweep=sweep, waves=waves, thinning=thinning, history_ops=hist_ops,
         r2=dict(sampled=e_sampled["total"], expected_counts=e_mean["total"], average_day=e_avg["total"], peak_vehicles=float(np.sum(e_peak["V"])),
                 peak_spot_day=float(e_peak["spot"] / C.DAYS_MONTH), peak_service=float(e_peak["service"][0]), owned=fr["owned"], peak_date=d_peak["date"],
                 phi=model["phi"], sigma=model["sigma"], prior_strength=model["b0_type"].tolist(), kappa=model["kappa"], m_type=model["m_type"].tolist(),
