@@ -80,6 +80,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 22px 24px 60px; }
 .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .spread { justify-content: space-between; }
 .mapbox { position: relative; width: 100%; height: min(78vh, 760px); background: var(--sky); border-radius: 16px; overflow: hidden; touch-action: none; cursor: grab; }
+@media (max-width: 720px) { .mapbox { touch-action: pan-y; } .tabs button svg { display: none; } .tabs button { padding: 8px 11px; } .hero::after { display: none; } .card { overflow-x: auto; } .card svg.chart { min-width: 560px; } }
 .mapbox.small { height: 520px; }
 .mapbox canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mapctl { position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
@@ -130,7 +131,8 @@ svg text { font-family: "Noto Sans", system-ui, sans-serif; }
 .truckcard { margin-top: 10px; background: var(--lav); border-radius: 14px; padding: 10px 12px; font-size: 13px; display: none; }
 .bar { height: 8px; background: #eee; border-radius: 999px; overflow: hidden; } .bar i { display: block; height: 100%; background: var(--lime); }
 footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
-@media (max-width: 1560px) { .nav-right .pill.pre { display: none; } }
+[hidden] { display: none !important; }
+@media (max-width: 1200px) { .nav-right .pill.pre { display: none; } }
 @media (max-width: 1100px) { .g2, .lec, .hero { grid-template-columns: minmax(0, 1fr); } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: 1fr; } }
 @media (max-width: 720px) { .nav-in { flex-wrap: wrap; gap: 10px; padding: 8px 14px; } .tabs { order: 3; width: 100%; overflow-x: auto; } .nav-right { display: none; } main { padding: 14px; } .g2e { grid-template-columns: minmax(0, 1fr); } .hero h1 { font-size: 26px; } .mapbox { height: 62vh; } }
 @media (prefers-reduced-motion: reduce) { .view.on { animation: none; } }
@@ -179,7 +181,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
       <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">🚚 Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
         <input type="range" id="scrub" min="3.5" max="14" step="0.01" value="3.5" style="flex:1;min-width:160px" aria-label="time of day"><select id="speed" aria-label="speed"><option value="0.5">slow</option><option value="1" selected>normal</option><option value="2.5">fast</option></select></div>
       <div class="mapbox" id="daymap"></div>
-      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>relay (beyond 250 km or shift)</span><span>🚚 truck · lines are straight between stops (road geometry follows with OSRM)</span></div>
+      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span id="geom-note"></span></div>
     </div>
     <div class="grid" style="align-content:start">
       <div class="card"><div class="grid g2e" id="day-kpis"></div><div class="truckcard" id="truckcard"></div></div>
@@ -190,7 +192,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
         <div class="ctrl"><label for="lv-speed">Average speed (km/h)</label><output id="o-speed"></output><input type="range" id="lv-speed" min="25" max="50" step="1" value="35"></div>
         <div class="ctrl"><label for="lv-cap">Vehicle capacity (cages)</label><output id="o-cap"></output><input type="range" id="lv-cap" min="30" max="60" step="1" value="48"></div>
         <div class="ctrl"><label for="lv-stops">Max stops per vehicle</label><output id="o-stops"></output><input type="range" id="lv-stops" min="10" max="35" step="1" value="25"></div>
-        <div class="ctrl"><label for="lv-fleet">Vehicles available (owned + spot)</label><output id="o-fleet"></output><input type="range" id="lv-fleet" min="3" max="40" step="1" value="40"></div>
+        <div class="ctrl"><label for="lv-fleet">Vehicles available (owned + spot)</label><output id="o-fleet"></output><input type="range" id="lv-fleet" min="3" max="400" step="1" value="400"></div>
         <div class="row"><button class="btn" id="lv-solve">Solve and show on the map</button><button class="btn ghost small" id="lv-reset">Defaults</button></div>
         <div id="live-out" style="margin-top:10px"></div>
       </div>
@@ -227,10 +229,12 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 <script id="data" type="application/json">/*__DATA__*/null</script>
 <script id="math" type="application/json">/*__MATH__*/null</script>
 <script id="verifydata" type="application/json">/*__VERIFY__*/null</script>
+<script id="shapes" type="application/json">/*__SHAPES__*/null</script>
 <script>
 const R = JSON.parse(document.getElementById("data").textContent);
 const MATH = JSON.parse(document.getElementById("math").textContent);
 const VER = JSON.parse(document.getElementById("verifydata").textContent);
+const SHAPES = JSON.parse(document.getElementById("shapes").textContent);
 const P = R.params, S = R.stores, SITES = R.sites, M = R.meta;
 const $ = s => document.querySelector(s);
 const fM = v => (v / 1e6).toLocaleString("en-US", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
@@ -354,14 +358,14 @@ RENDER.answer = () => {
     $("#hero-p").textContent = `Kept: ${kept.map(j => SITES[j].name).join(", ") || "none"}. New: ${opened.map(j => SITES[j].name).join(", ")}. Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
   } else {
     $("#hero-h1").innerHTML = `Keep <em>today's ${b.k} DCs</em>: no redesign pays here`;
-    $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% interval of the saving ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Fewer DCs cost more because vehicles and relay drivers rise faster than fixed costs fall. Fictional world, placeholder road distances.`;
+    $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% interval of the saving ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
   }
   $("#hero-ask").innerHTML = pays ? `<b>Decision requested:</b> approve a data audit (real road times, 12 months of store orders, current routes) and a shadow run at two DCs before any lease is signed.`
     : `<b>Decision requested:</b> renew leases as they expire, redraw nothing yet, and fund a data audit (real road times, orders, routes); revisit if real distances move the sweep.`;
   $("#hero-stats").innerHTML = [
     ["Monthly cost", fM(r.total), "M KRW", `today ${fM(b.total)} M`],
-    ["Saving, 28 days", fM(sv.final_mean), "M", `90% ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}`],
-    ["Saving, held-out", fM(sv.held_mean), "M", `90% ${fM(sv.held_ci[0])} to ${fM(sv.held_ci[1])}`],
+    ["Saving per month", fM(sv.final_mean), "M KRW", `${(12 * sv.final_mean / 1e9).toFixed(1)} bn a year · 28 final days, 90% band ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])} (demand days only)`],
+    ["Saving, unseen days", fM(sv.held_mean), "M KRW", `${M.days[2]} held-out days, 90% band ${fM(sv.held_ci[0])} to ${fM(sv.held_ci[1])}`],
     ["On time before noon", pct(r.service_mean), "", `worst day ${pct(r.service_min)}; today ${pct(b.service_mean)}`],
   ].map(([l, v, u, n]) => `<div class="hstat"><div class="l">${l}</div><div class="v">${v}<small>${u}</small></div><div class="l">${n}</div></div>`).join("");
   if (!ANS) {
@@ -399,14 +403,14 @@ function niceTicks(lo, hi, n = 5) { const raw = (hi - lo) / n, mag = 10 ** Math.
 function waterfall() {
   const svg = $("#waterfall"); svg.innerHTML = "";
   const st = R.saving.waterfall.filter(Boolean), vals = st.map(s => s.total);
-  const lo = Math.min(...vals) * 0.9, hi = Math.max(...vals) * 1.03, Y = v => 210 - (v - lo) / (hi - lo) * 190, bw = 300 / st.length;
+  const lo = 0, hi = Math.max(...vals) * 1.08, Y = v => 210 - (v - lo) / (hi - lo) * 190, bw = 300 / st.length;
   for (const t of niceTicks(lo, hi, 4)) { el("line", { x1: 60, x2: 450, y1: Y(t), y2: Y(t), stroke: "#f0edf2" }, svg); el("text", { x: 54, y: Y(t) + 4, "text-anchor": "end", "font-size": 11, fill: "#63636b" }, svg, fM(t)); }
   st.forEach((s, i) => {
     const x = 70 + i * (380 / st.length), prev = i ? st[i - 1].total : null;
     const y0 = prev == null ? Y(s.total) : Math.min(Y(prev), Y(s.total)), h = prev == null ? 210 - Y(s.total) : Math.abs(Y(prev) - Y(s.total));
     const col = i === 0 ? "#9a9aa2" : s.total < prev ? "#9dc92a" : "#d23f3f";
     el("rect", { x, y: y0, width: 380 / st.length - 18, height: Math.max(h, 2), rx: 5, fill: i === st.length - 1 ? "#751485" : col }, svg);
-    el("text", { x: x + (380 / st.length - 18) / 2, y: y0 - 6, "text-anchor": "middle", "font-size": 11.5, "font-weight": 800, fill: "#1f1f24" }, svg, i === 0 ? fM(s.total) : (s.total < prev ? "−" : "+") + fM(Math.abs(s.total - prev)));
+    el("text", { x: x + (380 / st.length - 18) / 2, y: y0 - 6, "text-anchor": "middle", "font-size": 11.5, "font-weight": 800, fill: "#1f1f24" }, svg, i === 0 || i === st.length - 1 ? fM(s.total) : (s.total < prev ? "−" : "+") + fM(Math.abs(s.total - prev)));
     el("foreignObject", { x: x - 6, y: 214, width: 380 / st.length - 4, height: 36 }, svg).innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:10.5px;line-height:1.2;color:#4a4a52;text-align:center">${s.step}</div>`;
   });
 }
@@ -456,7 +460,12 @@ function buildDay() {
   const sh = R.show[`${DNET}_${DKIND}`], open = R.networks[DNET], routes = [];
   for (const blk of sh.routes) for (const r of blk.routes) {
     const dc = SITES[blk.dc];
-    routes.push({ dc: blk.dc, col: colorOf(blk.dc, open), pts: [[dc.lat, dc.lon], ...r.stores.map(i => [S.lat[i], S.lon[i]]), [dc.lat, dc.lon]], arr: r.arr, ret: r.ret, stores: r.stores, km: r.km, load: r.load, over: r.binding === "violates limit", binding: r.binding });
+    routes.push({ dc: blk.dc, col: colorOf(blk.dc, open), pts: [[dc.lat, dc.lon], ...r.stores.map(i => [S.lat[i], S.lon[i]]), [dc.lat, dc.lon]], arr: r.arr, ret: r.ret, stores: r.stores, km: r.km, load: r.load, over: r.binding === "violates limit", relay: r.binding === "relay", binding: r.binding });
+  }
+  for (const r of routes) {
+    const nodes = [`d${r.dc}`, ...r.stores.map(i => `s${i}`), `d${r.dc}`];
+    r.legs = nodes.slice(1).map((b, k) => legPath(nodes[k], b, r.pts[k], r.pts[k + 1]));
+    r.path = r.legs.flatMap((L, k) => (k ? L.p.slice(1) : L.p));
   }
   const arrOf = new Float64Array(S.lat.length).fill(NaN), routeOf = new Int32Array(S.lat.length).fill(-1);
   routes.forEach((r, k) => r.stores.forEach((s, q) => { arrOf[s] = r.arr[q]; routeOf[s] = k; }));
@@ -466,14 +475,36 @@ function truckPos(r, t) {
   if (t < P.depart || t > r.ret) return null;
   let prevT = P.depart;
   for (let k = 0; k < r.arr.length; k++) {
-    if (t < r.arr[k]) { const f = (t - prevT) / Math.max(r.arr[k] - prevT, 1e-6); return [lerp(r.pts[k], r.pts[k + 1], f), r.pts[k + 1][1] - r.pts[k][1], k]; }
+    if (t < r.arr[k]) { const f = (t - prevT) / Math.max(r.arr[k] - prevT, 1e-6); return [...along(r.legs[k], f), k]; }
     if (t < r.arr[k] + P.stop_h) return [r.pts[k + 1], r.pts[k + 1][1] - r.pts[k][1], k + 1];
     prevT = r.arr[k] + P.stop_h;
   }
   const n = r.pts.length, f = (t - prevT) / Math.max(r.ret - prevT, 1e-6);
-  return [lerp(r.pts[n - 2], r.pts[n - 1], f), r.pts[n - 1][1] - r.pts[n - 2][1], r.arr.length];
+  return [...along(r.legs[n - 2], f), r.arr.length];
 }
 const lerp = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+// Road geometry of a leg from OSRM (encoded polyline, precision 5); straight line when the shape set has no entry
+function decodePoly(str) {
+  const out = []; let i = 0, la = 0, lo = 0;
+  while (i < str.length) {
+    for (const k of [0, 1]) { let sh = 0, res = 0, b; do { b = str.charCodeAt(i++) - 63; res |= (b & 31) << sh; sh += 5; } while (b >= 32); const d = res & 1 ? ~(res >> 1) : res >> 1; if (k) lo += d; else la += d; }
+    out.push([la / 1e5, lo / 1e5]);
+  }
+  return out;
+}
+function legPath(a, b, pa, pb) {
+  const enc = SHAPES && SHAPES[`${a}>${b}`], p = enc ? decodePoly(enc) : [pa, pb];
+  if (enc) { p[0] = pa; p[p.length - 1] = pb; }
+  const c = [0];
+  for (let k = 1; k < p.length; k++) c.push(c[k - 1] + Math.hypot((p[k][0] - p[k - 1][0]), (p[k][1] - p[k - 1][1]) * KX));
+  return { p, c };
+}
+function along(L, f) {
+  const d = f * L.c[L.c.length - 1]; let k = 1;
+  while (k < L.c.length - 1 && L.c[k] < d) k++;
+  const seg = Math.max(L.c[k] - L.c[k - 1], 1e-12), g = Math.min(Math.max((d - L.c[k - 1]) / seg, 0), 1);
+  return [lerp(L.p[k - 1], L.p[k], g), L.p[k][1] - L.p[k - 1][1]];
+}
 RENDER.day = () => {
   if (!DM) {
     DM = new MapView($("#daymap"));
@@ -491,7 +522,7 @@ RENDER.day = () => {
   }
   resetDay();
 };
-function resetDay() { DAY = buildDay(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : "recommended network"} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
+function resetDay() { $("#geom-note").textContent = SHAPES ? "🚚 truck · roads from OSRM; a live solve draws straight lines" : "🚚 truck · straight lines between stops; costs use road km"; DAY = buildDay(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : "recommended network"} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
 function truckAt(x, y) {
   let best = -1, bd = 400;
   DAY.routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
@@ -510,8 +541,9 @@ function drawDay(m) {
   const c = m.ctx, routes = LIVE_ROUTES || DAY.routes;
   c.lineWidth = m.z > 4 ? 2 : 0.8;
   routes.forEach((r, k) => {
-    c.strokeStyle = r.over ? "#d23f3f88" : (k === FOLLOW && !LIVE_ROUTES ? r.col : r.col + "55"); if (k === FOLLOW && !LIVE_ROUTES) c.lineWidth = 3;
-    c.beginPath(); r.pts.forEach(([la, lo], i) => { const [x, y] = m.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.stroke(); c.lineWidth = m.z > 4 ? 2 : 0.8;
+    c.strokeStyle = r.over || r.relay ? "#d23f3f99" : (k === FOLLOW && !LIVE_ROUTES ? r.col : r.col + "55"); if (k === FOLLOW && !LIVE_ROUTES) c.lineWidth = 3;
+    c.setLineDash(r.relay ? [6, 4] : []);
+    c.beginPath(); (r.path || r.pts).forEach(([la, lo], i) => { const [x, y] = m.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.stroke(); c.lineWidth = m.z > 4 ? 2 : 0.8; c.setLineDash([]);
   });
   const sz = Math.min(1.6 + m.z * 0.45, 6);
   for (const r of routes) r.stores.forEach((s, q) => {
@@ -522,15 +554,15 @@ function drawDay(m) {
   });
   const open = LIVE_ROUTES ? [LIVE.dc] : DAY.open;
   for (const j of open) drawDC(c, m, SITES[j], colorOf(j, DAY.open), m.z > 2.5);
-  if (!LIVE_ROUTES) routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; drawTruck(c, x, y, p[1], Math.min(0.55 + m.z * 0.09, 1.6), r.over ? "#b02f2f" : "#751485", k === FOLLOW); });
+  if (!LIVE_ROUTES) routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; drawTruck(c, x, y, p[1], Math.min(0.55 + m.z * 0.09, 1.6), r.over || r.relay ? "#b02f2f" : "#751485", k === FOLLOW); });
   $("#clock").textContent = hhmm(Math.max(T, P.depart)); $("#scrub").value = T;
 }
 function kpisDay() {
   const s = DAY.summary; let done = 0, late = 0, total = 0, road = 0;
   for (let i = 0; i < S.lat.length; i++) { const a = DAY.arrOf[i]; if (isNaN(a)) continue; total++; if (T >= a) { done++; if (a > P.deadline) late++; } }
   DAY.routes.forEach(r => { if (truckPos(r, T)) road++; });
-  $("#day-kpis").innerHTML = [["Delivered", `${f0(done)}<small>/ ${f0(total)}</small>`, `${late} after 12:00`], ["Trucks on the road", road, `${DAY.routes.length} routes, ${DAY.routes.filter(r => r.over).length} need a relay`],
-    ["Kilometres this day", `${f0(s.km_day)}<small>km</small>`, `${s.vehicles_day.toFixed(0)} vehicles`], ["Monthly cost", `${fM(s.total)}<small>M</small>`, "fleet sized on the 28 final days"]]
+  $("#day-kpis").innerHTML = [["Delivered", `${f0(done)}<small>/ ${f0(total)}</small>`, `${late} after 12:00`], ["Trucks on the road", road, `${DAY.routes.length} routes, ${DAY.routes.filter(r => r.relay).length} with two drivers`],
+    ["Kilometres this day", `${f0(s.km_day)}<small>km</small>`, `${s.vehicles_day.toFixed(0)} vehicles`], ["Monthly cost at this day's volume", `${fM(s.total)}<small>M</small>`, "if every day were like this one; the answer tab uses 28 days"]]
     .map(([l, v, n]) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n}</div><span class="badge">precomputed</span></div>`).join("");
 }
 function tick(ts) {
@@ -549,18 +581,31 @@ $("#scrub").oninput = e => { T = +e.target.value; LIVE_ROUTES = null; DM.draw();
 const LIVE = R.live;
 function initLive() {
   LIVE.days.forEach((d, i) => $("#lv-day").add(new Option(d.name, i)));
+  $("#lv-fleet").max = $("#lv-fleet").value = Math.ceil(LIVE.stores.length / 8);
   $("#live-sub").textContent = `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the recommended network's largest territory. Changing a setting re-solves it.`;
   document.querySelectorAll("#v-day input[type=range]:not(#scrub), #lv-day").forEach(i => i.oninput = () => { sync(); clearTimeout(i._t); i._t = setTimeout(solveLive, 250); });
   $("#lv-solve").onclick = solveLive;
-  $("#lv-reset").onclick = () => { Object.entries({ "lv-dead": 12, "lv-stop": 15, "lv-speed": 35, "lv-cap": 48, "lv-stops": 25, "lv-fleet": 40 }).forEach(([k, v]) => $("#" + k).value = v); sync(); solveLive(); };
+  $("#lv-reset").onclick = () => { Object.entries({ "lv-dead": 12, "lv-stop": 15, "lv-speed": 35, "lv-cap": 48, "lv-stops": 25, "lv-fleet": +$("#lv-fleet").max }).forEach(([k, v]) => $("#" + k).value = v); sync(); solveLive(); };
   sync();
 }
 function sync() { $("#o-dead").textContent = hhmm(+$("#lv-dead").value); $("#o-stop").textContent = $("#lv-stop").value; $("#o-speed").textContent = $("#lv-speed").value; $("#o-cap").textContent = $("#lv-cap").value; $("#o-stops").textContent = $("#lv-stops").value; $("#o-fleet").textContent = $("#lv-fleet").value; }
 function roadKm(la1, lo1, la2, lo2, mt) { const r = Math.PI / 180, dp = (la2 - la1) * r, dl = (lo2 - lo1) * r; const a = Math.sin(dp / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin(dl / 2) ** 2; const d = 2 * 6371 * Math.asin(Math.sqrt(Math.min(a, 1))); if (!P.road_coef) return d * (mt ? P.detour_mountain : P.detour); if (d === 0) return 0; const c = P.road_coef[mt ? 1 : 0], x = Math.max(d, 0.5); return x * Math.exp(c[0] + c[1] * Math.log(x)); }
 function solveJS(dc, st, p) {
-  // In-browser copy of routing.py's savings rules, without the 2-opt pass
-  const n = st.length, pts = [[dc[0], dc[1], 0], ...st.map(s => [s[0], s[1], s[2]])];
+  // In-browser copy of routing.solve without the 2-opt pass: savings, then a relay pass for stores no one-driver route reaches
+  const pts = [[dc[0], dc[1], 0], ...st.map(s => [s[0], s[1], s[2]])];
   const D = pts.map(a => pts.map(b => roadKm(a[0], a[1], b[0], b[1], a[2] || b[2])));
+  let out = savingsJS(D, st.map(s => s[3]), p);
+  const far = out.filter(r => r.binding === "violates limit").flatMap(r => r.seq).sort((a, b) => a - b);
+  if (far.length) {
+    const sub = [0, ...far.map(i => i + 1)], Ds = sub.map(i => sub.map(j => D[i][j]));
+    const relay = savingsJS(Ds, far.map(i => st[i][3]), { ...p, max_km: p.relay_km, shift_end: p.relay_shift_end });
+    relay.forEach(r => { r.seq = r.seq.map(i => far[i]); r.binding = r.binding === "violates limit" ? r.binding : "relay"; });
+    out = out.filter(r => r.binding !== "violates limit").concat(relay).sort((a, b) => a.arr[0] - b.arr[0]);
+  }
+  return { routes: out, vehicles: out.length, km: out.reduce((a, r) => a + r.km, 0) };
+}
+function savingsJS(D, q, p) {
+  const n = q.length;
   const walk = seq => { let t = p.depart, km = 0, prev = 0; const arr = []; for (const i of seq) { km += D[prev][i]; t += D[prev][i] / p.speed; arr.push(t); t += p.stop_h; prev = i; } km += D[prev][0]; return [km, arr, t + D[prev][0] / p.speed]; };
   const ok = seq => { const [km, arr, ret] = walk(seq); return km <= p.max_km && arr[arr.length - 1] <= p.deadline && ret + p.break_h <= p.shift_end; };
   // All pairs up to 400 stores, else each store with its 40 nearest, as routing._pairs
@@ -575,7 +620,7 @@ function solveJS(dc, st, p) {
   }
   pairs.sort((a, b) => b[0] - a[0] || a[1] - b[1] || a[2] - b[2]);
   const routes = new Map(), of = [0], load = new Map();
-  for (let i = 1; i <= n; i++) { routes.set(i, [i]); of.push(i); load.set(i, st[i - 1][3]); }
+  for (let i = 1; i <= n; i++) { routes.set(i, [i]); of.push(i); load.set(i, q[i - 1]); }
   for (const [s, i, j] of pairs) {
     if (s <= 0) break; const ri = of[i], rj = of[j]; if (ri === rj) continue;
     const A = routes.get(ri), B = routes.get(rj);
@@ -587,12 +632,11 @@ function solveJS(dc, st, p) {
   }
   const out = [];
   for (const [k, seq] of routes) { const [km, arr, ret] = walk(seq); out.push({ seq: seq.map(v => v - 1), km, load: load.get(k), arr, ret, binding: km > p.max_km || arr[arr.length - 1] > p.deadline || ret + p.break_h > p.shift_end ? "violates limit" : "" }); }
-  out.sort((a, b) => a.arr[0] - b.arr[0]);
-  return { routes: out, vehicles: out.length, km: out.reduce((a, r) => a + r.km, 0) };
+  return out.sort((a, b) => a.arr[0] - b.arr[0]);
 }
 async function solveLive() {
   const p = { deadline: +$("#lv-dead").value, stop_h: +$("#lv-stop").value / 60, speed: +$("#lv-speed").value, cap: +$("#lv-cap").value, max_stops: +$("#lv-stops").value,
-              depart: P.depart, max_km: P.max_km, shift_end: P.shift_end, break_h: P.break_h };
+              depart: P.depart, max_km: P.max_km, shift_end: P.shift_end, break_h: P.break_h, relay_km: P.relay_km, relay_shift_end: P.relay_shift_end };
   const day = LIVE.days[+$("#lv-day").value || 0], dc = SITES[LIVE.dc], fleet = +$("#lv-fleet").value;
   const st = LIVE.stores.map((i, k) => [S.lat[i], S.lon[i], S.mountain[i], day.q[k]]);
   const idx = LIVE.stores;

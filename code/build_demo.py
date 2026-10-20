@@ -1,9 +1,19 @@
 """Embed a run's results registry, formulas and verification into ../demo.html: python build_demo.py"""
+import json
 from pathlib import Path
 
 from dcn import config as C
 
 ROOT = Path(__file__).resolve().parent
+
+
+def _shapes(res, reg):
+    # Road shapes from osrm/build_shapes.py, only if fetched for this registry's routes
+    f = res / "shapes.json"
+    if not f.exists():
+        return "null"
+    s = json.loads(f.read_text())
+    return json.dumps(s["legs"]) if s["meta"]["registry"] == json.loads(reg)["meta"]["generated"] else "null"
 
 
 def build(profile="reduced"):
@@ -14,6 +24,7 @@ def build(profile="reduced"):
     html = (tpl.replace("/*__KATEX__*/", (ROOT / "static" / "katex.css").read_text())
                .replace("/*__MATH__*/null", (ROOT / "static" / "math.json").read_text())
                .replace("/*__VERIFY__*/null", ver)
+               .replace("/*__SHAPES__*/null", _shapes(res, reg))
                .replace("/*__DATA__*/null", reg))
     out = ROOT.parent / "demo.html"
     out.write_text(html)
