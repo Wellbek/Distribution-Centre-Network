@@ -33,11 +33,16 @@ The Examiner's estimate today: about 50/100 (R1 10, lower level 8, connection an
 
 ## 3. Round table
 
-- **Examiner, red team, CFO, operations, statistician agree** on the relay blocker; they differ only on the fix (price as line-haul plus route, as a satellite or second vehicle-day, or forbid the assignment). Resolution: model a far store as served by a second wave from a cross-dock (line-haul cost) and show a reversal row at relay 0 / 180k / 550k; fix the baseline with an east-coast DC.
-- **Data team vs Examiner** on the search: the recommended network is the centre-of-gravity candidate (pool 71), found by the GP at step 37; a centre-of-gravity sweep over k would have found it in 13 evaluations. Resolution: say so honestly; build the pool from E-relevant generators, not only G1 neighbours; random as a band with replicates; re-score the top 5 on 28 days.
-- **Operations vs plan** on what binds: the 13:00 shift end, not the noon deadline, is the tightest limit on 54 of 126 routes and is never labelled; no driver break fits. Resolution: label all five limits; put the legally required break inside the shift; revisit whether the shift or the window creates the trade-off once distances are real.
-- **Statistician vs plan** on the prior: strength 14 is far too strong (moment estimate about 2); rates redrawn each day wash out parameter uncertainty; Poisson understates DC-level spread. Resolution: empirical Bayes prior, draw rates once per scenario, negative binomial, predictive check, stratified days, held-out dates disjoint from final dates.
-- **TA vs developer** on reproducibility: unpinned numpy/scipy (registry made on 3.13), `run_full.py` never run, both run scripts overwrite `demo.html`, constants duplicated in the page. Resolution: pin, record versions in meta, params block in the registry, only the named profile builds the demo.
+- **Examiner, red team, CFO, operations, statistician agree** on the relay blocker; they differ only on the fix (price as line-haul plus route, as a satellite or second vehicle-day, or forbid the assignment).
+  Resolution: model a far store as served by a second wave from a cross-dock (line-haul cost) and show a reversal row at relay 0 / 180k / 550k; fix the baseline with an east-coast DC.
+- **Data team vs Examiner** on the search: the recommended network is the centre-of-gravity candidate (pool 71), found by the GP at step 37; a centre-of-gravity sweep over k would have found it in 13 evaluations.
+  Resolution: say so honestly; build the pool from E-relevant generators, not only G1 neighbours; random as a band with replicates; re-score the top 5 on 28 days.
+- **Operations vs plan** on what binds: the 13:00 shift end, not the noon deadline, is the tightest limit on 54 of 126 routes and is never labelled; no driver break fits.
+  Resolution: label all five limits; put the legally required break inside the shift; revisit whether the shift or the window creates the trade-off once distances are real.
+- **Statistician vs plan** on the prior: strength 14 is far too strong (moment estimate about 2); rates redrawn each day wash out parameter uncertainty; Poisson understates DC-level spread.
+  Resolution: empirical Bayes prior, draw rates once per scenario, negative binomial, predictive check, stratified days, held-out dates disjoint from final dates.
+- **TA vs developer** on reproducibility: unpinned numpy/scipy (registry made on 3.13), `run_full.py` never run, both run scripts overwrite `demo.html`, constants duplicated in the page.
+  Resolution: pin, record versions in meta, params block in the registry, only the named profile builds the demo.
 - **CEO, product, UX, store owner** on the demo: the answer is not a decision (keep 4, close 8, open 8), the live solve cannot fail (no vehicle limit), charts squashed, labels collide, contrast below 4.5:1, no store-level view (896 stores end up farther, 123 by more than 30 km).
 
 ## 4. Gap list (owner, severity, status)

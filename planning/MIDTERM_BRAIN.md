@@ -2,7 +2,9 @@
 
 Version 1.2 · 2026-10-19 (day 0 of 14) · Louis Wellmeyer (20264059)
 
-Status: planning complete, stakeholder review round 1 applied (Section 22), rolling records started (Section 25), nothing implemented yet.
+Status: this is the day-0 plan (v1.2, 2026-10-19) and is kept as written.
+Implementation has since moved on (v0.4 on 2026-10-20): the current state, results and every change of plan are in `WORK_LOG.md`, `DECISIONS.md` (D-001 to D-062), `BUSINESS_DECISIONS.md` and `stakeholders/REVIEW-03-v0.3.md`.
+Where this plan and those records disagree, the records win.
 
 This file is my working memory for the whole midterm.
 It lives in `planning/` of the private hand-in repo `Wellbek/Distribution-Centre-Network` and is never part of the submission ZIP (the ZIP is built from an allowlist, Section 17.1).

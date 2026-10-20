@@ -159,7 +159,8 @@ Then back on the laptop: `scp -r spark:~/dcn/code/results code/` (the full table
 
 **What was wrong.**
 
-- The k sweep jumped at k = 10 and 12 (10.7 and 10.9 bn against 7.8 bn at k = 11): the best k = 12 pool candidate put Naju and Muan 20 km apart, and the 500-store minimum then forced Naju to serve stores up to 515 km away (196 vehicles, 113 failures a day). G1 never saw it because its assignment ignored the minimum (D-052).
+- The k sweep jumped at k = 10 and 12 (10.7 and 10.9 bn against 7.8 bn at k = 11): the best k = 12 pool candidate put Naju and Muan 20 km apart, and the 500-store minimum then forced Naju to serve stores up to 515 km away (196 vehicles, 113 failures a day).
+  G1 never saw it because its assignment ignored the minimum (D-052).
 - No k = 12 candidate in the pool was as good as today's sites with redrawn territories (D-053).
 - With 16 docks every k, the baseline included, overflowed; the dock count must follow the 1,400-store cap (D-054).
 - The baseline itself misses 98% on its worst day: Wonju serves the east coast with about 111 over-limit single-store routes a day (stores 125-210 km away); this is real geography of a network without an east-coast DC and stays.
@@ -198,3 +199,28 @@ Then back on the laptop: `scp -r spark:~/dcn/code/results code/` (the full table
 
 - Review 03 with the panel on run 2 and the demo.
 - Dock-count sweep (break-even docks for k = 13), stop-time and demand-growth reversals in the next Spark run.
+
+### Review 03 and v0.4 (run 2 superseded)
+
+**Why.**
+Review 03 (`stakeholders/REVIEW-03-v0.3.md`) found that one-truck-per-far-store routes carried most of the run-2 saving and were counted late although they arrived by 10:34, and that today's network had been built with the store minimum the brief exempts it from.
+
+**Correction to the run-2 notes above.**
+The statement that today's network "misses 98%" because of real geography was wrong: it was the late label on relay deliveries (1 - 227/9,718 = 97.66%).
+
+**Changes.**
+
+- Relay route class, service by the clock (D-058); reach-constrained baseline with stable site ids (D-059); R5 reversals (D-060); second dock count and pool-wide Spearman (D-061); road shapes in the demo (D-062); business decision log (`BUSINESS_DECISIONS.md`).
+- New today's network (fixed point of `prep/current_network.py`): Gangneung Gujeong, Namyangju Jingeon, Gimpo Gochon, Gwangju-si Opo, Hwaseong Hyangnam, Yeongju Munsu, Nonsan Yeonmu, Daegu Dalseong, Gyeongju Oedong, Busan Gangseo, Naju Bitgaram, Gwangyang Port; demand-weighted road km 31.9, farthest store 121 km.
+- 5% smoke run (215 s, one capped core): no relay route in today's network, today's network cheaper than every candidate at that scale (not evidence; thinning distorts).
+
+**Run 3 on the Spark** (from the laptop, in `Distribution-Centre-Network/`):
+
+```sh
+tar czf - --exclude=.venv310 --exclude=results --exclude=__pycache__ code | ssh spark 'rm -rf ~/dcn && mkdir -p ~/dcn && tar xzf - -C ~/dcn'
+ssh spark
+tmux new -s dcn
+cd ~/dcn/code && ~/dcn-venv/bin/python run_reduced.py && ~/dcn-venv/bin/python run_full.py 2>&1 | tee run.log
+```
+
+Then `scp -r spark:~/dcn/code/results code/`, and with the OSRM tunnel open `python osrm/build_shapes.py full` for the new routes.

@@ -2,9 +2,11 @@
 
 **Who.** An external reviewer paid to break the conclusion before management or the examiner does.
 
-**Personality.** Adversarial, creative, fair. Assumes every saving is an artefact until shown otherwise.
+**Personality.** Adversarial, creative, fair.
+Assumes every saving is an artefact until shown otherwise.
 
-**Voice.** "You built the world, you built the baseline, and you found a saving. Convince me that is not circular."
+**Voice.** "You built the world, you built the baseline, and you found a saving.
+Convince me that is not circular."
 
 ## What I care about
 
@@ -37,4 +39,6 @@
 
 ## How to role-play me
 
-> You are the red team. Your job is to find the one argument that would make the examiner or the board reject the recommendation. Rank findings by how much damage they would do.
+> You are the red team.
+Your job is to find the one argument that would make the examiner or the board reject the recommendation.
+Rank findings by how much damage they would do.
