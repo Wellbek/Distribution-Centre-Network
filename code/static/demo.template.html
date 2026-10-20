@@ -112,7 +112,8 @@ svg text { font-family: "Noto Sans", system-ui, sans-serif; }
 .lec h3 { font-size: 21px; margin: 2px 0 8px; letter-spacing: -.3px; }
 .lec p { margin: 6px 0; color: var(--ink-2); }
 .formula { background: #fbf9fc; border: 1px solid var(--lav-2); border-radius: 14px; padding: 4px 12px; margin: 10px 0; overflow-x: auto; }
-.formula .katex-display { margin: .5em 0; }
+.formula .katex-display { margin: .5em 0; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+.tw { overflow-x: auto; }
 .keypoint { border-left: 5px solid var(--lime); background: var(--lime-soft); border-radius: 0 14px 14px 0; padding: 9px 14px; margin: 10px 0; font-size: 14px; color: var(--ink); }
 .keypoint b { color: var(--lime-ink); }
 .flow { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; margin: 8px 0; }
@@ -130,8 +131,8 @@ svg text { font-family: "Noto Sans", system-ui, sans-serif; }
 .bar { height: 8px; background: #eee; border-radius: 999px; overflow: hidden; } .bar i { display: block; height: 100%; background: var(--lime); }
 footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 @media (max-width: 1560px) { .nav-right .pill.pre { display: none; } }
-@media (max-width: 1100px) { .g2, .lec, .hero { grid-template-columns: 1fr; } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: 1fr; } }
-@media (max-width: 720px) { .nav-in { flex-wrap: wrap; gap: 10px; padding: 8px 14px; } .tabs { order: 3; width: 100%; overflow-x: auto; } .nav-right { display: none; } main { padding: 14px; } .g2e { grid-template-columns: 1fr; } .hero h1 { font-size: 26px; } .mapbox { height: 62vh; } }
+@media (max-width: 1100px) { .g2, .lec, .hero { grid-template-columns: minmax(0, 1fr); } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .nav-in { flex-wrap: wrap; gap: 10px; padding: 8px 14px; } .tabs { order: 3; width: 100%; overflow-x: auto; } .nav-right { display: none; } main { padding: 14px; } .g2e { grid-template-columns: minmax(0, 1fr); } .hero h1 { font-size: 26px; } .mapbox { height: 62vh; } }
 @media (prefers-reduced-motion: reduce) { .view.on { animation: none; } }
 </style>
 </head>
@@ -156,7 +157,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
       <div class="legend" id="ans-legend"></div></div>
     <div class="grid" style="align-content:start">
       <div class="card"><h3>Where the saving comes from</h3><p class="sub">28 final days, paired; each bar is one step from today's network</p><svg class="chart" id="waterfall" viewBox="0 0 460 250"></svg></div>
-      <div class="card"><h3>Does the answer survive the far-store charge?</h3><p class="sub">Stores beyond 250 km or the shift need a relay driver. The monthly cost and the best number of DCs under three prices for that relay.</p><table id="reversal"></table></div>
+      <div class="card"><h3>Does the answer survive the far-store charge?</h3><p class="sub">Stores beyond 250 km or the shift need a relay driver. The monthly cost and the best number of DCs under three prices for that relay.</p><div class="tw"><table id="reversal"></table></div></div>
     </div>
   </div>
   <div class="stitle"><span class="deco">k</span><h2>Cost against the number of DCs</h2><span class="rule"></span><span class="chip">reported search · 7 search days</span></div>
@@ -206,6 +207,13 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 <section class="view" id="v-checks">
   <div class="stitle"><span class="deco">!</span><h2>Normal, boundary and failure cases</h2><span class="rule"></span></div>
   <div class="grid g3" id="cases"></div>
+  <div class="stitle"><span class="deco">≈</span><h2>Do the simplifications change the decision?</h2><span class="rule"></span><span class="chip">two balance-table checks</span></div>
+  <div class="grid">
+    <div class="card"><h3>Departure waves instead of one 04:00 start</h3><p class="sub" id="wave-sub"></p><svg class="chart" id="wavechart" viewBox="0 0 760 300"></svg><div class="legend" id="wave-legend"></div><p class="note" id="wave-note"></p></div>
+    <div class="card"><h3>One store in five instead of all stores</h3><p class="sub" id="thin-sub"></p><svg class="chart" id="thinchart" viewBox="0 0 760 300"></svg><div class="legend" id="thin-legend"></div><p class="note" id="thin-note"></p></div>
+  </div>
+  <div class="stitle"><span class="deco">▤</span><h2>Today's operation, last 12 months</h2><span class="rule"></span><span class="chip">outcome tables</span></div>
+  <div class="grid g2e"><div class="card" id="histops"></div><div class="card" id="histcheck"></div></div>
   <div class="stitle"><span class="deco">♥</span><h2>Stores like mine</h2><span class="rule"></span><span class="chip">franchise view</span></div>
   <div class="grid g2"><div class="card"><h3>On-time share per store, 28 final days</h3><p class="sub">Each store's day-weighted share of deliveries before 12:00 (relay deliveries count as late)</p><svg class="chart" id="storehist" viewBox="0 0 760 260"></svg></div><div class="card" id="storeview"></div></div>
   <div class="stitle"><span class="deco">✓</span><h2>Verification and reproduction</h2><span class="rule"></span></div>
@@ -343,7 +351,7 @@ RENDER.answer = () => {
   $("#hero-kicker").textContent = `Recommendation${SCALED}`;
   if (pays) {
     $("#hero-h1").innerHTML = `Run <em>${r.k} DCs</em>: keep ${kept.length}, close ${closed.length}, open ${opened.length}`;
-    $("#hero-p").textContent = `Kept: ${kept.map(j => SITES[j].name).join(", ") || "none"}. New: ${opened.map(j => SITES[j].name).join(", ")}. Numbers come from the fictional world with placeholder road distances.`;
+    $("#hero-p").textContent = `Kept: ${kept.map(j => SITES[j].name).join(", ") || "none"}. New: ${opened.map(j => SITES[j].name).join(", ")}. Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
   } else {
     $("#hero-h1").innerHTML = `Keep <em>today's ${b.k} DCs</em>: no redesign pays here`;
     $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% interval of the saving ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Fewer DCs cost more because vehicles and relay drivers rise faster than fixed costs fall. Fictional world, placeholder road distances.`;
@@ -555,7 +563,16 @@ function solveJS(dc, st, p) {
   const D = pts.map(a => pts.map(b => roadKm(a[0], a[1], b[0], b[1], a[2] || b[2])));
   const walk = seq => { let t = p.depart, km = 0, prev = 0; const arr = []; for (const i of seq) { km += D[prev][i]; t += D[prev][i] / p.speed; arr.push(t); t += p.stop_h; prev = i; } km += D[prev][0]; return [km, arr, t + D[prev][0] / p.speed]; };
   const ok = seq => { const [km, arr, ret] = walk(seq); return km <= p.max_km && arr[arr.length - 1] <= p.deadline && ret + p.break_h <= p.shift_end; };
-  const pairs = []; for (let i = 1; i <= n; i++) for (let j = i + 1; j <= n; j++) pairs.push([D[0][i] + D[0][j] - D[i][j], i, j]);
+  // All pairs up to 400 stores, else each store with its 40 nearest, as routing._pairs
+  const pairs = [];
+  if (n <= 400) { for (let i = 1; i <= n; i++) for (let j = i + 1; j <= n; j++) pairs.push([D[0][i] + D[0][j] - D[i][j], i, j]); }
+  else {
+    const seen = new Set();
+    for (let i = 1; i <= n; i++) {
+      const near = Array.from({ length: n }, (_, k) => k + 1).sort((a, b) => D[i][a] - D[i][b]).slice(0, 41);
+      for (const j of near) { if (j === i) continue; const a = Math.min(i, j), b = Math.max(i, j), key = a * 100000 + b; if (!seen.has(key)) { seen.add(key); pairs.push([D[0][a] + D[0][b] - D[a][b], a, b]); } }
+    }
+  }
   pairs.sort((a, b) => b[0] - a[0] || a[1] - b[1] || a[2] - b[2]);
   const routes = new Map(), of = [0], load = new Map();
   for (let i = 1; i <= n; i++) { routes.set(i, [i]); of.push(i); load.set(i, st[i - 1][3]); }
@@ -580,7 +597,7 @@ async function solveLive() {
   const st = LIVE.stores.map((i, k) => [S.lat[i], S.lon[i], S.mountain[i], day.q[k]]);
   const idx = LIVE.stores;
   let res, engine; const t0 = performance.now();
-  if (BACKEND) { try { res = await (await fetch("/api/solve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dc: [dc.lat, dc.lon], stores: st, params: p }) })).json(); engine = "Python engine (savings + 2-opt)"; } catch (e) { BACKEND = false; setEngine(); } }
+  if (BACKEND) { try { res = await (await fetch("/api/solve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dc: [dc.lat, dc.lon], stores: st, params: p, site: LIVE.dc, ids: idx }) })).json(); engine = "Python engine (savings + 2-opt, cached road distances)"; } catch (e) { BACKEND = false; setEngine(); } }
   if (!res) { res = solveJS([dc.lat, dc.lon], st, p); engine = "in-browser engine (same savings rules, no 2-opt)"; }
   const ms = performance.now() - t0;
   // Fleet limit: routes beyond the available vehicles are not driven; their stores are uncovered
@@ -737,31 +754,77 @@ function figBound() {
 }
 
 // ---------- 4 · Checks ----------
+// Cost against k for two settings; hollow marker = fails the rule of that setting, ringed = its best k
+function kLines(svg, rows, series, fy) {
+  svg.innerHTML = "";
+  const ks = rows.map(r => r.k), vals = rows.flatMap(r => series.map(s => r[s.key])), lo = Math.min(...vals), hi = Math.min(Math.max(...vals), lo * 1.6);
+  const { X, Y } = axesXY(svg, [64, 14, 740, 262], [ks[0] - 0.5, ks[ks.length - 1] + 0.5], [lo * 0.97, hi], v => (Number.isInteger(v) ? v : ""), fy, ks.length, 4);
+  const cy = v => Y(Math.min(v, hi));
+  for (const s of series) {
+    el("path", { d: rows.map((r, i) => `${i ? "L" : "M"}${X(r.k)},${cy(r[s.key])}`).join(""), fill: "none", stroke: s.color, "stroke-width": 2.5, "stroke-dasharray": s.dash || "" }, svg);
+    const ok = rows.filter(r => s.ok(r)), best = ok.length ? ok.reduce((a, b) => (b[s.key] < a[s.key] ? b : a)) : null;
+    rows.forEach(r => {
+      const good = s.ok(r);
+      el("circle", { cx: X(r.k), cy: cy(r[s.key]), r: 5, fill: good ? s.color : "#fff", stroke: s.color, "stroke-width": 2 }, svg);
+      if (r === best) el("circle", { cx: X(r.k), cy: cy(r[s.key]), r: 10, fill: "none", stroke: s.color, "stroke-width": 2 }, svg);
+      if (r[s.key] > hi) el("text", { x: X(r.k), y: 26, "text-anchor": "middle", "font-size": 10, fill: "#63636b" }, svg, "↑");
+    });
+  }
+  el("text", { x: 402, y: 296, "text-anchor": "middle", "font-size": 11.5, fill: "#63636b" }, svg, "number of DCs, k");
+}
+function checkCharts() {
+  const W = R.waves, T = R.thinning;
+  kLines($("#wavechart"), W.rows, [{ key: "total_plain", color: "#c9a6d1", ok: r => R.sweep.find(s => s.k === r.k).ok98, dash: "6 5" }, { key: "total", color: "#751485", ok: r => r.ok98 }], v => f0(v / 1e6));
+  $("#wave-sub").textContent = `${W.docks} docks per DC, one hour of loading, waves at ${W.waves.map(hhmm).join(", ")}; best candidate of every k, ${M.days[0]} search days, M KRW per month`;
+  $("#wave-legend").innerHTML = `<span><i class="sq" style="background:#c9a6d1"></i>all leave at 04:00</span><span><i class="sq" style="background:#751485"></i>departure waves</span><span class="note">hollow = below 98% or more departures than the docks allow · ring = best k</span>`;
+  const over = W.rows.find(r => r.k === W.k_star_plain), bw = W.baseline;
+  $("#wave-note").innerHTML = W.k_star_waves === W.k_star_plain
+    ? `<b>The decision holds:</b> k* = ${W.k_star_plain} with and without waves.`
+    : `<b>The decision moves:</b> k* = ${W.k_star_plain} with one 04:00 start, ${W.k_star_waves ?? "none"} with waves. At k = ${W.k_star_plain} the DCs at the store cap need ${over.dock_over_day.toFixed(0)} more departures a day than ${W.docks} docks allow in the last wave; the monthly cost ${over.total < over.total_plain ? "falls" : "rises"} by ${fM(Math.abs(over.total - over.total_plain))} M. Today's network overflows by ${(bw.dock_over_day || 0).toFixed(0)} a day. The dock count is an assumption (${W.docks} = store cap × today's vehicles per store ÷ ${W.waves.length} waves), so this is the first number to confirm with the DC managers.`;
+  if (!T) { $("#thin-sub").textContent = "Shown when the full run follows a reduced run."; $("#thin-note").textContent = ""; $("#thinchart").innerHTML = ""; }
+  else {
+    kLines($("#thinchart"), T.rows, [{ key: "reduced", color: "#9dc92a", ok: () => true, dash: "6 5" }, { key: "full", color: "#751485", ok: () => true }], v => f0(v / 1e3));
+    $("#thin-sub").textContent = `Cost per planning store (thousand KRW per month), best candidate of every k; reduced: ${f0(T.stores_reduced)} stores with DC cost and bounds × ${T.fraction}`;
+    $("#thin-legend").innerHTML = `<span><i class="sq" style="background:#9dc92a"></i>1 in ${Math.round(1 / T.fraction)} stores</span><span><i class="sq" style="background:#751485"></i>all stores</span><span class="note">ring = cheapest k</span>`;
+    $("#thin-note").innerHTML = `${T.k_star_reduced === T.k_star_full ? `<b>The decision holds:</b> both pick k = ${T.k_star_full}.` : `<b>The reduced instance is off by ${Math.abs(T.k_star_reduced - T.k_star_full)}:</b> it picks k = ${T.k_star_reduced}, the full one k = ${T.k_star_full}.`} Thinning raises cost per store at every k; km per store rise ${T.km_ratio_baseline.toFixed(2)}× for today's network, well below the ${T.km_ratio_pred.toFixed(2)}× that the square-root argument predicts, because the trip from the DC to the first store does not shrink with density. The full instance is the one reported.`;
+  }
+  const H = R.history_ops, B = R.finals.baseline;
+  $("#histops").innerHTML = `<h3>The lower level on today's network, ${H.days} history days</h3><table>
+    <tr><td>Deliveries</td><td><b>${f0(H.deliveries)}</b> (one per open store and day)</td></tr><tr><td>Before noon</td><td>${pct(H.service)}</td></tr>
+    <tr><td>Vehicles a day</td><td>${f0(H.vehicles_day)} (${f0(H.owned)} owned at the ${M.fleet_quantile.toFixed(3)} quantile)</td></tr><tr><td>Kilometres a day</td><td>${f0(H.km_day)}</td></tr><tr><td>Spot trucks</td><td>${fM(H.spot_month)} M KRW per month</td></tr></table>
+    <p class="note">Files: <code>deliveries.csv.gz</code>, <code>vehicle_days.csv.gz</code>, <code>spot_hires.csv</code> in <code>code/results/${M.profile}/tables/</code>.</p>`;
+  $("#histcheck").innerHTML = `<h3>Does the planning model reproduce it?</h3><p class="sub">Realised orders of the history year against ${M.days[1]} sampled planning days, same network and rules</p><table>
+    <tr><th></th><th>History</th><th>Sampled days</th></tr><tr><td>Vehicles a day</td><td>${f0(H.vehicles_day)}</td><td>${f0(B.vehicles_day)}</td></tr>
+    <tr><td>Kilometres a day</td><td>${f0(H.km_day)}</td><td>${f0(B.km_day)}</td></tr><tr><td>Before noon</td><td>${pct(H.service)}</td><td>${pct(B.service_mean)}</td></tr></table>
+    <p class="note">History includes stores that closed during the year; the planning days serve the ${f0(M.stores_planning)} stores open at its end.</p>`;
+}
 RENDER.checks = () => {
   const c = R.cases, r = R.finals.recommended, sv = R.stores_view;
   const bh = c.boundary_hi.map(j => SITES[j].name), bl = c.boundary_lo.map(j => SITES[j].name);
   $("#cases").innerHTML = `
   <div class="card case"><div class="tag">Normal</div><h3>Recommended network, ordinary weekday</h3><p>${r.k} DCs, ${f0(r.vehicles_day)} vehicles a day, ${f0(r.km_day)} km a day, ${pct(r.service_mean)} before noon over the 28 final days.</p><button class="btn small" onclick="show('day')">Watch the day</button></div>
-  <div class="card case b"><div class="tag">Boundary</div><h3>At the limits</h3><p><b>Capacity.</b> ${bh.length ? `${bh.join(", ")} sit at the upper bound of ${M.bounds[1]} stores` : `no DC at the upper bound`}; ${bl.length ? `${bl.join(", ")} at the lower bound of ${M.bounds[0]}` : "none at the lower bound"}.</p><p><b>Budget of one.</b> With B = 1 the search returns its first seed at ${fM(c.budget_one)} M; with B = ${M.budget}, ${fM(c.budget_full)} M.</p></div>
+  <div class="card case b"><div class="tag">Boundary</div><h3>At the limits</h3><p><b>Capacity.</b> ${bh.length ? `${bh.join(", ")} ${bh.length > 1 ? "sit" : "sits"} at the upper bound of ${M.bounds[1]} stores` : `no DC at the upper bound`}; ${bl.length ? `${bl.join(", ")} at the lower bound of ${M.bounds[0]}` : "none at the lower bound"}.</p><p><b>Budget of one.</b> With B = 1 the search returns its first seed at ${fM(c.budget_one)} M; with B = ${M.budget}, ${fM(c.budget_full)} M.</p></div>
   <div class="card case f"><div class="tag">Failure</div><h3>Inputs the system refuses</h3>${c.failure ? `<div class="err"><b>k = ${c.failure.k} is infeasible.</b> ${c.failure.reason}; no cost is reported.</div>` : ""}<p style="margin-top:8px"><b>A day the fleet cannot cover.</b> On the peak day (${R.r2.peak_date}) the network needs ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned. Cap the fleet in the live solve to see uncovered stores.</p><button class="btn ghost small" onclick="show('day');document.getElementById('lv-day').value=2;document.getElementById('lv-fleet').value=12;sync();solveLive()">Show the peak day with 12 vehicles</button></div>`;
   const svg = $("#storehist"); svg.innerHTML = "";
-  const bins = 20, hb = new Array(bins).fill(0), hr = new Array(bins).fill(0);
-  S.ontime_base.forEach(v => hb[Math.min(bins - 1, Math.floor(v * bins))]++); S.ontime_rec.forEach(v => hr[Math.min(bins - 1, Math.floor(v * bins))]++);
+  // Stores always on time sit in a caption; the bars show the rest
+  const bins = 20, hb = new Array(bins).fill(0), hr = new Array(bins).fill(0), full = a => a.filter(v => v >= 0.9995).length;
+  S.ontime_base.forEach(v => v < 0.9995 && hb[Math.min(bins - 1, Math.floor(v * bins))]++); S.ontime_rec.forEach(v => v < 0.9995 && hr[Math.min(bins - 1, Math.floor(v * bins))]++);
   const mx = Math.max(...hb, ...hr), { X, Y } = axesXY(svg, [52, 12, 740, 225], [0, 1], [0, mx], v => pct(v), v => f0(v), 10, 4), bw = (X(1 / bins) - X(0)) / 2.4;
   for (let i = 0; i < bins; i++) { el("rect", { x: X(i / bins) + 2, y: Y(hb[i]), width: bw, height: 225 - Y(hb[i]), fill: "#c9c3cd", rx: 2 }, svg); el("rect", { x: X(i / bins) + 3 + bw, y: Y(hr[i]), width: bw, height: 225 - Y(hr[i]), fill: "#751485", rx: 2 }, svg); }
-  el("text", { x: 60, y: 24, "font-size": 11.5, fill: "#63636b" }, svg, "grey: today · purple: recommended · number of stores");
+  svg.previousElementSibling.textContent = `Stores below 100% before 12:00 over the 28 final days (grey: today, purple: recommended); always on time: today ${f0(full(S.ontime_base))}, recommended ${f0(full(S.ontime_rec))}. Relay deliveries count as late.`;
   $("#storeview").innerHTML = `<h3>What changes for stores</h3><table>
     <tr><td>Stores that change DC</td><td><b>${f0(sv.moved)}</b> of ${f0(S.lat.length)}</td></tr><tr><td>Farther from their DC</td><td>${f0(sv.farther)} (${f0(sv.farther30)} by more than 30 km, worst +${sv.worst_farther.toFixed(0)} km)</td></tr>
     <tr><td>Stores below 98% before noon</td><td>today ${f0(sv.below98_base)} · recommended ${f0(sv.below98_rec)}</td></tr><tr><td>Worst store</td><td>today ${pct(sv.worst_base)} · recommended ${pct(sv.worst_rec)}</td></tr></table>
     <p class="note">Hover a store on any map for its own numbers. Stores served by a relay driver count as late here.</p>`;
+  checkCharts();
   $("#verify").innerHTML = `<h3>Independent checks</h3><p class="sub">${VER ? `<code>python verify.py</code> on ${VER.generated.replace("T", " ")}` : "Run <code>python verify.py</code> to fill this table."}</p>` +
     (VER ? `<div class="scroll"><table><tr><th>Check</th><th>Result</th></tr>${VER.checks.map(x => `<tr><td>${x.check}<br><span class="note">${x.detail}</span></td><td class="${x.ok ? "pass" : "fail"}">${x.ok ? "PASS" : "FAIL"}</td></tr>`).join("")}</table></div>` : "");
   $("#about").innerHTML = `<h3>How these numbers were produced</h3><table>
     <tr><td>Command</td><td><code>${M.command}</code> · seed ${M.seed} · ${M.runtime_s} s</td></tr><tr><td>Environment</td><td>Python ${M.python}, numpy ${M.numpy}, scipy ${M.scipy}</td></tr>
-    <tr><td>Instance</td><td>${f0(M.stores_planning)} stores (1 in ${SCALE} of 10,000); DC cost and bounds scaled by ${M.fraction}</td></tr><tr><td>Distances</td><td>${M.distance_model}</td></tr>
+    <tr><td>Instance</td><td>${f0(M.stores_planning)} planning stores${M.fraction < 1 ? ` (1 in ${SCALE} of 10,000 kept; DC cost and bounds scaled by ${M.fraction})` : " (all stores still open at the end of the history year)"}</td></tr><tr><td>Distances</td><td>${M.distance_model}</td></tr>
     <tr><td>Days</td><td>${M.days[0]} search, ${M.days[1]} final, ${M.days[2]} held-out, stratified by calendar class</td></tr><tr><td>Fleet</td><td>owned at the ${M.fleet_quantile.toFixed(3)} quantile (newsvendor), spot above, relay at ${f0(P.relay_day)} KRW per over-limit route</td></tr>
     <tr><td>Search</td><td>B = ${M.budget}: one G seed per k, then EI on a GP of E − G; random selection on the same pool</td></tr></table>
-    <p class="note">Not yet in this version: road distances from OSRM, full density, departure waves, outcome tables of the current operation.</p>`;
+    <p class="note">Not yet in this version: a second fleet or routing rule as a reversal, demand growth and stop-time sweeps.</p>`;
 };
 
 addEventListener("hashchange", () => { const v = location.hash.slice(1); if (RENDER[v]) show(v); });
