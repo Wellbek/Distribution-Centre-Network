@@ -40,14 +40,14 @@ def _sample_points(n, rng):
     city = d.argmin(1)
     r = d[np.arange(n), city] / sigma[city]
     city = np.where(h["pop"][k] < RURAL_HEX, -1, city)
-    return lat, lon, h["province"][k].astype(object), city, r, pop
+    return lat, lon, h["province"][k].astype(object), h["district"][k].astype(object), city, r, pop
 
 
 def make_world(fraction=1.0, seed=C.SEED):
     """Build all input tables of brief §2.5 for one seed; fraction thins stores nationwide."""
     rng = np.random.default_rng(seed)
     provinces = geo.load_land()
-    lat, lon, prov, city, r, pop = _sample_points(C.FULL_STORES, rng)
+    lat, lon, prov, dist, city, r, pop = _sample_points(C.FULL_STORES, rng)
     n = len(lat)
 
     # Store types from location: office near big-city centres, roadside in the countryside
@@ -86,7 +86,7 @@ def make_world(fraction=1.0, seed=C.SEED):
         d["max_stores"], d["min_stores"] = round(C.MAX_STORES * fraction), round(C.MIN_STORES * fraction)
 
     stores = dict(
-        lat=lat[keep], lon=lon[keep], province=prov[keep], type=t[keep], rate_true=rate[keep],
+        lat=lat[keep], lon=lon[keep], province=prov[keep], district=dist[keep], type=t[keep], rate_true=rate[keep],
         opened=opened[keep], closed=closed[keep], mountain=np.isin(prov[keep], list(geo.MOUNTAIN)),
     )
     stores["id"] = np.array([f"ST{i:05d}" for i in keep])
