@@ -41,7 +41,7 @@ def greedy_assign(ctx, open_idx):
 
 def g1(ctx, open_idx, a=None):
     """Cheap criterion: fixed cost + load-based fleet + line-haul and continuous-approximation local km.
-    Ignores the clock, except that a store beyond the 125 km reach gets its own over-limit route, as in E."""
+    Ignores the clock, except that stores beyond the 125 km reach ride relay routes by load, each with a second driver, as in E."""
     open_idx = np.asarray(open_idx)
     k = len(open_idx)
     if a is None:
@@ -57,9 +57,11 @@ def g1(ctx, open_idx, a=None):
     km = (2 * rbar * routes + 0.7124 * np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()).sum()
     veh = np.ceil(routes * 1.08).sum()
     far = d > C.FAR_KM
-    km += 2 * d[far].sum()
-    veh += far.sum()
-    total = ctx["fixed"][open_idx].sum() + veh * C.VEHICLE_MONTH + C.DAYS_MONTH * (C.FUEL_KM * km + C.RELAY_DAY * far.sum())
+    Wf = np.bincount(a[far], w[far], k)
+    relay = np.ceil(Wf / (0.92 * C.CAP) - 1e-9)
+    km += (2 * np.bincount(a[far], w[far] * d[far], k) / np.maximum(Wf, 1e-9) * relay).sum()
+    veh += relay.sum()
+    total = ctx["fixed"][open_idx].sum() + veh * C.VEHICLE_MONTH + C.DAYS_MONTH * (C.FUEL_KM * km + C.RELAY_DAY * relay.sum())
     return float(total), a
 
 

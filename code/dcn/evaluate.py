@@ -18,7 +18,7 @@ def context(world, model):
     sites = world["sites"]
     slat = np.array([s["lat"] for s in sites]); slon = np.array([s["lon"] for s in sites])
     full = st["full"][m]
-    dsite = distances.site_km(full, lat, lon, mt, slat, slon)
+    dsite = distances.site_km(full, lat, lon, mt, slat, slon, [s["id"] for s in sites])
     current = np.array([i for i, s in enumerate(sites) if s["current"]])
     return dict(
         mask=m, full=full, lat=lat, lon=lon, mountain=mt, w=model["a"][m] / model["b"][m], dsite=dsite,
@@ -124,13 +124,13 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
     used = [int(j) for j in open_idx if (assign == j).any()]
     nd = len(days)
     w = np.array([d.get("w", 1.0) for d in days])
-    V = np.zeros((len(used), nd)); KM = np.zeros_like(V); FAIL = np.zeros_like(V); OVER = np.zeros_like(V); DOCK = np.zeros_like(V)
+    V = np.zeros((len(used), nd)); KM = np.zeros_like(V); FAIL = np.zeros_like(V); OVER = np.zeros_like(V); MISS = np.zeros_like(V); DOCK = np.zeros_like(V)
     ontime = np.zeros(nd); total = np.zeros(nd)
     store_ok = np.zeros(ctx["n"]) if keep_stores else None
     census, routes_out = {}, []
     # Every store gets its daily delivery, even with zero cages ordered (brief §2.1)
     idx_by = [np.flatnonzero(assign == j) for j in used]
-    jobs = [((ctx["dsite"][idx, j], ctx["full"][idx], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx]),
+    jobs = [((ctx["dsite"][idx, j], ctx["full"][idx], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx], ctx.get("use_cache", True)),
              [(None, day["q"][idx]) for day in days], p, docks) for j, idx in zip(used, idx_by)]
     for a_i, (j, idx_all, res) in enumerate(zip(used, idx_by, territories(jobs))):
         for d_i, r in enumerate(res):
@@ -138,8 +138,10 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
             DOCK[a_i, d_i] = r.get("dock_over", 0)
             for rr in r["routes"]:
                 census[rr["binding"]] = census.get(rr["binding"], 0) + w[d_i]
+                # Relay routes pay a second driver; on time is by the clock; a route beyond even the relay limits is missed
+                OVER[a_i, d_i] += rr["binding"] == "relay"
                 over = rr["binding"] == "violates limit"
-                OVER[a_i, d_i] += over
+                MISS[a_i, d_i] += over
                 good = 0 if over else int((np.array(rr["arr"]) <= p.deadline + 1e-9).sum())
                 ontime[d_i] += good; total[d_i] += len(rr["seq"])
                 if keep_stores and not over:
@@ -153,7 +155,7 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
     wn = w / w.sum()
     out = dict(feasible=True, open=used, k=len(used), **parts, owned=int(owned.sum()), owned_by_dc=owned.tolist(),
                V=V.tolist(), fuel_d=fuel_d.tolist(), pen_d=pen_d.tolist(), over_d=over_d.tolist(), w=w.tolist(),
-               vehicles_day=float(wn @ V.sum(0)), dock_over_day=float(wn @ DOCK.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d),
+               vehicles_day=float(wn @ V.sum(0)), dock_over_day=float(wn @ DOCK.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d), missed_routes_day=float(wn @ MISS.sum(0)),
                daily_total=daily.tolist(), service=service.tolist(), service_min=float(service.min()),
                ok98=bool(service.min() >= 0.98), census={k: round(v, 2) for k, v in census.items()},
                loads=[int((assign == j).sum()) for j in used])

@@ -44,7 +44,10 @@ DETOUR_MOUNTAIN = 1.45                      # Gangwon, North Gyeongsang
 SEARCH_DAYS, FINAL_DAYS, HELDOUT_DAYS = 7, 28, 14
 BUDGET = 40
 
-# Far stores: a route beyond 250 km or the shift needs a second driver (relay) [ASSUMPTION]
+# Far stores: a store no one-driver route can serve goes on a relay route with a second driver: up to RELAY_KM and on duty
+# until RELAY_SHIFT_END, same noon deadline [ASSUMPTION, a business decision: two-driver vehicles on the far routes]
+RELAY_KM = 2 * MAX_KM
+RELAY_SHIFT_END = 19.0                      # two drivers from 03:00, 16 h vehicle day
 RELAY_DAY = VEHICLE_MONTH / (365 / 12)      # one extra driver-day, priced like an owned vehicle-day
 RELAY_SWEEP = (0.0, RELAY_DAY, 550e3)       # reversal row: free, driver-day, spot rate
 REACH_KM, FAR_KM = 55.0, 125.0              # noon reach of a full route; 250 km round trip

@@ -18,6 +18,8 @@ class Params:
     deadline: float = C.DEADLINE
     shift_end: float = C.SHIFT_END
     break_h: float = C.BREAK_H
+    relay_km: float = C.RELAY_KM
+    relay_shift_end: float = C.RELAY_SHIFT_END
 
 
 def dist_matrix(dc_lat, dc_lon, lat, lon, mountain):
@@ -86,8 +88,31 @@ def two_opt(seq, D, p):
 
 
 def solve(D, q, p=None, improve=True):
-    """Route one DC's stores for one day; returns routes and day totals."""
+    """Route one DC's stores for one day; stores no one-driver route can reach go on two-driver relay routes."""
     p = p or Params()
+    routes = _savings(D, q, p, improve)
+    bad = [r for r in routes if r["binding"] == "violates limit"]
+    if bad:
+        # Relay pass: the far stores share routes with a second driver (longer km and shift, same noon deadline)
+        far = np.array(sorted(v for r in bad for v in r["seq"]))
+        sub = np.r_[0, far + 1]
+        pr = replace(p, max_km=p.relay_km, shift_end=p.relay_shift_end)
+        relay = _savings(D[np.ix_(sub, sub)], q[far], pr, improve)
+        for r in relay:
+            r["seq"] = far[r["seq"]].tolist()
+            r["binding"] = "relay" if r["binding"] != "violates limit" else "violates limit"
+        routes = [r for r in routes if r["binding"] != "violates limit"] + relay
+        routes.sort(key=lambda r: r["arr"][0])
+    arr_all = np.concatenate([r["arr"] for r in routes]) if routes else np.zeros(0)
+    return dict(
+        routes=routes, vehicles=len(routes), km=float(sum(r["km"] for r in routes)),
+        on_time=int((arr_all <= p.deadline + 1e-9).sum()), late=int((arr_all > p.deadline + 1e-9).sum()),
+        failed=int((arr_all > C.FAIL_AT).sum()), deliveries=int(len(arr_all)),
+    )
+
+
+def _savings(D, q, p, improve):
+    # Clarke-Wright savings under the limits in p, then 2-opt per route
     n = len(q)
     routes = {k: [k] for k in range(1, n + 1)}
     of = list(range(n + 1))
@@ -120,12 +145,7 @@ def solve(D, q, p=None, improve=True):
         km, arr, ret = walk(seq, D, p)
         out.append(dict(seq=[v - 1 for v in seq], km=km, load=load[k], arr=arr, ret=ret, binding=_binding(seq, load[k], km, arr, ret, p)))
     out.sort(key=lambda r: r["arr"][0])
-    arr_all = np.concatenate([r["arr"] for r in out]) if out else np.zeros(0)
-    return dict(
-        routes=out, vehicles=len(out), km=float(sum(r["km"] for r in out)),
-        on_time=int((arr_all <= p.deadline + 1e-9).sum()), late=int((arr_all > p.deadline + 1e-9).sum()),
-        failed=int((arr_all > C.FAIL_AT).sum()), deliveries=int(len(arr_all)),
-    )
+    return out
 
 
 def solve_waves(D, q, p, docks, waves=C.WAVES):
@@ -135,7 +155,7 @@ def solve_waves(D, q, p, docks, waves=C.WAVES):
     routes, over = [], 0
     for w, t in enumerate(waves):
         sub = np.r_[0, left]
-        pw = replace(p, depart=t, shift_end=p.shift_end + t - p.depart)
+        pw = replace(p, depart=t, shift_end=p.shift_end + t - p.depart, relay_shift_end=p.relay_shift_end + t - p.depart)
         r = solve(D[np.ix_(sub, sub)], q[left - 1], pw)
         rs = sorted(r["routes"], key=lambda x: x["arr"][-1] - pw.deadline, reverse=True)
         keep = rs if w == len(waves) - 1 else rs[:docks]
