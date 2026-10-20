@@ -242,15 +242,16 @@ def _run(profile):
         good = [r for r in rows if r[ok]]
         return min(good, key=lambda r: r[key])["k"] if good else None
 
-    # Check 1: departure waves, DOCKS vehicles per hour from 04:00 to 07:00, on the best candidate of every k
+    # Check 1: departure waves from 04:00 to 07:00, docks for a DC at the store cap, on the best candidate of every k
+    docks = int(np.ceil(ctx["hi"] * base["vehicles_day"] / ctx["n"] / len(C.WAVES)))
     wave_rows = []
     for s in sweep:
-        e = evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=C.DOCKS)
+        e = evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=docks)
         wave_rows.append(dict(k=s["k"], total=e["total"], total_plain=s["total"], ok98=e["ok98"] and e["dock_over_day"] == 0,
                               service_min=e["service_min"], dock_over_day=e["dock_over_day"], vehicles_day=e["vehicles_day"],
                               vehicles_plain=s["vehicles_day"]))
-    wb = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"], docks=C.DOCKS)
-    waves = dict(docks=C.DOCKS, waves=list(C.WAVES), rows=wave_rows, baseline=_summary(wb), baseline_plain=_summary(base),
+    wb = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"], docks=docks)
+    waves = dict(docks=docks, waves=list(C.WAVES), rows=wave_rows, baseline=_summary(wb), baseline_plain=_summary(base),
                  k_star_plain=k_star(sweep), k_star_waves=k_star(wave_rows))
     clock(f"departure-wave check: k* {waves['k_star_plain']} -> {waves['k_star_waves']}")
 

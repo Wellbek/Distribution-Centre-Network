@@ -128,10 +128,9 @@ def solve(D, q, p=None, improve=True):
     )
 
 
-def solve_waves(D, q, p=None, docks=C.DOCKS, waves=C.WAVES):
+def solve_waves(D, q, p, docks, waves=C.WAVES):
     """Departure waves: at most `docks` vehicles load per hour; the least-slack routes take the earliest wave,
     the remaining stores are re-routed from the next wave; the last wave takes all that is left."""
-    p = p or Params()
     left = np.arange(1, len(q) + 1)
     routes, over = [], 0
     for w, t in enumerate(waves):

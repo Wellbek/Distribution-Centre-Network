@@ -27,11 +27,21 @@ def greedy_assign(ctx, open_idx):
             for m in move:
                 t = int(np.argmin(np.where(load >= ctx["hi"], np.inf, d[m])))
                 load[a[m]] -= 1; a[m] = t; load[t] += 1
+    # Fill DCs below the minimum with the stores that cost least to move, as the LP will
+    for u in np.flatnonzero(load < ctx["lo"]):
+        donors = np.flatnonzero(load[a] > ctx["lo"])
+        extra = d[donors, u] - d[donors, a[donors]]
+        for m in donors[np.argsort(extra)]:
+            if load[u] >= ctx["lo"]:
+                break
+            if load[a[m]] > ctx["lo"]:
+                load[a[m]] -= 1; a[m] = u; load[u] += 1
     return a
 
 
 def g1(ctx, open_idx, a=None):
-    """Cheap criterion: fixed cost + load-based fleet + line-haul and continuous-approximation local km. Ignores the clock."""
+    """Cheap criterion: fixed cost + load-based fleet + line-haul and continuous-approximation local km.
+    Ignores the clock, except that a store beyond the 125 km reach gets its own over-limit route, as in E."""
     open_idx = np.asarray(open_idx)
     k = len(open_idx)
     if a is None:
@@ -46,7 +56,10 @@ def g1(ctx, open_idx, a=None):
     sy = np.sqrt(np.maximum(np.bincount(a, y * y, k) / np.maximum(n_j, 1) - (np.bincount(a, y, k) / np.maximum(n_j, 1)) ** 2, 1))
     km = (2 * rbar * routes + 0.7124 * np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()).sum()
     veh = np.ceil(routes * 1.08).sum()
-    total = ctx["fixed"][open_idx].sum() + veh * C.VEHICLE_MONTH + C.DAYS_MONTH * C.FUEL_KM * km
+    far = d > C.FAR_KM
+    km += 2 * d[far].sum()
+    veh += far.sum()
+    total = ctx["fixed"][open_idx].sum() + veh * C.VEHICLE_MONTH + C.DAYS_MONTH * (C.FUEL_KM * km + C.RELAY_DAY * far.sum())
     return float(total), a
 
 
@@ -116,16 +129,21 @@ def build_pool(ctx, ks, per_k, seed):
         g0 = g0_sites(ctx, k, seed + k)
         add(best, "G1-best")
         add(g0, "G0 centre of gravity")
+        # Today's sites are a candidate of their own k, and a third base for swaps
+        bases = [(best, "G1-best"), (g0, "G0")]
+        if k == len(ctx["current"]):
+            add(ctx["current"].tolist(), "current sites")
+            bases.append((ctx["current"].tolist(), "current sites"))
         tries = 0
         while sum(p["k"] == k for p in pool) < per_k and tries < 50 * per_k:
+            base, name = bases[tries % len(bases)]
             tries += 1
-            base = best if tries % 2 else g0
             s = list(base)
             for _ in range(rng.integers(1, 3)):
                 out_ = rng.integers(len(s)); new = rng.integers(J)
                 if new not in s:
                     s[out_] = int(new)
-            add(s, "swap of G1-best" if base is best else "swap of G0")
+            add(s, f"swap of {name}")
     for p in pool:
         lp = assign_lp(ctx, np.array(p["sites"]))
         a = np.searchsorted(np.array(p["sites"]), lp["site"]) if lp else greedy_assign(ctx, np.array(p["sites"]))

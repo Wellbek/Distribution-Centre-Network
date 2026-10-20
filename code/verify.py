@@ -76,7 +76,7 @@ loads = np.bincount(np.searchsorted(np.sort(rec), a["site"]), minlength=len(rec)
 check("assignment LP within bounds", loads.min() >= ctx["lo"] and loads.max() <= ctx["hi"], f"loads {loads.min()}-{loads.max()} in [{ctx['lo']}, {ctx['hi']}]")
 
 # Determinism: same candidate, same days, same cost
-days2 = demand.sample_days(model, world, 2, C.SEED + 11, ctx["mask"])
+days2 = demand.sample_days(model, world, 3, C.SEED + 11, ctx["mask"])
 e1 = evaluate.evaluate(ctx, rec, days2)["total"]; e2 = evaluate.evaluate(ctx, rec, days2)["total"]
 check("deterministic evaluation", e1 == e2, f"{e1 / 1e6:,.3f} M twice")
 with evaluate.workers(2):

@@ -140,3 +140,28 @@ Then back on the laptop: `scp -r spark:~/dcn/code/results code/` (the full table
 **Open.**
 
 - Results of both runs; switch `DEMO_PROFILE` to `full`, rebuild the demo, rerun `verify.py`.
+
+### Spark run 1 (v0.3) and what it exposed
+
+**Run.** Spark, Python 3.12.3 aarch64; reduced 83 s, full 718 s (16 workers).
+
+**Results (not reportable, superseded).**
+
+| Measure | Reduced | Full |
+|---|---|---|
+| Baseline E (M KRW/month) | 2,069 | 9,383 |
+| Recommended | k = 12, 1,803 | k = 13, 7,607 |
+| Saving, 28 final days (90% band) | 266 [261, 271] | 1,776 [1,771, 1,782] |
+| Saving, held-out days | 274 | 1,778 |
+| Baseline worst-day service | 97.9% | 97.7% |
+| History year (outcome tables) | 97.9%, 190 vehicles/day | 97.6%, 824 vehicles/day, 3.50 M deliveries |
+| G1 against E, Spearman | 0.55 | 0.20 |
+
+**What was wrong.**
+
+- The k sweep jumped at k = 10 and 12 (10.7 and 10.9 bn against 7.8 bn at k = 11): the best k = 12 pool candidate put Naju and Muan 20 km apart, and the 500-store minimum then forced Naju to serve stores up to 515 km away (196 vehicles, 113 failures a day). G1 never saw it because its assignment ignored the minimum (D-052).
+- No k = 12 candidate in the pool was as good as today's sites with redrawn territories (D-053).
+- With 16 docks every k, the baseline included, overflowed; the dock count must follow the 1,400-store cap (D-054).
+- The baseline itself misses 98% on its worst day: Wonju serves the east coast with about 111 over-limit single-store routes a day (stores 125-210 km away); this is real geography of a network without an east-coast DC and stays.
+
+**Rerun.** Same commands as above (copy the code again first); then copy `results/` back.

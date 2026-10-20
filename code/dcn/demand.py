@@ -149,6 +149,8 @@ def sample_days(model, world, n, seed, mask, exclude=()):
 
     One posterior draw of the store rates per scenario set; chain shock, overdispersion and counts per day.
     """
+    if n < 3:
+        raise ValueError("sample_days needs n >= 3, one day per calendar class")
     rng = np.random.default_rng(seed)
     cal = calendar(PLAN_START, PLAN_DAYS)
     cm = calendar_multiplier(model, cal)
