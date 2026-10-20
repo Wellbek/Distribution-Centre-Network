@@ -45,13 +45,13 @@ def _spearman(a, b):
 
 def _summary(e):
     keys = ["k", "open", "total", "fixed", "fleet", "fuel", "spot", "penalty", "relay", "owned", "loads", "census",
-            "over_limit_day", "vehicles_day", "dock_over_day", "km_day", "service_min", "ok98", "lp_frac", "price_hi", "price_lo"]
+            "over_limit_day", "missed_routes_day", "vehicles_day", "dock_over_day", "km_day", "service_min", "ok98", "lp_frac", "price_hi", "price_lo"]
     out = {k: e[k] for k in keys if k in e}
     out["service_mean"] = float(np.average(e["service"], weights=e["w"]))
     return out
 
 
-def write_tables(world, model, hist, out):
+def write_tables(world, hist, out):
     # Input tables of brief §2.5
     st, sites = world["stores"], world["sites"]
     out.mkdir(parents=True, exist_ok=True)
@@ -75,7 +75,9 @@ def write_tables(world, model, hist, out):
         w = csv.writer(f); w.writerow(["parameter", "value", "unit"])
         for row in [("fuel per km", C.FUEL_KM, "KRW/km"), ("vehicle monthly cost", C.VEHICLE_MONTH, "KRW/month"),
                     ("spot-truck daily rate", C.SPOT_DAY, "KRW/day"), ("late-delivery penalty", C.LATE_PEN, "KRW"),
-                    ("stock-out penalty", C.STOCKOUT_PEN, "KRW"), ("vehicle capacity", C.CAP, "roll cages")]:
+                    ("stock-out penalty", C.STOCKOUT_PEN, "KRW"), ("vehicle capacity", C.CAP, "roll cages"),
+                    ("relay driver per relay route-day [assumption]", round(C.RELAY_DAY), "KRW/day"),
+                    ("relay route km limit [assumption]", C.RELAY_KM, "km"), ("relay route on duty until [assumption]", C.RELAY_SHIFT_END, "hour of day")]:
             w.writerow(row)
     with gzip.open(out / "demand_history.csv.gz", "wt", newline="") as f:
         w = csv.writer(f); w.writerow(["store_id", "date", "cages_ordered"])
@@ -95,7 +97,7 @@ def write_outcomes(world, hist, out):
     st, sites = world["stores"], world["sites"]
     cur = [i for i, s in enumerate(sites) if s["current"]]
     slat = np.array([s["lat"] for s in sites]); slon = np.array([s["lon"] for s in sites])
-    dsite = distances.site_km(st["full"], st["lat"], st["lon"], st["mountain"], slat, slon)
+    dsite = distances.site_km(st["full"], st["lat"], st["lon"], st["mountain"], slat, slon, [s["id"] for s in sites])
     y, dates = hist["y"], hist["cal"]["date"]
     p = routing.Params()
     jobs, terr = [], []
@@ -151,7 +153,7 @@ def _run(profile):
     ctx = evaluate.context(world, model)
     m = ctx["mask"]
     clock(f"world: {ctx['n']} planning stores, {len(world['sites'])} sites; prior strength {np.round(model['b0_type'], 2)}, kappa {model['kappa']:.1f}")
-    write_tables(world, model, hist, RESULTS / profile["name"] / "tables")
+    write_tables(world, hist, RESULTS / profile["name"] / "tables")
     hist_ops = write_outcomes(world, hist, RESULTS / profile["name"] / "tables")
     clock(f"outcome tables: {hist_ops['days']} history days, service {hist_ops['service']:.4f}, {hist_ops['vehicles_day']:.0f} vehicles/day")
 
@@ -253,7 +255,33 @@ def _run(profile):
     wb = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"], docks=docks)
     waves = dict(docks=docks, waves=list(C.WAVES), rows=wave_rows, baseline=_summary(wb), baseline_plain=_summary(base),
                  k_star_plain=k_star(sweep), k_star_waves=k_star(wave_rows))
-    clock(f"departure-wave check: k* {waves['k_star_plain']} -> {waves['k_star_waves']}")
+    more = int(np.ceil(1.25 * docks))
+    waves["docks_more"] = more
+    waves["k_star_more_docks"] = k_star([dict(k=s["k"], total=e["total"], ok98=e["ok98"] and e["dock_over_day"] == 0)
+                                         for s in sweep for e in [evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=more)]])
+    clock(f"departure-wave check: k* {waves['k_star_plain']} -> {waves['k_star_waves']} ({docks} docks), {waves['k_star_more_docks']} ({more} docks)")
+
+    # R5 reversals: today's network and the best candidate of every k re-scored under one changed assumption
+    ctx_model = dict(ctx, use_cache=False, dsite=distances.model_km(ctx["lat"][:, None], ctx["lon"][:, None], ctx["site_lat"][None], ctx["site_lon"][None], ctx["mountain"][:, None]))
+    variants = [("stop time", "10 min", ctx, routing.Params(stop_h=10 / 60)), ("stop time", "20 min", ctx, routing.Params(stop_h=20 / 60)),
+                ("speed", "30 km/h", ctx, routing.Params(speed=30.0)), ("speed", "45 km/h", ctx, routing.Params(speed=45.0)),
+                ("distance model", "calibrated model only", ctx_model, None)]
+    reversals = []
+    for name, label, c, pp in variants:
+        b = evaluate.evaluate(c, c["current"], d_search, assign=c["hist_assign"], p=pp)
+        rows = [dict(k=s["k"], total=e["total"], ok98=e["ok98"]) for s in sweep for e in [evaluate.evaluate(c, pool[s["cand"]]["sites"], d_search, p=pp)]]
+        ok = [r for r in rows if r["ok98"]]
+        best = min(r["total"] for r in ok) if ok else None
+        reversals.append(dict(assumption=name, value=label, k_star=k_star(rows), baseline=b["total"], baseline_ok98=b["ok98"],
+                              best=best, saving=None if best is None else b["total"] - best))
+    for label, f in (("100 M", 100e6 / C.DC_FIXED), ("200 M", 200e6 / C.DC_FIXED)):
+        rows = [dict(k=s["k"], total=s["total"] + (f - 1) * s["fixed"], ok98=s["ok98"]) for s in sweep]
+        b = base["total"] + (f - 1) * base["fixed"]
+        best = min(r["total"] for r in rows if r["ok98"])
+        reversals.append(dict(assumption="DC fixed cost", value=label, k_star=k_star(rows), baseline=b, baseline_ok98=base["ok98"], best=best, saving=b - best))
+    reversals.insert(0, dict(assumption="as reported", value="", k_star=k_star(sweep), baseline=base["total"], baseline_ok98=base["ok98"],
+                             best=min(s["total"] for s in sweep if s["ok98"]), saving=base["total"] - min(s["total"] for s in sweep if s["ok98"])))
+    clock("reversals: " + ", ".join(f"{r['assumption']} {r['value']} k*={r['k_star']}" for r in reversals))
 
     # Check 2: thinning, the reduced instance against this one (same stores, 1 in 5 kept); needs run_reduced.py first
     thinning = None
@@ -291,7 +319,7 @@ def _run(profile):
     g_pick = evald[int(np.argmin(G))]; e_pick = evald[int(np.argmin(E))]
     within = [ _spearman(G[[i for i, c in enumerate(evald) if pool[c]["k"] == k]], E[[i for i, c in enumerate(evald) if pool[c]["k"] == k]])
                for k in ks if sum(pool[c]["k"] == k for c in evald) >= 3]
-    r3 = dict(spearman=_spearman(G, E), spearman_within_k=float(np.mean(within)) if within else None,
+    r3 = dict(spearman=_spearman(G, E), spearman_pool=_spearman(np.array([p["G1"] for p in pool]), E_pool), spearman_within_k=float(np.mean(within)) if within else None,
               r2=float(1 - ((E - G) ** 2).sum() / ((E - E.mean()) ** 2).sum()), rmse=float(np.sqrt(((E - G) ** 2).mean())),
               loss=float(E_pool[g_pick] - E.min()), g_pick_k=pool[g_pick]["k"], e_best_k=pool[e_pick]["k"],
               A=float(pool[e_pick]["G1"] - E_pool[e_pick]), B=float(E_pool[g_pick] - pool[g_pick]["G1"]),
@@ -331,7 +359,7 @@ def _run(profile):
                     deadline=C.DEADLINE, shift_end=C.SHIFT_END, break_h=C.BREAK_H, fail_at=C.FAIL_AT, detour=C.DETOUR,
                     detour_mountain=C.DETOUR_MOUNTAIN, road_coef=distances.cache() and distances.cache()['coef'].tolist(),
                     fuel_km=C.FUEL_KM, spot_day=C.SPOT_DAY, late_pen=C.LATE_PEN,
-                    relay_day=C.RELAY_DAY, vehicle_month=C.VEHICLE_MONTH, days_month=C.DAYS_MONTH, fleet_q=C.FLEET_Q),
+                    relay_day=C.RELAY_DAY, relay_km=C.RELAY_KM, relay_shift_end=C.RELAY_SHIFT_END, vehicle_month=C.VEHICLE_MONTH, days_month=C.DAYS_MONTH, fleet_q=C.FLEET_Q),
         geo=dict(provinces=[dict(name=n, rings=[np.round(r, 3).tolist() for r in rings]) for n, rings in world["provinces"]]),
         stores=dict(id=world["stores"]["id"][m].tolist(), lat=np.round(ctx["lat"], 4).tolist(), lon=np.round(ctx["lon"], 4).tolist(),
                     type=world["stores"]["type"][m].tolist(), rate=np.round(ctx["w"], 3).tolist(),
@@ -356,7 +384,7 @@ def _run(profile):
                    ok98=cache[tuple(p["sites"])]["ok98"]) for i, p in enumerate(pool)],
         feature_names=search.FEATURE_NAMES, top5=[dict(cand=i, k=pool[i]["k"], search_E=E_pool[i], final_E=top_final[i]["total"]) for i in top],
         log_bo=log_bo, log_random=log_rand, curve_bo=curve(log_bo), curve_random=curve(log_rand), random_band=band, pool_best=pool_best,
-        sweep=sweep, waves=waves, thinning=thinning, history_ops=hist_ops,
+        sweep=sweep, waves=waves, thinning=thinning, history_ops=hist_ops, reversals=reversals,
         r2=dict(sampled=e_sampled["total"], expected_counts=e_mean["total"], average_day=e_avg["total"], peak_vehicles=float(np.sum(e_peak["V"])),
                 peak_spot_day=float(e_peak["spot"] / C.DAYS_MONTH), peak_service=float(e_peak["service"][0]), owned=fr["owned"], peak_date=d_peak["date"],
                 phi=model["phi"], sigma=model["sigma"], prior_strength=model["b0_type"].tolist(), kappa=model["kappa"], m_type=model["m_type"].tolist(),

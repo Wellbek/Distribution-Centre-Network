@@ -1,5 +1,6 @@
 """Local demo with a live lower-level solve by the same Python code: python app.py, then open the printed URL."""
 import json
+import sys
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -59,5 +60,7 @@ if __name__ == "__main__":
             break
         except OSError:
             continue
+    else:
+        sys.exit("ports 8437-8447 are all in use")
     print(f"Dasol network lab: http://localhost:{port}  (Ctrl+C to stop)", flush=True)
     server.serve_forever()

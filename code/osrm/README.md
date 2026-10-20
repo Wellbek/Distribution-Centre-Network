@@ -35,7 +35,7 @@ On the laptop, in `code/`:
 
 ```sh
 ssh -N -L 5000:localhost:5000 spark      # keep open in a second terminal
-python osrm/build_cache.py               # about 10-20 minutes, mostly waiting on the server
+python osrm/build_cache.py               # about 3-4 minutes (188 s on 2026-10-19), mostly waiting on the server
 ```
 
 Stop the server afterwards with `docker stop osrm && docker rm osrm` on the Spark.

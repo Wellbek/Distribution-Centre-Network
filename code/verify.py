@@ -148,15 +148,15 @@ try:
         pg.goto((ROOT.parent / "demo.html").resolve().as_uri()); pg.wait_for_timeout(300)
         js = pg.evaluate("""() => { const d = LIVE.days[0], s = SITES[LIVE.dc];
             const st = LIVE.stores.map((i, k) => [S.lat[i], S.lon[i], S.mountain[i], d.q[k]]);
-            const r = solveJS([s.lat, s.lon], st, {deadline: 12, stop_h: 0.25, speed: 35, cap: 48, max_stops: 25, depart: 4, max_km: 250, shift_end: 13, break_h: 0.5});
+            const r = solveJS([s.lat, s.lon], st, {deadline: 12, stop_h: 0.25, speed: 35, cap: 48, max_stops: 25, depart: 4, max_km: 250, shift_end: 13, break_h: 0.5, relay_km: 500, relay_shift_end: 19});
             return [r.vehicles, r.km]; }""")
         external = pg.evaluate("[...document.querySelectorAll('script[src],link[href],img[src]')].length")
         b.close()
     check("JS engine = Python engine without 2-opt", js[0] == py0["vehicles"] and abs(js[1] - py0["km"]) / py0["km"] < 1e-3,
           f"JS {js[0]} vehicles {js[1]:.1f} km; Python {py0['vehicles']} vehicles {py0['km']:.1f} km; with 2-opt {py1['km']:.1f} km")
     check("demo has no external resources", external == 0, f"{external} external script/link/img tags")
-except Exception as e:  # noqa: BLE001
-    check("JS engine = Python engine without 2-opt", False, f"not run: {e}")
+except ImportError:
+    print("SKIP  demo checks: playwright not installed (pip install playwright && playwright install chromium)")
 
 # Local app: live solve answers with the Python engine
 proc = subprocess.Popen([sys.executable, "app.py"], cwd=ROOT, stdout=subprocess.PIPE, text=True)
