@@ -165,3 +165,36 @@ Then back on the laptop: `scp -r spark:~/dcn/code/results code/` (the full table
 - The baseline itself misses 98% on its worst day: Wonju serves the east coast with about 111 over-limit single-store routes a day (stores 125-210 km away); this is real geography of a network without an east-coast DC and stays.
 
 **Rerun.** Same commands as above (copy the code again first); then copy `results/` back.
+
+### Spark run 2 (v0.3, reportable)
+
+**Run.** Spark, Python 3.12.3 aarch64, numpy 2.2.6, scipy 1.15.3; seed 437; reduced 85 s, full 709 s; budget 40 (13 G seeds + 27 EI); 7 search, 28 final, 14 held-out days.
+
+| Measure | Full (9,718 planning stores) | Reduced (1,938) |
+|---|---|---|
+| Today's network E (M KRW/month) | 9,383 | 2,069 |
+| Recommended | 13 DCs (keep 7, close 5, open 6), 7,607 | 12 DCs, 1,775 |
+| Saving, 28 final days (90% band) | 1,776 [1,771, 1,782] | 294 [291, 297] |
+| Saving, held-out days | 1,778 [1,771, 1,784] | 296 |
+| Worst-day service, today / recommended | 97.7% / 99.0% | 97.9% / 99.1% |
+| Waterfall: redraw territories / move sites / 13th DC | -630 / -1,059 / -87 | |
+| k sweep, search days (M) | 9: 7,964 · 10: 7,593 · 11: 7,563 · 12: 7,550 · 13: 7,448 · 14: 8,012 | flat 10-13 |
+| Departure waves (30 docks) | k* 13 -> 14 (k = 9-13 overflow the docks by 13-34 departures a day; today's network by 37) | 12 -> 12 (8 docks) |
+| Thinning | full k* 13, reduced k* 12; km per store 1.26x (square-root rule predicts 2.24x) | |
+| G1 against E (Spearman, within k) | 0.60, 0.25; G-pick loss 116 M | 0.75, 0.51 |
+| Search vs random selection (best after 40) | 7,448 vs 7,929 (random median 7,929) | both 1,793 |
+| Relay reversal (0 / 180,822 / 550,000 KRW) | k* 13 / 13 / 12; saving 1,045 / 1,776 / 3,270 | k* 11 / 12 / 12 |
+| History year (outcome tables) | 3,502,822 deliveries, 97.6% before noon, 824 vehicles/day, 139,919 km/day | |
+
+**What it means.**
+
+- The saving is mostly relocation (1,059 M) and redrawn territories (630 M); the number of DCs is a flat choice between 10 and 13 (within 150 M), so k is the least certain part of the answer.
+- The departure-wave check moves k* from 13 to 14 at an assumed 30 docks: the dock count is the first number to confirm with operations.
+- The reduced instance is off by one DC; the full instance is reported.
+- Relay routes still carry 517 M of the recommended network's cost and 1,249 M of today's; the reversal keeps k* at 12-13 and the saving positive at every price.
+- `verify.py`: 23/23.
+
+**Open.**
+
+- Review 03 with the panel on run 2 and the demo.
+- Dock-count sweep (break-even docks for k = 13), stop-time and demand-growth reversals in the next Spark run.
