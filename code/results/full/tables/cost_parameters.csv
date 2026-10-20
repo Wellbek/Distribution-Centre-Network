@@ -5,3 +5,6 @@ spot-truck daily rate,550000.0,KRW/day
 late-delivery penalty,120000.0,KRW
 stock-out penalty,500000.0,KRW
 vehicle capacity,48,roll cages
+relay driver per relay route-day [assumption],180822,KRW/day
+relay route km limit [assumption],500.0,km
+relay route on duty until [assumption],19.0,hour of day

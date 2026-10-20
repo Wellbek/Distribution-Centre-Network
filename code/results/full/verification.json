@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-20T10:25:44",
- "registry": "2026-10-20T10:19:15",
+ "generated": "2026-10-20T15:52:03",
+ "registry": "2026-10-20T15:23:30",
  "checks": [
   {
    "check": "world rebuilt",
@@ -15,7 +15,7 @@
   {
    "check": "baseline: route limits",
    "ok": true,
-   "detail": "0 unflagged violations, 227 flagged over-limit routes, max km mismatch 0.050"
+   "detail": "0 unflagged violations, 0 beyond even the relay limits, max km mismatch 0.050"
   },
   {
    "check": "recommended: every store served once",
@@ -25,42 +25,42 @@
   {
    "check": "recommended: route limits",
    "ok": true,
-   "detail": "0 unflagged violations, 94 flagged over-limit routes, max km mismatch 0.050"
+   "detail": "0 unflagged violations, 0 beyond even the relay limits, max km mismatch 0.050"
   },
   {
    "check": "cost identity baseline",
    "ok": true,
-   "detail": "components 9,383.1 M = total 9,383.1 M"
+   "detail": "components 5,874.3 M = total 5,874.3 M"
   },
   {
    "check": "cost identity reassigned12",
    "ok": true,
-   "detail": "components 8,752.8 M = total 8,752.8 M"
+   "detail": "components 9,567.6 M = total 9,567.6 M"
   },
   {
    "check": "cost identity best12",
    "ok": true,
-   "detail": "components 7,693.5 M = total 7,693.5 M"
+   "detail": "components 6,116.1 M = total 6,116.1 M"
   },
   {
    "check": "cost identity recommended",
    "ok": true,
-   "detail": "components 7,606.8 M = total 7,606.8 M"
+   "detail": "components 5,974.5 M = total 5,974.5 M"
   },
   {
    "check": "cost identity proxy_only",
    "ok": true,
-   "detail": "components 7,689.7 M = total 7,689.7 M"
+   "detail": "components 6,400.0 M = total 6,400.0 M"
   },
   {
    "check": "cost identity best_k8",
    "ok": true,
-   "detail": "components 8,763.4 M = total 8,763.4 M"
+   "detail": "components 6,400.0 M = total 6,400.0 M"
   },
   {
    "check": "paired saving equals total difference",
    "ok": true,
-   "detail": "1,776.2 M vs 1,776.2 M"
+   "detail": "-100.2 M vs -100.2 M"
   },
   {
    "check": "assignment LP within bounds",
@@ -70,32 +70,32 @@
   {
    "check": "deterministic evaluation",
    "ok": true,
-   "detail": "7,332.811 M twice"
+   "detail": "5,739.274 M twice"
   },
   {
    "check": "worker pool = one process",
    "ok": true,
-   "detail": "7,332.811 M with 2 workers"
+   "detail": "5,739.274 M with 2 workers"
   },
   {
    "check": "departure waves",
    "ok": true,
-   "detail": "1017 stores once; departures per wave [4, 4, 4, 50] with 4 docks"
+   "detail": "1400 stores once; departures per wave [4, 4, 4, 75] with 4 docks"
   },
   {
    "check": "outcome tables",
    "ok": true,
-   "detail": "3,502,822 deliveries = open store-days; 300,778 vehicle-days, 139,920 km/day"
+   "detail": "3,502,822 deliveries = open store-days; 209,022 vehicle-days, 64,810 km/day"
   },
   {
    "check": "heuristic vs exact (7 stores, 25 instances)",
    "ok": true,
-   "detail": "extra vehicles mean 0.00 (max 0), km gap mean 0.6% (max 4.4%)"
+   "detail": "extra vehicles mean 0.00 (max 0), km gap mean 0.1% (max 3.7%)"
   },
   {
    "check": "JS engine = Python engine without 2-opt",
    "ok": true,
-   "detail": "JS 72 vehicles 7099.8 km; Python 72 vehicles 7099.8 km; with 2-opt 6763.5 km"
+   "detail": "JS 67 vehicles 4877.6 km; Python 67 vehicles 4877.6 km; with 2-opt 4847.0 km"
   },
   {
    "check": "demo has no external resources",
@@ -105,17 +105,17 @@
   {
    "check": "app.py live solve = routing.solve",
    "ok": true,
-   "detail": "72 vehicles 6763.5 km in 466 ms"
+   "detail": "69 vehicles 4847.0 km in 496 ms"
   },
   {
    "check": "demo embeds this registry",
    "ok": true,
-   "detail": "2026-10-20T10:19:15"
+   "detail": "2026-10-20T15:23:30"
   },
   {
    "check": "Spearman recomputes",
    "ok": true,
-   "detail": "0.601"
+   "detail": "0.658"
   }
  ]
 }
