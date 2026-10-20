@@ -113,3 +113,30 @@ Without an east-coast DC (Gangwon has only 253 stores, below the 500 minimum), W
 
 - Rerun the reduced and full pipelines on the new world (on the Spark).
 - District labels for the `stores` table (the brief asks for province and district).
+
+### v0.3 engine and the Spark run
+
+**Why.**
+No v0.2 number survives the road cache and the Kontur world (D-025); the brief also asks for outcome tables, districts and two checks.
+
+**Changes.**
+
+- Territory process pool (D-048); departure waves (D-049); outcome tables (D-050); districts (D-051).
+- Timing on one laptop core: a 1,039-store territory takes 0.14 s for its road matrix and 0.17 s to route one day.
+- Smoke run at 5% (483 stores, 52 candidates): 202 s on one capped core; pooled and serial costs identical.
+
+**Run on the Spark** (from the laptop, in `Distribution-Centre-Network/`):
+
+```sh
+tar czf - --exclude=.venv310 --exclude=results --exclude=__pycache__ code | ssh spark 'rm -rf ~/dcn && mkdir -p ~/dcn && tar xzf - -C ~/dcn'
+ssh spark
+python3 -m venv ~/dcn-venv && ~/dcn-venv/bin/pip install -r ~/dcn/code/requirements.txt
+tmux new -s dcn
+cd ~/dcn/code && ~/dcn-venv/bin/python run_reduced.py && ~/dcn-venv/bin/python run_full.py 2>&1 | tee run.log
+```
+
+Then back on the laptop: `scp -r spark:~/dcn/code/results code/` (the full tables are about 40 MB).
+
+**Open.**
+
+- Results of both runs; switch `DEMO_PROFILE` to `full`, rebuild the demo, rerun `verify.py`.
