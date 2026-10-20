@@ -1,6 +1,8 @@
 """Embed a run's results registry, formulas and verification into ../demo.html: python build_demo.py"""
 from pathlib import Path
 
+from dcn import config as C
+
 ROOT = Path(__file__).resolve().parent
 
 
@@ -19,4 +21,4 @@ def build(profile="reduced"):
 
 
 if __name__ == "__main__":
-    build("reduced")
+    build(C.DEMO_PROFILE)

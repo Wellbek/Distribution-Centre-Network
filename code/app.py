@@ -5,10 +5,18 @@ from pathlib import Path
 
 import numpy as np
 
-from dcn import routing
+from dcn import config as C
+from dcn import demand, evaluate, routing
+from dcn.world import make_world
 
 ROOT = Path(__file__).resolve().parent
 PAGE = ROOT.parent / "demo.html"
+
+# Same world as the run the page shows, so the live solve uses the engine's cached road distances
+_P = C.FULL if C.DEMO_PROFILE == "full" else C.REDUCED
+_W = make_world(_P["fraction"], C.SEED)
+_M = demand.fit(_W, demand.make_history(_W, np.random.default_rng(C.SEED + 1)))
+CTX = evaluate.context(_W, _M)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -33,7 +41,10 @@ class Handler(SimpleHTTPRequestHandler):
         req = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         st = np.asarray(req["stores"], float)
         p = routing.Params(**req["params"])
-        D = routing.dist_matrix(req["dc"][0], req["dc"][1], st[:, 0], st[:, 1], st[:, 2] > 0)
+        if "ids" in req:
+            D = routing.territory_matrix(CTX, int(req["site"]), np.asarray(req["ids"], int))
+        else:
+            D = routing.dist_matrix(req["dc"][0], req["dc"][1], st[:, 0], st[:, 1], st[:, 2] > 0)
         r = routing.solve(D, st[:, 3], p)
         self._send(200, r)
 

@@ -163,7 +163,7 @@ proc = subprocess.Popen([sys.executable, "app.py"], cwd=ROOT, stdout=subprocess.
 try:
     line = proc.stdout.readline()
     url = re.search(r"http://localhost:\d+", line).group(0)
-    body = json.dumps(dict(dc=[float(ctx["site_lat"][j]), float(ctx["site_lon"][j])],
+    body = json.dumps(dict(dc=[float(ctx["site_lat"][j]), float(ctx["site_lon"][j])], site=int(j), ids=idx.tolist(),
                            stores=[[float(ctx["lat"][i]), float(ctx["lon"][i]), int(ctx["mountain"][i]), float(qq)] for i, qq in zip(idx, q)],
                            params=dict(deadline=12, stop_h=0.25, speed=35, cap=48, max_stops=25, depart=4, max_km=250, shift_end=13, break_h=0.5))).encode()
     t0 = time.time()
