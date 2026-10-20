@@ -61,49 +61,48 @@ CITIES = [
     ("Hadong", "South Gyeongsang", 35.0674, 127.7513, 43), ("Namhae", "South Gyeongsang", 34.8377, 127.8924, 41),
 ]
 
-# Current network: the 12 sites a capacitated p-median on demand-weighted map distance picks (prep/current_network.py)
-CURRENT_DCS = [
-    ("DC01", "Yongin Giheung", "Gyeonggi", 37.245, 127.130, "2027-03-31"),
-    ("DC02", "Gimpo Gochon", "Gyeonggi", 37.600, 126.700, "2028-06-30"),
-    ("DC03", "Yangju Gwangjeok", "Gyeonggi", 37.790, 127.010, "2029-09-30"),
-    ("DC04", "Hanam Gamil", "Gyeonggi", 37.555, 127.200, "2027-12-31"),
-    ("DC05", "Cheonan Seobuk", "South Chungcheong", 36.860, 127.150, "2030-03-31"),
-    ("DC06", "Daejeon Daedeok", "Daejeon", 36.420, 127.420, "2028-12-31"),
-    ("DC07", "Wonju Munmak", "Gangwon", 37.320, 127.820, "2031-06-30"),
-    ("DC08", "Iksan Wanggung", "North Jeolla", 35.960, 127.000, "2029-03-31"),
-    ("DC09", "Gwangju Pyeongdong", "Gwangju", 35.140, 126.760, "2030-09-30"),
-    ("DC10", "Gyeongsan Jillyang", "North Gyeongsang", 35.860, 128.790, "2027-09-30"),
-    ("DC11", "Busan Gangseo", "Busan", 35.110, 128.900, "2031-03-31"),
-    ("DC12", "Incheon Namdong", "Incheon", 37.400, 126.700, "2028-09-30"),
+# The 60 leasable sites near motorway interchanges and logistics zones (id, name, province, lat, lon); ids match data/road_cache.npz
+SITES = [
+    ("S01", "Yongin Giheung", "Gyeonggi", 37.245, 127.13), ("S02", "Gimpo Gochon", "Gyeonggi", 37.6, 126.7),
+    ("S03", "Yangju Gwangjeok", "Gyeonggi", 37.79, 127.01), ("S04", "Hanam Gamil", "Gyeonggi", 37.555, 127.2),
+    ("S05", "Cheonan Seobuk", "South Chungcheong", 36.86, 127.15), ("S06", "Daejeon Daedeok", "Daejeon", 36.42, 127.42),
+    ("S07", "Wonju Munmak", "Gangwon", 37.32, 127.82), ("S08", "Iksan Wanggung", "North Jeolla", 35.96, 127.0),
+    ("S09", "Gwangju Pyeongdong", "Gwangju", 35.14, 126.76), ("S10", "Gyeongsan Jillyang", "North Gyeongsang", 35.86, 128.79),
+    ("S11", "Busan Gangseo", "Busan", 35.11, 128.9), ("S12", "Incheon Namdong", "Incheon", 37.4, 126.7),
+    ("S13", "Hwaseong Hyangnam", "Gyeonggi", 37.12, 126.92), ("S14", "Pyeongtaek Poseung", "Gyeonggi", 36.99, 126.86),
+    ("S15", "Anseong Wongok", "Gyeonggi", 37.04, 127.18), ("S16", "Namyangju Jingeon", "Gyeonggi", 37.66, 127.18),
+    ("S17", "Paju Munsan", "Gyeonggi", 37.85, 126.79), ("S18", "Siheung Banwol", "Gyeonggi", 37.33, 126.74),
+    ("S19", "Gwangju-si Opo", "Gyeonggi", 37.36, 127.23), ("S20", "Osan Gajang", "Gyeonggi", 37.17, 127.04),
+    ("S21", "Icheon Majang", "Gyeonggi", 37.235, 127.39), ("S22", "Gangneung Gujeong", "Gangwon", 37.72, 128.87),
+    ("S23", "Chuncheon Toegye", "Gangwon", 37.85, 127.71), ("S24", "Ulsan Onsan", "Ulsan", 35.44, 129.3),
+    ("S25", "Donghae Bukpyeong", "Gangwon", 37.5, 129.08), ("S26", "Chungju Daesowon", "North Chungcheong", 37.01, 127.88),
+    ("S27", "Cheongju Osong", "North Chungcheong", 36.63, 127.33), ("S28", "Eumseong Daeso", "North Chungcheong", 36.96, 127.56),
+    ("S29", "Jecheon Bongyang", "North Chungcheong", 37.11, 128.13), ("S30", "Okcheon Cheongsan", "North Chungcheong", 36.33, 127.6),
+    ("S31", "Sejong Bugang", "Sejong", 36.53, 127.25), ("S32", "Asan Tangjeong", "South Chungcheong", 36.79, 127.05),
+    ("S33", "Dangjin Songak", "South Chungcheong", 36.9, 126.72), ("S34", "Seosan Daesan", "South Chungcheong", 36.78, 126.5),
+    ("S35", "Nonsan Yeonmu", "South Chungcheong", 36.17, 127.1), ("S36", "Hongseong Galsan", "South Chungcheong", 36.62, 126.61),
+    ("S37", "Wanju Bongdong", "North Jeolla", 35.93, 127.17), ("S38", "Gunsan Okseo", "North Jeolla", 35.95, 126.7),
+    ("S39", "Jeongeup Buk", "North Jeolla", 35.6, 126.88), ("S40", "Namwon Ijin", "North Jeolla", 35.43, 127.41),
+    ("S41", "Naju Bitgaram", "South Jeolla", 35.02, 126.78), ("S42", "Muan Iljo", "South Jeolla", 34.99, 126.47),
+    ("S43", "Suncheon Haeryong", "South Jeolla", 34.95, 127.54), ("S44", "Gwangyang Port", "South Jeolla", 34.92, 127.7),
+    ("S45", "Jinju Sabong", "South Gyeongsang", 35.17, 128.18), ("S46", "Changwon Jinyeong", "South Gyeongsang", 35.3, 128.72),
+    ("S47", "Yangsan Sangbuk", "South Gyeongsang", 35.39, 129.05), ("S48", "Gimhae Hallim", "South Gyeongsang", 35.3, 128.81),
+    ("S49", "Miryang Sangnam", "South Gyeongsang", 35.48, 128.76), ("S50", "Geochang Namha", "South Gyeongsang", 35.68, 127.94),
+    ("S51", "Gyeongju Oedong", "North Gyeongsang", 35.75, 129.29), ("S52", "Pohang Yeongil", "North Gyeongsang", 36.0, 129.39),
+    ("S53", "Gumi Sandong", "North Gyeongsang", 36.15, 128.43), ("S54", "Gimcheon Eomo", "North Gyeongsang", 36.12, 128.15),
+    ("S55", "Andong Pungsan", "North Gyeongsang", 36.59, 128.58), ("S56", "Yeongcheon Geumho", "North Gyeongsang", 35.94, 128.88),
+    ("S57", "Chilgok Waegwan", "North Gyeongsang", 35.99, 128.4), ("S58", "Daegu Dalseong", "Daegu", 35.77, 128.47),
+    ("S59", "Sangju Cheongni", "North Gyeongsang", 36.39, 128.18), ("S60", "Yeongju Munsu", "North Gyeongsang", 36.78, 128.6),
 ]
 
-# Further leasable sites near motorway interchanges and logistics zones (id, name, province, lat, lon)
-NEW_SITES = [
-    ("S13", "Hwaseong Hyangnam", "Gyeonggi", 37.120, 126.920), ("S14", "Pyeongtaek Poseung", "Gyeonggi", 36.990, 126.860),
-    ("S15", "Anseong Wongok", "Gyeonggi", 37.040, 127.180), ("S16", "Namyangju Jingeon", "Gyeonggi", 37.660, 127.180),
-    ("S17", "Paju Munsan", "Gyeonggi", 37.850, 126.790), ("S18", "Siheung Banwol", "Gyeonggi", 37.330, 126.740),
-    ("S19", "Gwangju-si Opo", "Gyeonggi", 37.360, 127.230), ("S20", "Osan Gajang", "Gyeonggi", 37.170, 127.040),
-    ("S21", "Icheon Majang", "Gyeonggi", 37.235, 127.390), ("S22", "Gangneung Gujeong", "Gangwon", 37.720, 128.870),
-    ("S23", "Chuncheon Toegye", "Gangwon", 37.850, 127.710), ("S24", "Ulsan Onsan", "Ulsan", 35.440, 129.300),
-    ("S25", "Donghae Bukpyeong", "Gangwon", 37.500, 129.080), ("S26", "Chungju Daesowon", "North Chungcheong", 37.010, 127.880),
-    ("S27", "Cheongju Osong", "North Chungcheong", 36.630, 127.330), ("S28", "Eumseong Daeso", "North Chungcheong", 36.960, 127.560),
-    ("S29", "Jecheon Bongyang", "North Chungcheong", 37.110, 128.130), ("S30", "Okcheon Cheongsan", "North Chungcheong", 36.330, 127.600),
-    ("S31", "Sejong Bugang", "Sejong", 36.530, 127.250), ("S32", "Asan Tangjeong", "South Chungcheong", 36.790, 127.050),
-    ("S33", "Dangjin Songak", "South Chungcheong", 36.900, 126.720), ("S34", "Seosan Daesan", "South Chungcheong", 36.780, 126.500),
-    ("S35", "Nonsan Yeonmu", "South Chungcheong", 36.170, 127.100), ("S36", "Hongseong Galsan", "South Chungcheong", 36.620, 126.610),
-    ("S37", "Wanju Bongdong", "North Jeolla", 35.930, 127.170), ("S38", "Gunsan Okseo", "North Jeolla", 35.950, 126.700),
-    ("S39", "Jeongeup Buk", "North Jeolla", 35.600, 126.880), ("S40", "Namwon Ijin", "North Jeolla", 35.430, 127.410),
-    ("S41", "Naju Bitgaram", "South Jeolla", 35.020, 126.780), ("S42", "Muan Iljo", "South Jeolla", 34.990, 126.470),
-    ("S43", "Suncheon Haeryong", "South Jeolla", 34.950, 127.540), ("S44", "Gwangyang Port", "South Jeolla", 34.920, 127.700),
-    ("S45", "Jinju Sabong", "South Gyeongsang", 35.170, 128.180), ("S46", "Changwon Jinyeong", "South Gyeongsang", 35.300, 128.720),
-    ("S47", "Yangsan Sangbuk", "South Gyeongsang", 35.390, 129.050), ("S48", "Gimhae Hallim", "South Gyeongsang", 35.300, 128.810),
-    ("S49", "Miryang Sangnam", "South Gyeongsang", 35.480, 128.760), ("S50", "Geochang Namha", "South Gyeongsang", 35.680, 127.940),
-    ("S51", "Gyeongju Oedong", "North Gyeongsang", 35.750, 129.290), ("S52", "Pohang Yeongil", "North Gyeongsang", 36.000, 129.390),
-    ("S53", "Gumi Sandong", "North Gyeongsang", 36.150, 128.430), ("S54", "Gimcheon Eomo", "North Gyeongsang", 36.120, 128.150),
-    ("S55", "Andong Pungsan", "North Gyeongsang", 36.590, 128.580), ("S56", "Yeongcheon Geumho", "North Gyeongsang", 35.940, 128.880),
-    ("S57", "Chilgok Waegwan", "North Gyeongsang", 35.990, 128.400), ("S58", "Daegu Dalseong", "Daegu", 35.770, 128.470),
-    ("S59", "Sangju Cheongni", "North Gyeongsang", 36.390, 128.180), ("S60", "Yeongju Munsu", "North Gyeongsang", 36.780, 128.600),
-]
+# Today's 12 DCs and their lease ends: the sites a planner picks by p-median on road km with every store within one
+# driver-day and no DC above the store cap (prep/current_network.py); the baseline is exempt from the store minimum
+CURRENT = {
+    "S22": "2027-03-31", "S16": "2028-06-30", "S02": "2029-09-30",
+    "S19": "2027-12-31", "S13": "2030-03-31", "S60": "2028-12-31",
+    "S35": "2031-06-30", "S58": "2029-03-31", "S51": "2030-09-30",
+    "S11": "2027-09-30", "S41": "2031-03-31", "S44": "2028-09-30",
+}
 
 CAPITAL = {"Seoul", "Gyeonggi", "Incheon"}
 METRO = {"Busan", "Daegu", "Daejeon", "Gwangju", "Ulsan", "Sejong"}

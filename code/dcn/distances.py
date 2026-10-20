@@ -1,5 +1,6 @@
 """Road distances: OSRM cache for store-site and nearest-store pairs, calibrated map-distance model for the rest."""
 import json
+import warnings
 from functools import lru_cache
 
 import numpy as np
@@ -12,8 +13,9 @@ CACHE = geo.DATA / "road_cache.npz"
 
 @lru_cache(1)
 def cache():
-    # None until osrm/build_cache.py has written the file
+    # None until osrm/build_cache.py has written the file; the runs then use the uncalibrated placeholder
     if not CACHE.exists():
+        warnings.warn(f"{CACHE} missing: distances fall back to map distance x {C.DETOUR}; results are not the reported ones")
         return None
     z = np.load(CACHE)
     return {k: z[k] for k in z.files} | dict(meta=json.loads(str(z["meta"])))
@@ -59,24 +61,25 @@ def describe():
             f"{m['k_nn']} nearest stores per store; other pairs by a model calibrated on {m['calibration_pairs']} road distances")
 
 
-def site_km(full, lat, lon, mountain, slat, slon):
-    """Store x site road km: cached OSRM values, model if no cache."""
+def site_km(full, lat, lon, mountain, slat, slon, ids):
+    """Store x site road km for the sites named in ids: cached OSRM values, model if no cache."""
     z = cache()
     if z is None:
         return model_km(lat[:, None], lon[:, None], slat[None], slon[None], mountain[:, None])
     if not (np.allclose(z["lat"][full], lat) and np.allclose(z["lon"][full], lon)):
         raise RuntimeError("road_cache.npz was built for another world; rerun osrm/build_cache.py")
-    return z["site_km"][full].astype(float)
+    col = {s: i for i, s in enumerate(z["site_ids"].tolist())}
+    return z["site_km"][full][:, [col[i] for i in ids]].astype(float)
 
 
-def territory(dc_km, full, lat, lon, mountain):
+def territory(dc_km, full, lat, lon, mountain, use_cache=True):
     """DC + stores matrix (index 0 = DC): cached DC legs and nearest-store legs, model for the remaining store pairs."""
     n = len(full)
     D = np.zeros((n + 1, n + 1))
     D[0, 1:] = D[1:, 0] = dc_km
     D[1:, 1:] = model_km(lat[:, None], lon[:, None], lat[None], lon[None], mountain[:, None] | mountain[None])
     np.fill_diagonal(D, 0.0)
-    z = cache()
+    z = cache() if use_cache else None
     if z is not None:
         local = np.full(len(z["lat"]), -1)
         local[full] = np.arange(n)

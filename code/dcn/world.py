@@ -6,7 +6,7 @@ from scipy import sparse
 from scipy.optimize import linprog
 
 from . import config as C
-from . import geo
+from . import distances, geo
 
 TYPES = np.array(["residential", "office", "mixed", "roadside"])
 TYPE_LEVEL = np.array([1.00, 0.95, 1.05, 1.10])
@@ -75,9 +75,9 @@ def make_world(fraction=1.0, seed=C.SEED):
     order = rng.permutation(n)
     keep = np.sort(order[: int(round(fraction * n))])
 
-    dcs = [dict(id=d[0], name=d[1], province=d[2], lat=d[3], lon=d[4], lease_expires_on=d[5]) for d in geo.CURRENT_DCS]
-    sites = [dict(id=d["id"], name=d["name"], province=d["province"], lat=d["lat"], lon=d["lon"], current=True) for d in dcs]
-    sites += [dict(id=s_[0], name=s_[1], province=s_[2], lat=s_[3], lon=s_[4], current=False) for s_ in geo.NEW_SITES]
+    sites = [dict(id=s_[0], name=s_[1], province=s_[2], lat=s_[3], lon=s_[4], current=s_[0] in geo.CURRENT) for s_ in geo.SITES]
+    dcs = [dict(id=x["id"], name=x["name"], province=x["province"], lat=x["lat"], lon=x["lon"], lease_expires_on=geo.CURRENT[x["id"]])
+           for x in sites if x["current"]]
     for st in sites:
         st["monthly_fixed_cost"] = round(C.DC_FIXED * geo.site_cost_factor(st["province"]) * fraction)
         st["max_stores"] = round(C.MAX_STORES * fraction)
@@ -92,19 +92,17 @@ def make_world(fraction=1.0, seed=C.SEED):
     stores["id"] = np.array([f"ST{i:05d}" for i in keep])
     stores["full"] = keep
 
-    # Historical assignment: the network planner's capacitated assignment on demand-weighted map distance for the stores
-    # open before the history year; stores opened during it go to the nearest DC with room; never rebalanced
+    # Historical assignment: the planner's assignment on demand-weighted road km, every store within one driver-day,
+    # no DC above the cap, no minimum (prep/current_network.py), for the stores open before the history year;
+    # stores opened during it go to the nearest DC by road (the baseline is exempt from the bounds); never rebalanced
     dlat = np.array([d["lat"] for d in dcs]); dlon = np.array([d["lon"] for d in dcs])
-    dm = geo.haversine(stores["lat"][:, None], stores["lon"][:, None], dlat[None, :], dlon[None, :])
-    lo, hi = round(C.MIN_STORES * fraction), round(C.MAX_STORES * fraction)
+    dm = distances.site_km(keep, stores["lat"], stores["lon"], stores["mountain"], dlat, dlon, [d["id"] for d in dcs])
+    hi = round(C.MAX_STORES * fraction)
     old = stores["opened"] < 0
-    res = transport_lp(stores["rate_true"][old, None] * dm[old], lo, hi)
+    res = transport_lp(stores["rate_true"][old, None] * dm[old] + 1e12 * (dm[old] > C.MAX_KM / 2), 0, hi)
     cur = np.full(len(keep), -1)
     cur[old] = res.x.reshape(old.sum(), -1).argmax(1)
-    load = np.bincount(cur[old], minlength=len(dcs))
-    for i in np.flatnonzero(~old)[np.argsort(stores["opened"][~old], kind="stable")]:
-        j = int(np.argmin(np.where(load < hi, dm[i], np.inf)))
-        cur[i] = j; load[j] += 1
+    cur[~old] = dm[~old].argmin(1)
     stores["current_dc"] = cur
 
     return dict(
