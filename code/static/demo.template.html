@@ -102,6 +102,7 @@ select { font: inherit; border: 1px solid var(--line); border-radius: 999px; pad
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
 th { text-align: left; color: var(--purple-ink); background: var(--lav); padding: 7px 9px; font-weight: 800; position: sticky; top: 0; }
 td { padding: 6px 9px; border-bottom: 1px solid #efedf1; font-variant-numeric: tabular-nums; }
+tr.flip td { background: #fdecec; }
 tr.hl td { background: var(--lime-soft); }
 .scroll { max-height: 340px; overflow: auto; border-radius: 12px; border: 1px solid #efedf1; }
 .chart { width: 100%; height: auto; display: block; }
@@ -152,14 +153,14 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div><span class="kicker" id="hero-kicker"></span><h1 id="hero-h1"></h1><p id="hero-p"></p><div class="ask" id="hero-ask"></div></div>
     <div class="stats" id="hero-stats"></div>
   </div>
-  <div class="stitle"><span class="deco">✓</span><h2>Where the DCs go</h2><span class="rule"></span><span class="chip">baseline vs recommended</span></div>
+  <div class="stitle"><span class="deco">✓</span><h2>Where the DCs go</h2><span class="rule"></span><span class="chip"><span data-alt="pair">baseline vs recommended</span></span></div>
   <div class="grid g2">
-    <div class="card"><div class="row spread"><div class="seg" id="ans-seg"><button data-n="change" class="on">What changes</button><button data-n="baseline">Current 12</button><button data-n="recommended">Recommended</button></div><span class="note">scroll to zoom · drag to pan · hover a store</span></div>
+    <div class="card"><div class="row spread"><div class="seg" id="ans-seg"><button data-n="change" class="on">What changes</button><button data-n="baseline">Current 12</button><button data-n="recommended"><span data-alt="cap">Recommended</span></button></div><span class="note">scroll to zoom · drag to pan · hover a store</span></div>
       <div class="mapbox small" id="ansmap" style="margin-top:10px"></div>
       <div class="legend" id="ans-legend"></div></div>
     <div class="grid" style="align-content:start">
       <div class="card"><h3>Where the saving comes from</h3><p class="sub">28 final days, paired; each bar is one step from today's network</p><svg class="chart" id="waterfall" viewBox="0 0 460 250"></svg></div>
-      <div class="card"><h3>Does the answer survive the far-store charge?</h3><p class="sub">Stores beyond 250 km or the shift need a relay driver. The monthly cost and the best number of DCs under three prices for that relay.</p><div class="tw"><table id="reversal"></table></div></div>
+      <div class="card"><h3>When would the answer change?</h3><p class="sub">Today's network and the best candidate of every k re-scored under one changed assumption (brief R5), 7 search days; saving = today minus the best candidate, M KRW per month.</p><div class="tw"><table id="reversal"></table></div></div>
     </div>
   </div>
   <div class="stitle"><span class="deco">k</span><h2>Cost against the number of DCs</h2><span class="rule"></span><span class="chip">reported search · 7 search days</span></div>
@@ -175,7 +176,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="card">
       <div class="row spread">
         <div class="row"><div class="clockbig" id="clock">04:00</div><div><div class="note" id="day-label"></div><div class="note">deadline 12:00 · back by 13:00 incl. a 30 min break</div></div></div>
-        <div class="row"><div class="seg" id="day-net"><button data-n="baseline">Current 12</button><button data-n="recommended" class="on">Recommended</button></div>
+        <div class="row"><div class="seg" id="day-net"><button data-n="baseline">Current 12</button><button data-n="recommended" class="on"><span data-alt="cap">Recommended</span></button></div>
           <div class="seg" id="day-kind"><button data-n="weekday" class="on">Weekday</button><button data-n="peak">Peak day</button></div></div>
       </div>
       <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">🚚 Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
@@ -217,7 +218,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   <div class="stitle"><span class="deco">▤</span><h2>Today's operation, last 12 months</h2><span class="rule"></span><span class="chip">outcome tables</span></div>
   <div class="grid g2e"><div class="card" id="histops"></div><div class="card" id="histcheck"></div></div>
   <div class="stitle"><span class="deco">♥</span><h2>Stores like mine</h2><span class="rule"></span><span class="chip">franchise view</span></div>
-  <div class="grid g2"><div class="card"><h3>On-time share per store, 28 final days</h3><p class="sub">Each store's day-weighted share of deliveries before 12:00 (relay deliveries count as late)</p><svg class="chart" id="storehist" viewBox="0 0 760 260"></svg></div><div class="card" id="storeview"></div></div>
+  <div class="grid g2"><div class="card"><h3>On-time share per store, 28 final days</h3><p class="sub">Each store's day-weighted share of deliveries before 12:00</p><svg class="chart" id="storehist" viewBox="0 0 760 260"></svg></div><div class="card" id="storeview"></div></div>
   <div class="stitle"><span class="deco">✓</span><h2>Verification and reproduction</h2><span class="rule"></span></div>
   <div class="grid g2e"><div class="card" id="verify"></div><div class="card" id="about"></div></div>
 </section>
@@ -243,6 +244,10 @@ const pct = v => (100 * v).toFixed(1) + "%";
 const hhmm = t => { let h = Math.floor(t), m = Math.round((t - h) * 60); if (m === 60) { h++; m = 0; } return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0"); };
 const PAL = ["#751485", "#2e86ab", "#e07a5f", "#3d9970", "#8e7dbe", "#c9822b", "#577590", "#b5838d", "#43aa8b", "#9c6644", "#6d597a", "#277da1", "#bc4b51", "#5b8e7d", "#7a5195", "#ef8a62", "#4d908e", "#a05195", "#355070", "#b56576"];
 const SCALE = Math.round(1 / M.fraction);
+// When no design beats today's network, the searched network is the best alternative, not a recommendation
+const ALT = R.saving.final_ci[0] > 0 && R.saving.held_ci[0] > 0 ? "recommended" : "best alternative", ALTC = ALT[0].toUpperCase() + ALT.slice(1);
+document.querySelectorAll("[data-alt=pair]").forEach(e => e.textContent = `today vs ${ALT}`);
+document.querySelectorAll("[data-alt=cap]").forEach(e => e.textContent = ALTC);
 const SCALED = M.fraction < 1 ? ` · reduced instance, 1 store in ${SCALE}` : "";
 
 // Tabs
@@ -357,13 +362,14 @@ RENDER.answer = () => {
     $("#hero-h1").innerHTML = `Run <em>${r.k} DCs</em>: keep ${kept.length}, close ${closed.length}, open ${opened.length}`;
     $("#hero-p").textContent = `Kept: ${kept.map(j => SITES[j].name).join(", ") || "none"}. New: ${opened.map(j => SITES[j].name).join(", ")}. Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
   } else {
+    const flips = R.reversals.slice(1).filter(x => x.saving > 0).map(x => `${x.assumption} is ${x.value} (saving ${fM(x.saving)} M at k = ${x.k_star})`);
     $("#hero-h1").innerHTML = `Keep <em>today's ${b.k} DCs</em>: no redesign pays here`;
-    $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% interval of the saving ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
+    $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% band over demand days ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Today's network may keep small regional DCs and grow past 1,400 stores; a new design must stay within 500-1,400 per DC, and that costs more than it saves. ${flips.length ? `The answer changes only if ${flips.join("; ")}.` : "No tested assumption changes the answer."} Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
   }
   $("#hero-ask").innerHTML = pays ? `<b>Decision requested:</b> approve a data audit (real road times, 12 months of store orders, current routes) and a shadow run at two DCs before any lease is signed.`
-    : `<b>Decision requested:</b> renew leases as they expire, redraw nothing yet, and fund a data audit (real road times, orders, routes); revisit if real distances move the sweep.`;
+    : `<b>Decision requested:</b> renew leases as they expire and redraw nothing yet; confirm the DC rents and dock counts the answer depends on, and decide whether the capital-region DCs may keep running above 1,400 stores.`;
   $("#hero-stats").innerHTML = [
-    ["Monthly cost", fM(r.total), "M KRW", `today ${fM(b.total)} M`],
+    [pays ? "Monthly cost" : "Best alternative costs", fM(r.total), "M KRW", `today ${fM(b.total)} M a month`],
     ["Saving per month", fM(sv.final_mean), "M KRW", `${(12 * sv.final_mean / 1e9).toFixed(1)} bn a year · 28 final days, 90% band ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])} (demand days only)`],
     ["Saving, unseen days", fM(sv.held_mean), "M KRW", `${M.days[2]} held-out days, 90% band ${fM(sv.held_ci[0])} to ${fM(sv.held_ci[1])}`],
     ["On time before noon", pct(r.service_mean), "", `worst day ${pct(r.service_min)}; today ${pct(b.service_mean)}`],
@@ -395,14 +401,14 @@ RENDER.answer = () => {
 };
 function storeTip(i) {
   const b = SITES[S.base_dc[i]].name, r = SITES[S.rec_dc[i]].name;
-  return `<b>${S.id[i]}</b> · ${TYPES[S.type[i]]}<br>about ${S.rate[i].toFixed(1)} cages a day<br>DC today: ${b}<br>DC recommended: ${r}${b === r ? "" : " <b>(moves)</b>"}<br>on time before noon: ${pct(S.ontime_base[i])} today, ${pct(S.ontime_rec[i])} recommended`;
+  return `<b>${S.id[i]}</b> · ${TYPES[S.type[i]]}<br>about ${S.rate[i].toFixed(1)} cages a day<br>DC today: ${b}<br>DC ${ALT}: ${r}${b === r ? "" : " <b>(moves)</b>"}<br>on time before noon: ${pct(S.ontime_base[i])} today, ${pct(S.ontime_rec[i])} ${ALT}`;
 }
 const NS = "http://www.w3.org/2000/svg";
 function el(t, a, p, txt) { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; }
 function niceTicks(lo, hi, n = 5) { const raw = (hi - lo) / n, mag = 10 ** Math.floor(Math.log10(raw)), step = [1, 2, 2.5, 5, 10].map(x => x * mag).find(x => x >= raw); const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v); return out; }
 function waterfall() {
   const svg = $("#waterfall"); svg.innerHTML = "";
-  const st = R.saving.waterfall.filter(Boolean), vals = st.map(s => s.total);
+  const st = R.saving.waterfall.filter(Boolean).map(s => ({ ...s, step: s.step.replace("same 12 DCs, territories redrawn", "today's sites, redrawn within 500-1,400").replace("recommended", ALT) })), vals = st.map(s => s.total);
   const lo = 0, hi = Math.max(...vals) * 1.08, Y = v => 210 - (v - lo) / (hi - lo) * 190, bw = 300 / st.length;
   for (const t of niceTicks(lo, hi, 4)) { el("line", { x1: 60, x2: 450, y1: Y(t), y2: Y(t), stroke: "#f0edf2" }, svg); el("text", { x: 54, y: Y(t) + 4, "text-anchor": "end", "font-size": 11, fill: "#63636b" }, svg, fM(t)); }
   st.forEach((s, i) => {
@@ -415,10 +421,12 @@ function waterfall() {
   });
 }
 function reversal() {
-  const rv = R.reversal;
-  $("#reversal").innerHTML = `<tr><th>Relay price per route-day</th><th>Today</th><th>Recommended</th><th>Saving</th><th>Best k</th></tr>` +
-    rv.map(x => `<tr class="${Math.abs(x.relay - P.relay_day) < 1 ? "hl" : ""}"><td>${x.relay === 0 ? "free" : f0(x.relay) + " KRW"}${Math.abs(x.relay - P.relay_day) < 1 ? " (used)" : ""}</td><td>${fM(x.baseline)}</td><td>${fM(x.recommended)}</td><td>${fM(x.baseline - x.recommended)}</td><td>${x.k_star}</td></tr>`).join("") +
-    `<tr><td colspan="5" class="note">Over-limit routes a day: today ${R.finals.baseline.over_limit_day.toFixed(1)}, recommended ${R.finals.recommended.over_limit_day.toFixed(1)}. M KRW per month.</td></tr>`;
+  // R5 reversals plus the relay-price sweep; a row flips the answer when the saving changes sign or k* moves
+  const base = R.reversals[0], rows = [...R.reversals.map(x => [x.assumption, x.value || "base case", x.k_star, x.saving]),
+    ...R.reversal.filter(x => Math.abs(x.relay - P.relay_day) > 1).map(x => ["relay driver per route-day", x.relay === 0 ? "free" : `${f0(x.relay)} KRW`, x.k_star, x.baseline - x.recommended])];
+  $("#reversal").innerHTML = `<tr><th>Assumption</th><th>Value</th><th>Best k</th><th>Saving</th></tr>` +
+    rows.map(([a, v, k, sv], i) => `<tr class="${i === 0 ? "hl" : (sv > 0) !== (base.saving > 0) || k !== base.k_star ? "flip" : ""}"><td>${a}</td><td>${v}</td><td>${k ?? "none"}</td><td>${sv == null ? "n/a" : (sv < 0 ? "−" : "") + fM(Math.abs(sv))}</td></tr>`).join("") +
+    `<tr><td colspan="4" class="note">Highlighted rows change the answer. Relay routes a day: today ${R.finals.baseline.over_limit_day.toFixed(0)}, recommended ${R.finals.recommended.over_limit_day.toFixed(0)}. Sweep candidates come from the whole-pool validation, not only the 40 searched.</td></tr>`;
 }
 function sweep() {
   const svg = $("#sweep"); svg.innerHTML = "";
@@ -522,7 +530,7 @@ RENDER.day = () => {
   }
   resetDay();
 };
-function resetDay() { $("#geom-note").textContent = SHAPES ? "🚚 truck · roads from OSRM; a live solve draws straight lines" : "🚚 truck · straight lines between stops; costs use road km"; DAY = buildDay(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : "recommended network"} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
+function resetDay() { $("#geom-note").textContent = SHAPES ? "🚚 truck · roads from OSRM; a live solve draws straight lines" : "🚚 truck · straight lines between stops; costs use road km"; DAY = buildDay(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
 function truckAt(x, y) {
   let best = -1, bd = 400;
   DAY.routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
@@ -582,7 +590,7 @@ const LIVE = R.live;
 function initLive() {
   LIVE.days.forEach((d, i) => $("#lv-day").add(new Option(d.name, i)));
   $("#lv-fleet").max = $("#lv-fleet").value = Math.ceil(LIVE.stores.length / 8);
-  $("#live-sub").textContent = `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the recommended network's largest territory. Changing a setting re-solves it.`;
+  $("#live-sub").textContent = `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the ${ALT} network's largest territory. Changing a setting re-solves it.`;
   document.querySelectorAll("#v-day input[type=range]:not(#scrub), #lv-day").forEach(i => i.oninput = () => { sync(); clearTimeout(i._t); i._t = setTimeout(solveLive, 250); });
   $("#lv-solve").onclick = solveLive;
   $("#lv-reset").onclick = () => { Object.entries({ "lv-dead": 12, "lv-stop": 15, "lv-speed": 35, "lv-cap": 48, "lv-stops": 25, "lv-fleet": +$("#lv-fleet").max }).forEach(([k, v]) => $("#" + k).value = v); sync(); solveLive(); };
@@ -642,7 +650,7 @@ async function solveLive() {
   const idx = LIVE.stores;
   let res, engine; const t0 = performance.now();
   if (BACKEND) { try { res = await (await fetch("/api/solve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dc: [dc.lat, dc.lon], stores: st, params: p, site: LIVE.dc, ids: idx }) })).json(); engine = "Python engine (savings + 2-opt, cached road distances)"; } catch (e) { BACKEND = false; setEngine(); } }
-  if (!res) { res = solveJS([dc.lat, dc.lon], st, p); engine = "in-browser engine (same savings rules, no 2-opt)"; }
+  if (!res) { res = solveJS([dc.lat, dc.lon], st, p); engine = "in-browser engine (same savings and relay rules; no 2-opt, calibrated distance model instead of the OSRM cache)"; }
   const ms = performance.now() - t0;
   // Fleet limit: routes beyond the available vehicles are not driven; their stores are uncovered
   const covered = res.routes.slice().sort((a, b) => b.load - a.load).slice(0, fleet), uncovered = res.routes.filter(r => !covered.includes(r));
@@ -676,7 +684,7 @@ RENDER.how = () => {
     { q: "Q3 · How does one DC run its morning?", lec: "Lecture 1 · formulation is a balance", title: "The lower level: one DC, one day",
       left: `<div class="formula">${MATH.lower_obj}</div><div class="formula">${MATH.lower_st}</div><div class="formula">${MATH.time}</div>
       <p>Built by Clarke-Wright savings, improved by 2-opt; every merge is checked against all five limits.</p><div class="formula">${MATH.savings}</div><div class="formula">${MATH.twoopt}</div>
-      <div class="keypoint"><b>What limits a vehicle's day?</b> In the recommended network: ${Object.entries(r.census).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v.toFixed(0)}`).join(", ")} route-days (day-weighted).</div>`,
+      <div class="keypoint"><b>What limits a vehicle's day?</b> In the ${ALT} network: ${Object.entries(r.census).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v.toFixed(0)}`).join(", ")} route-days (day-weighted).</div>`,
       right: `<svg class="chart" viewBox="0 0 440 270" id="fig-savings"></svg><svg class="chart" viewBox="0 0 440 80" id="fig-census"></svg>` },
     { q: "Q4 · How does a day's routing price a network?", lec: "Lectures 1-2 · bilevel evaluation, sample average", title: "The connection: E(x)",
       left: `<div class="formula">${MATH.E}</div><div class="formula">${MATH.lp}</div><div class="formula">${MATH.newsvendor}</div>
@@ -690,7 +698,7 @@ RENDER.how = () => {
     { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E",
       left: `<div class="formula">${MATH.bound}</div>
       <p>Prediction quality: Spearman ${R.r3.spearman.toFixed(2)} overall${R.r3.spearman_within_k != null ? `, ${R.r3.spearman_within_k.toFixed(2)} within k` : ""}. Decision quality: trusting G alone picks k = ${R.r3.g_pick_k} and loses ${fM(R.r3.loss)} M a month against the best evaluated (k = ${R.r3.e_best_k}).</p>
-      <div class="keypoint"><b>G ignores the clock and the 250 km limit,</b> so it under-rates large territories: B, the amount G under-rates its own pick, is ${fM(R.r3.B)} M.</div>`,
+      <div class="keypoint"><b>G ignores the clock</b> (it only prices stores beyond 125 km as relay routes by load), so it under-rates large territories: B, the amount G under-rates its own pick, is ${fM(R.r3.B)} M.</div>`,
       right: `<svg class="chart" viewBox="0 0 440 300" id="fig-scatter"></svg><svg class="chart" viewBox="0 0 440 90" id="fig-bound"></svg>` },
   ];
   $("#lectures").innerHTML = L.map(x => `<div class="lec"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.left}</div><div>${x.right}</div></div>`).join("");
@@ -750,7 +758,7 @@ function figSavings() {
 function figCensus() {
   const s = $("#fig-census"), c = R.finals.recommended.census, tot = Object.values(c).reduce((a, b) => a + b, 0), COL = { load: "#751485", clock: "#d23f3f", shift: "#e07a5f", stops: "#2e86ab", km: "#e8950f", geometry: "#c9c3cd", "violates limit": "#1f1f24" };
   let x = 10; Object.entries(c).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => { const w = v / tot * 420; el("rect", { x, y: 10, width: Math.max(w - 2, 1), height: 26, rx: 5, fill: COL[k] || "#999" }, s); if (w > 78) el("text", { x: x + 6, y: 28, "font-size": 11, "font-weight": 700, fill: "#fff" }, s, k); el("text", { x: x + 2, y: 54, "font-size": 10, fill: "#4a4a52" }, s, w > 34 ? pct(v / tot) : ""); x += w; });
-  el("text", { x: 10, y: 74, "font-size": 11, fill: "#63636b" }, s, "share of route-days by tightest limit, recommended network");
+  el("text", { x: 10, y: 74, "font-size": 11, fill: "#63636b" }, s, "share of route-days by tightest limit, ${ALT} network");
 }
 function figNews() {
   const s = $("#fig-news"), V = R.finals.recommended.vehicles_day, own = R.finals.recommended.owned;
@@ -846,20 +854,23 @@ RENDER.checks = () => {
   const c = R.cases, r = R.finals.recommended, sv = R.stores_view;
   const bh = c.boundary_hi.map(j => SITES[j].name), bl = c.boundary_lo.map(j => SITES[j].name);
   $("#cases").innerHTML = `
-  <div class="card case"><div class="tag">Normal</div><h3>Recommended network, ordinary weekday</h3><p>${r.k} DCs, ${f0(r.vehicles_day)} vehicles a day, ${f0(r.km_day)} km a day, ${pct(r.service_mean)} before noon over the 28 final days.</p><button class="btn small" onclick="show('day')">Watch the day</button></div>
+  <div class="card case"><div class="tag">Normal</div><h3>${ALTC} network, ordinary weekday</h3><p>${r.k} DCs, ${f0(r.vehicles_day)} vehicles a day, ${f0(r.km_day)} km a day, ${pct(r.service_mean)} before noon over the 28 final days.</p><button class="btn small" onclick="show('day')">Watch the day</button></div>
   <div class="card case b"><div class="tag">Boundary</div><h3>At the limits</h3><p><b>Capacity.</b> ${bh.length ? `${bh.join(", ")} ${bh.length > 1 ? "sit" : "sits"} at the upper bound of ${M.bounds[1]} stores` : `no DC at the upper bound`}; ${bl.length ? `${bl.join(", ")} at the lower bound of ${M.bounds[0]}` : "none at the lower bound"}.</p><p><b>Budget of one.</b> With B = 1 the search returns its first seed at ${fM(c.budget_one)} M; with B = ${M.budget}, ${fM(c.budget_full)} M.</p></div>
   <div class="card case f"><div class="tag">Failure</div><h3>Inputs the system refuses</h3>${c.failure ? `<div class="err"><b>k = ${c.failure.k} is infeasible.</b> ${c.failure.reason}; no cost is reported.</div>` : ""}<p style="margin-top:8px"><b>A day the fleet cannot cover.</b> On the peak day (${R.r2.peak_date}) the network needs ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned. Cap the fleet in the live solve to see uncovered stores.</p><button class="btn ghost small" onclick="show('day');document.getElementById('lv-day').value=2;document.getElementById('lv-fleet').value=12;sync();solveLive()">Show the peak day with 12 vehicles</button></div>`;
   const svg = $("#storehist"); svg.innerHTML = "";
   // Stores always on time sit in a caption; the bars show the rest
   const bins = 20, hb = new Array(bins).fill(0), hr = new Array(bins).fill(0), full = a => a.filter(v => v >= 0.9995).length;
   S.ontime_base.forEach(v => v < 0.9995 && hb[Math.min(bins - 1, Math.floor(v * bins))]++); S.ontime_rec.forEach(v => v < 0.9995 && hr[Math.min(bins - 1, Math.floor(v * bins))]++);
+  if (Math.max(...hb, ...hr) === 0) { el("text", { x: 380, y: 130, "text-anchor": "middle", "font-size": 15, "font-weight": 700, fill: "#4f6b0c" }, svg, "Every store is on time on every final day, in both networks."); }
+  else {
   const mx = Math.max(...hb, ...hr), { X, Y } = axesXY(svg, [52, 12, 740, 225], [0, 1], [0, mx], v => pct(v), v => f0(v), 10, 4), bw = (X(1 / bins) - X(0)) / 2.4;
   for (let i = 0; i < bins; i++) { el("rect", { x: X(i / bins) + 2, y: Y(hb[i]), width: bw, height: 225 - Y(hb[i]), fill: "#c9c3cd", rx: 2 }, svg); el("rect", { x: X(i / bins) + 3 + bw, y: Y(hr[i]), width: bw, height: 225 - Y(hr[i]), fill: "#751485", rx: 2 }, svg); }
-  svg.previousElementSibling.textContent = `Stores below 100% before 12:00 over the 28 final days (grey: today, purple: recommended); always on time: today ${f0(full(S.ontime_base))}, recommended ${f0(full(S.ontime_rec))}. Relay deliveries count as late.`;
+  }
+  svg.previousElementSibling.textContent = `Stores below 100% before 12:00 over the 28 final days (grey: today, purple: ${ALT}); always on time: today ${f0(full(S.ontime_base))}, ${ALT} ${f0(full(S.ontime_rec))}. `;
   $("#storeview").innerHTML = `<h3>What changes for stores</h3><table>
     <tr><td>Stores that change DC</td><td><b>${f0(sv.moved)}</b> of ${f0(S.lat.length)}</td></tr><tr><td>Farther from their DC</td><td>${f0(sv.farther)} (${f0(sv.farther30)} by more than 30 km, worst +${sv.worst_farther.toFixed(0)} km)</td></tr>
-    <tr><td>Stores below 98% before noon</td><td>today ${f0(sv.below98_base)} · recommended ${f0(sv.below98_rec)}</td></tr><tr><td>Worst store</td><td>today ${pct(sv.worst_base)} · recommended ${pct(sv.worst_rec)}</td></tr></table>
-    <p class="note">Hover a store on any map for its own numbers. Stores served by a relay driver count as late here.</p>`;
+    <tr><td>Stores below 98% before noon</td><td>today ${f0(sv.below98_base)} · ${ALT} ${f0(sv.below98_rec)}</td></tr><tr><td>Worst store</td><td>today ${pct(sv.worst_base)} · ${ALT} ${pct(sv.worst_rec)}</td></tr></table>
+    <p class="note">Hover a store on any map for its own numbers. Deliveries on two-driver relay routes count by the clock like every other.</p>`;
   checkCharts();
   $("#verify").innerHTML = `<h3>Independent checks</h3><p class="sub">${VER ? `<code>python verify.py</code> on ${VER.generated.replace("T", " ")}` : "Run <code>python verify.py</code> to fill this table."}</p>` +
     (VER ? `<div class="scroll"><table><tr><th>Check</th><th>Result</th></tr>${VER.checks.map(x => `<tr><td>${x.check}<br><span class="note">${x.detail}</span></td><td class="${x.ok ? "pass" : "fail"}">${x.ok ? "PASS" : "FAIL"}</td></tr>`).join("")}</table></div>` : "");

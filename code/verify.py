@@ -52,14 +52,17 @@ for net in ("baseline_weekday", "recommended_weekday"):
             km, arr, ret = routing.walk(list(range(1, len(idx) + 1)), D, p)
             load = show_day["q"][idx].sum()
             kmerr = max(kmerr, abs(km - r["km"]))
-            ok = load <= p.cap + 1e-9 and len(idx) <= p.max_stops and km <= p.max_km and arr[-1] <= p.deadline and ret + p.break_h <= p.shift_end
+            # Relay routes (two drivers) are held to the relay km and shift, everything else to one driver's limits
+            relay = r["binding"] == "relay"
+            km_max, end = (p.relay_km, p.relay_shift_end) if relay else (p.max_km, p.shift_end)
+            ok = load <= p.cap + 1e-9 and len(idx) <= p.max_stops and km <= km_max and arr[-1] <= p.deadline and ret + p.break_h <= end
             if r["binding"] == "violates limit":
                 viol += 1
                 bad += len(idx) > 1 and ok
             else:
                 bad += not ok
     check(f"{net.split('_')[0]}: every store served once", (seen == 1).all(), f"{(seen == 1).sum()}/{ctx['n']} stores")
-    check(f"{net.split('_')[0]}: route limits", bad == 0 and kmerr < 0.2, f"{bad} unflagged violations, {viol} flagged over-limit routes, max km mismatch {kmerr:.3f}")
+    check(f"{net.split('_')[0]}: route limits", bad == 0 and kmerr < 0.2, f"{bad} unflagged violations, {viol} beyond even the relay limits, max km mismatch {kmerr:.3f}")
 
 # Cost identities
 for name, f in REG["finals"].items():

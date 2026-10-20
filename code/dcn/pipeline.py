@@ -376,7 +376,7 @@ def _run(profile):
                     held_service_base=float(np.average(held_b["service"], weights=held_b["w"])),
                     held_service_rec=float(np.average(held_r["service"], weights=held_r["w"])),
                     waterfall=[dict(step="current network", total=fb["total"]),
-                               dict(step="same 12 DCs, territories redrawn", total=finals["reassigned12"]["total"]),
+                               dict(step="today's sites, redrawn within 500-1,400", total=finals["reassigned12"]["total"]),
                                dict(step="best 12 sites", total=finals["best12"]["total"]) if "best12" in finals else None,
                                dict(step=f"recommended ({fr['k']} DCs)", total=fr["total"])]),
         reversal=reversal, stores_view=stores_view,

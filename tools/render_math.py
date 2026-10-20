@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 KATEX = ROOT.parent / "HW01" / "src" / "node_modules" / "katex"
 
 F = {
-    "lower_obj": r"\min_{\text{routes}}\; c_f\!\sum_{r}\sum_{(a,b)\in r} d_{ab} \;+\; c_s\,\big(|R|-n_j\big)^{+} \;+\; c_{\text{relay}}\,|R^{\text{over}}|",
-    "lower_st": r"\textstyle\sum_{i\in r} q_i\le 48,\quad |r|\le 25,\quad \mathrm{km}(r)\le 250,\quad a_i\le 12{:}00,\quad \text{return}+\tfrac12\text{h}\le 13{:}00",
+    "lower_obj": r"\min_{\text{routes}}\; c_f\!\sum_{r}\sum_{(a,b)\in r} d_{ab} \;+\; c_s\,\big(|R|-n_j\big)^{+} \;+\; c_{\text{relay}}\,|R^{\text{relay}}| \;+\; c_{\text{late}}\,\#\{i: a_i>14{:}00\}",
+    "lower_st": r"\begin{aligned}&\text{one driver:}\ \textstyle\sum_{i\in r} q_i\le 48,\ |r|\le 25,\ \mathrm{km}(r)\le 250,\ a_i\le 12{:}00,\ \text{return}+\tfrac12\text{h}\le 13{:}00\\&\text{relay (two drivers, stores no one-driver route reaches):}\ \mathrm{km}(r)\le 500,\ a_i\le 12{:}00,\ \text{return}+\tfrac12\text{h}\le 19{:}00\end{aligned}",
     "time": r"a_{\text{next}} = a_{\text{prev}} + \tfrac14\,\text{h} + \frac{d_{\text{prev},\text{next}}}{35\ \text{km/h}}",
     "savings": r"s_{ij} = d_{0i} + d_{0j} - d_{ij}",
     "twoopt": r"\Delta = d_{p_{i-1}p_j} + d_{p_i p_{j+1}} - d_{p_{i-1}p_i} - d_{p_j p_{j+1}} < 0",
