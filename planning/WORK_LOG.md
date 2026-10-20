@@ -224,3 +224,36 @@ cd ~/dcn/code && ~/dcn-venv/bin/python run_reduced.py && ~/dcn-venv/bin/python r
 ```
 
 Then `scp -r spark:~/dcn/code/results code/`, and with the OSRM tunnel open `python osrm/build_shapes.py full` for the new routes.
+
+### Spark run 3 (v0.4, reportable)
+
+**Run.** Spark, Python 3.12.3 aarch64, numpy 2.2.6, scipy 1.15.3, 16 workers; seed 437; reduced 100 s, full 886 s; budget 40 (13 G seeds + 27 EI); 7 search, 28 final, 14 held-out days; road shapes 27,437 legs, 0 missing.
+
+| Measure | Full (9,718 planning stores) | Reduced (1,938) |
+|---|---|---|
+| Today's network E (M KRW/month) | 5,874 (579 vehicles/day, no relay route, 100% before noon) | 1,355 |
+| Best alternative (top-5 re-scored on 28 days) | 10 DCs, 5,975 (617 vehicles/day, 18 relay routes/day) | 12 DCs, 1,466 |
+| Saving, 28 final days (90% band over demand days) | -100 [-110, -91] | -112 [-114, -107] |
+| Saving, held-out days | -103 [-108, -97] | -110 |
+| Today's sites, territories redrawn within 500-1,400 | 9,568 (118 routes a day beyond even the relay limits) | 2,161 |
+| k sweep, search days (validation, best of the pool per k) | 9: 5,952 · 10: 5,828 · 11: 5,856 · 12: 5,982 · 13: 6,066 | flat 10-12 |
+| Departure waves (21 docks; 27 docks) | k* 10 -> 12; 10 with 27 docks; today's network does not overflow | 11 -> 11 |
+| Thinning | full k* 10, reduced k* 11; km per store 1.45x for today's network (square-root rule 2.24x) | |
+| Reversals (saving at k*) | stop 10 min -41 (10), 20 min -156 (10); speed 30 km/h -261 (11), 45 km/h -32 (10); calibrated model only -55 (10); DC fixed 100 M -197 (11), **200 M +29 (10)** | all negative |
+| Relay price reversal (0 / 180,822 / 550,000 KRW) | saving -1 / -100 / -302; k* 10 / 10 / 11 | k* 11 |
+| G1 against E, Spearman (40 evaluated / whole pool / within k) | 0.66 / 0.58 / 0.76; G-pick loss 446 M (k = 8 against 10) | 0.55 / 0.46 / 0.46 |
+| Search vs random selection | both reach the pool best (5,828); the G seeds already contain it | same |
+| History year (outcome tables) | 3,502,822 deliveries, 100% before noon, 573 vehicles/day, 64,811 km/day | |
+| Average day vs sampled days | 5,758 vs 5,828 (1.2% lower) | |
+
+**What it means.**
+
+- With today's network placed as a planner would (every store within one driver-day, small regional DCs allowed because the baseline is exempt from the bounds), no redesign that respects 500-1,400 stores per DC beats it; the best alternative costs about 100 M a month more on every day set.
+- The bounds are what make redesign unattractive: forcing today's own sites into 500-1,400 costs 3.7 bn a month (Gangneung, Yeongju and Gwangyang would have to take stores far beyond one driver-day).
+- Only a DC rent of 200 M turns the answer (+29 M at 10 DCs); every other tested assumption keeps today's network.
+- The departure-wave check moves the best alternative from 10 to 12 DCs at 21 docks, but no alternative beats today's network either way.
+- The search added nothing over its seeds this time (the G1-best of k = 10 was already the pool best); both rules reach it.
+
+**Open.**
+
+- `verify.py` on run 3; demo QA; definition and proposal.
