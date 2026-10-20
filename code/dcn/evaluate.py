@@ -1,4 +1,7 @@
 """Connection: E(candidate) = DC fixed + owned fleet + day-weighted operating cost from the lower level."""
+from concurrent.futures import ProcessPoolExecutor
+from contextlib import contextmanager
+
 import numpy as np
 
 from . import config as C
@@ -68,8 +71,48 @@ def monthly(V, fuel_d, pen_d, over_d, w, fixed, owned=None, relay=C.RELAY_DAY):
     return parts, owned, daily
 
 
-def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=False, keep_stores=False):
-    """Full evaluation E over sampled days (common random numbers, calendar-stratum weights)."""
+_POOL = None
+
+
+@contextmanager
+def workers(n=C.WORKERS):
+    """Route territories in n processes inside this block; same numbers as one process."""
+    global _POOL
+    if n <= 1:
+        yield
+        return
+    with ProcessPoolExecutor(n) as ex:
+        _POOL = ex
+        try:
+            yield
+        finally:
+            _POOL = None
+
+
+def _territory_days(job):
+    # One DC: road matrix once, then every day (sel = the day's stores, None = all)
+    geo, days, p, docks = job
+    D = distances.territory(*geo)
+    out = []
+    for sel, q in days:
+        Dd = D if sel is None else D[np.ix_(np.r_[0, sel + 1], np.r_[0, sel + 1])]
+        out.append(routing.solve(Dd, q, p) if docks is None else routing.solve_waves(Dd, q, p, docks))
+    return out
+
+
+def territories(jobs):
+    """Run territory jobs, biggest first, in the pool when one is open; results in job order."""
+    order = sorted(range(len(jobs)), key=lambda i: -len(jobs[i][0][1]))
+    todo = [jobs[i] for i in order]
+    res = list(_POOL.map(_territory_days, todo)) if _POOL else [_territory_days(j) for j in todo]
+    out = [None] * len(jobs)
+    for i, r in zip(order, res):
+        out[i] = r
+    return out
+
+
+def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=False, keep_stores=False, docks=None):
+    """Full evaluation E over sampled days (common random numbers, calendar-stratum weights); docks = departure waves."""
     p = p or routing.Params()
     open_idx = np.asarray(open_idx)
     lp = None
@@ -81,18 +124,18 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
     used = [int(j) for j in open_idx if (assign == j).any()]
     nd = len(days)
     w = np.array([d.get("w", 1.0) for d in days])
-    V = np.zeros((len(used), nd)); KM = np.zeros_like(V); FAIL = np.zeros_like(V); OVER = np.zeros_like(V)
+    V = np.zeros((len(used), nd)); KM = np.zeros_like(V); FAIL = np.zeros_like(V); OVER = np.zeros_like(V); DOCK = np.zeros_like(V)
     ontime = np.zeros(nd); total = np.zeros(nd)
     store_ok = np.zeros(ctx["n"]) if keep_stores else None
     census, routes_out = {}, []
-    for a_i, j in enumerate(used):
-        idx_all = np.flatnonzero(assign == j)
-        D_all = routing.territory_matrix(ctx, j, idx_all)
-        for d_i, day in enumerate(days):
-            sel = np.arange(len(idx_all))  # every store gets its daily delivery, even with zero cages ordered (brief §2.1)
-            D = D_all[np.r_[0, sel + 1]][:, np.r_[0, sel + 1]]
-            r = routing.solve(D, day["q"][idx_all[sel]], p)
+    # Every store gets its daily delivery, even with zero cages ordered (brief §2.1)
+    idx_by = [np.flatnonzero(assign == j) for j in used]
+    jobs = [((ctx["dsite"][idx, j], ctx["full"][idx], ctx["lat"][idx], ctx["lon"][idx], ctx["mountain"][idx]),
+             [(None, day["q"][idx]) for day in days], p, docks) for j, idx in zip(used, idx_by)]
+    for a_i, (j, idx_all, res) in enumerate(zip(used, idx_by, territories(jobs))):
+        for d_i, r in enumerate(res):
             V[a_i, d_i], KM[a_i, d_i], FAIL[a_i, d_i] = r["vehicles"], r["km"], r["failed"]
+            DOCK[a_i, d_i] = r.get("dock_over", 0)
             for rr in r["routes"]:
                 census[rr["binding"]] = census.get(rr["binding"], 0) + w[d_i]
                 over = rr["binding"] == "violates limit"
@@ -100,17 +143,17 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
                 good = 0 if over else int((np.array(rr["arr"]) <= p.deadline + 1e-9).sum())
                 ontime[d_i] += good; total[d_i] += len(rr["seq"])
                 if keep_stores and not over:
-                    store_ok[idx_all[sel[rr["seq"]]][np.array(rr["arr"]) <= p.deadline + 1e-9]] += w[d_i]
+                    store_ok[idx_all[rr["seq"]][np.array(rr["arr"]) <= p.deadline + 1e-9]] += w[d_i]
             if keep_routes:
-                routes_out.append(dict(dc=j, day=d_i, routes=[dict(stores=idx_all[sel[rr["seq"]]].tolist(), arr=[round(x, 3) for x in rr["arr"]],
-                                       ret=round(rr["ret"], 3), km=round(rr["km"], 1), load=round(rr["load"], 1), binding=rr["binding"]) for rr in r["routes"]]))
+                routes_out.append(dict(dc=j, day=d_i, routes=[dict(stores=idx_all[rr["seq"]].tolist(), arr=[round(x, 3) for x in rr["arr"]],
+                                       ret=round(rr["ret"], 3), depart=rr.get("depart", p.depart), km=round(rr["km"], 1), load=round(rr["load"], 1), binding=rr["binding"]) for rr in r["routes"]]))
     fuel_d = C.FUEL_KM * KM.sum(0); pen_d = C.LATE_PEN * FAIL.sum(0); over_d = OVER.sum(0)
     parts, owned, daily = monthly(V, fuel_d, pen_d, over_d, w, float(ctx["fixed"][used].sum()), owned)
     service = ontime / np.maximum(total, 1)
     wn = w / w.sum()
     out = dict(feasible=True, open=used, k=len(used), **parts, owned=int(owned.sum()), owned_by_dc=owned.tolist(),
                V=V.tolist(), fuel_d=fuel_d.tolist(), pen_d=pen_d.tolist(), over_d=over_d.tolist(), w=w.tolist(),
-               vehicles_day=float(wn @ V.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d),
+               vehicles_day=float(wn @ V.sum(0)), dock_over_day=float(wn @ DOCK.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d),
                daily_total=daily.tolist(), service=service.tolist(), service_min=float(service.min()),
                ok98=bool(service.min() >= 0.98), census={k: round(v, 2) for k, v in census.items()},
                loads=[int((assign == j).sum()) for j in used])

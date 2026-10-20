@@ -1,4 +1,5 @@
 """Teaching defaults (brief §2.6) and run settings; edit values here, no CLI flags."""
+import os
 
 SEED = 437
 
@@ -24,6 +25,13 @@ DEADLINE = 12.0                             # hard window
 FAIL_AT = 14.0                              # after this a delivery is a failure
 SHIFT_END = 13.0                            # 10 h shift from 03:00 incl. 1 h loading
 BREAK_H = 0.5                               # legal break inside the shift (30 min per 4 h)
+
+# Departure-wave check: hourly waves inside the 04:00-07:00 window, 1 h loading per dock [ASSUMPTION: 16 docks per DC]
+WAVES = (4.0, 5.0, 6.0, 7.0)
+DOCKS = 16
+
+# Parallel territories (results do not depend on it)
+WORKERS = min(os.cpu_count() or 1, 16)
 
 # Fleet policy: newsvendor fractile = 1 - owned cost per day / spot rate = 0.671
 FLEET_Q = 1 - VEHICLE_MONTH / DAYS_MONTH / SPOT_DAY

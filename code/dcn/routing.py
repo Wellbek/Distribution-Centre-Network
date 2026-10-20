@@ -1,5 +1,5 @@
 """Lower level: one DC's day as a capacitated VRP with a hard noon deadline, Clarke-Wright savings plus 2-opt."""
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 
@@ -123,6 +123,36 @@ def solve(D, q, p=None, improve=True):
     arr_all = np.concatenate([r["arr"] for r in out]) if out else np.zeros(0)
     return dict(
         routes=out, vehicles=len(out), km=float(sum(r["km"] for r in out)),
+        on_time=int((arr_all <= p.deadline + 1e-9).sum()), late=int((arr_all > p.deadline + 1e-9).sum()),
+        failed=int((arr_all > C.FAIL_AT).sum()), deliveries=int(len(arr_all)),
+    )
+
+
+def solve_waves(D, q, p=None, docks=C.DOCKS, waves=C.WAVES):
+    """Departure waves: at most `docks` vehicles load per hour; the least-slack routes take the earliest wave,
+    the remaining stores are re-routed from the next wave; the last wave takes all that is left."""
+    p = p or Params()
+    left = np.arange(1, len(q) + 1)
+    routes, over = [], 0
+    for w, t in enumerate(waves):
+        sub = np.r_[0, left]
+        pw = replace(p, depart=t, shift_end=p.shift_end + t - p.depart)
+        r = solve(D[np.ix_(sub, sub)], q[left - 1], pw)
+        rs = sorted(r["routes"], key=lambda x: x["arr"][-1] - pw.deadline, reverse=True)
+        keep = rs if w == len(waves) - 1 else rs[:docks]
+        over = max(len(keep) - docks, 0)
+        done = []
+        for rr in keep:
+            rr["seq"] = (left[rr["seq"]] - 1).tolist()
+            rr["depart"] = t
+            done += rr["seq"]
+        routes += keep
+        left = np.setdiff1d(left, np.array(done, int) + 1)
+        if not len(left):
+            break
+    arr_all = np.concatenate([r["arr"] for r in routes]) if routes else np.zeros(0)
+    return dict(
+        routes=routes, vehicles=len(routes), km=float(sum(r["km"] for r in routes)), dock_over=over,
         on_time=int((arr_all <= p.deadline + 1e-9).sum()), late=int((arr_all > p.deadline + 1e-9).sum()),
         failed=int((arr_all > C.FAIL_AT).sum()), deliveries=int(len(arr_all)),
     )
