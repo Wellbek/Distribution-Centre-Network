@@ -48,6 +48,10 @@ def _summary(e):
             "over_limit_day", "missed_routes_day", "vehicles_day", "dock_over_day", "km_day", "service_min", "ok98", "lp_frac", "price_hi", "price_lo"]
     out = {k: e[k] for k in keys if k in e}
     out["service_mean"] = float(np.average(e["service"], weights=e["w"]))
+    if "V" in e:
+        # Per DC: owned vehicles (the 0.671 quantile) against the day-weighted mean and the largest daily need
+        V = np.asarray(e["V"])
+        out.update(owned_by_dc=e["owned_by_dc"], need_mean_by_dc=np.round(np.average(V, axis=1, weights=e["w"]), 1).tolist(), need_max_by_dc=V.max(1).astype(int).tolist())
     return out
 
 
