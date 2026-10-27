@@ -38,6 +38,10 @@ def build(profile="reduced"):
             "baseline_search", "stores_view", "log_bo", "random_band"]
     slim = {k: r.get(k) for k in keep}
     slim["stores"] = {k: r["stores"][k] for k in ("lat", "lon", "base_dc", "rec_dc")}
+    slim["params"] = r["params"]
+    ver = ROOT / "results" / "full" / "verification.json"
+    slim["exact"] = next((c["detail"] for c in json.loads(ver.read_text())["checks"] if c["check"].startswith("heuristic vs exact")), None) if ver.exists() else None
+    slim["r2"] = {k: r["r2"][k] for k in ("peak_vehicles", "owned", "peak_date")}
     slim["pool"] = [dict(sites=p["sites"], k=p["k"], origin=p["origin"], E=p["E"], ok98=p["ok98"]) for p in r["pool"]]
     tpl = (ROOT / "static" / "proposal.template.html").read_text()
     out = ROOT.parent / "proposal.html"
