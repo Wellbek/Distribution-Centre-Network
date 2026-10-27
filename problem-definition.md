@@ -293,6 +293,15 @@ The gap would grow with a stronger chain-wide shock (φ or σ) or a sharper holi
 | Scope | Fresh food out of scope unless brought in; one-off costs not mentioned | Fresh food, Jeju and ferry-only islands, moving and opening costs left out | Allowed by the brief or not costable without data | Moving cost as a payback condition (Section 6) |
 | Closure sequence | Leases expire one after another | First month a redesign can operate: January 2027; leases end on the fictional dates of `dcs` `[ASSUMPTION]` | Two months to fit out a site | Extensions (Section 5) |
 | Value-of-information prior | Not given | 0.25 / 0.5 / 0.25 on low / reported / high stop time and speed `[ASSUMPTION]` | A neutral prior around the teaching defaults | EVPI reported as a lower bound |
+| Traffic by time of day | One stated average speed [A §2.3] | 35 km/h at every hour `[ASSUMPTION]` | The brief allows one average speed; no hourly data | Speed reversal: at 30 km/h the best k is 11; GPS traces |
+| Winter roads and closures | Not mentioned | Roads always open, no seasonal speed `[ASSUMPTION]` | No weather or closure data | Longer far routes; seasonal speeds from the GPS study |
+| Driver hours and breaks | A 10-hour shift | A 30-minute break, no further limit `[ASSUMPTION]` | The brief gives no break rule | 253 of the recommendation's 617 routes a day are shift-bound and would lose stops under a longer break; confirm with HR |
+| Drivers for new DCs | Not mentioned | Available wherever a DC opens `[ASSUMPTION]` | Hiring is outside the monthly model | Could delay a lease step, not change the target |
+| Store unloading | 15 minutes per stop [A §2.6] | The same at every store `[ASSUMPTION]` | No store-level data | Stop-time reversal: at 20 min the saving is 560 M |
+| Several trips per vehicle | Not mentioned | One trip per vehicle and day `[ASSUMPTION]` | Keeps the lower level a single-trip routing problem | Would lower vehicles in large territories; dispatch practice at one DC |
+| Returns and empty cages | The driver collects empty cages [A §2.4] | They ride back at no capacity cost `[ASSUMPTION]` | Returns travel on the emptied vehicle | Only binds on full return legs |
+| Breakdowns and spare vehicles | Not mentioned | No breakdowns `[ASSUMPTION]` | No fleet records | A failure is covered by a spot truck at 550,000 KRW a day |
+| Fuel price and staff transfers | 350 KRW per km; no transfer cost given | Fixed fuel price; no transfer cost `[ASSUMPTION]` | Teaching default; transfers are one-off | Fuel moves every network alike; transfers belong to the moving cost (Section 6) |
 
 **Main uncertainties and when not to trust the recommendation.**
 The decision rests on how far today's real network is from the optimum (Section 5, last reversal row), on the stop time and speed that fix the noon reach, and on the rent level; demand noise moves the saving far less (Section 5 intervals).
@@ -518,7 +527,7 @@ It would pay with a weaker pool (no clock-aware G, or a longer candidate list), 
 | Router and assignment speed-ups | Route fingerprints of 108 territory-days under three parameter sets at both scales; 2,400 random networks | Results identical bit for bit; the reduced run fell from 10 min 22 s to 6 min 48 s on two laptop cores |
 | Reversal rows, departure waves, thinning, extensions | Inside the full run | Sections 4 and 5 |
 | `verify.py` | Independent re-check of the shown run | 29 of 29 pass |
-| Demo and proposal in a browser | Playwright, Chromium 149, offline, ten widths, every tab and all 16 slides | No console errors, no blocked requests, no overflow; 60 frames per second on the delivery day |
+| Demo and proposal in a browser | Playwright, Chromium 149, offline, ten widths, every tab and all 17 slides | No console errors, no blocked requests, no overflow; 60 frames per second on the delivery day |
 | Lint | `ruff` on `dcn/`, `verify.py`, the run scripts | No errors in the error classes (F, E9) |
 
 **What the demonstration establishes and what it does not.**
