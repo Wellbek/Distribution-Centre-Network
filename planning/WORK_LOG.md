@@ -410,3 +410,12 @@ Fixes:
 - Checks: reduced run and how it differs; Delivery day: one command tag for the KPIs, fading truck tails (about 10% more draw time, no extra data); a "Find an answer" index of 28 business and analyst questions.
 - Proposal (15 slides): scope as must, should, could, won't (left-out items flagged for the business); why the answer is right; linear against combinatorial; owned vehicles in the four voices as in the demo.
 - README: scope section. Checks: demo offline at 1440 and 390 px clean, all 15 slides clean, `verify.py` 29/29.
+
+### User feedback round, 28 Oct: lag, visuals, proposal, definition
+
+- Delivery day: truck tails and emoji labels removed; the map now draws from cached layers (static land and routes, incremental stores, truck sprites, a padded layer so following a truck only shifts it): 60 frames per second in every view, against 9-27 before (Chromium, measured by painted frames).
+- Visuals: night-to-day light with headlight glows, DC progress rings, delivery pulses, a day-against-the-clock chart; the answer map plays the change from today's territories and follows waterfall clicks; count-up hero numbers, growing bars, cards rising into view (all off under reduced motion).
+- The challenger card is gone; its comparison is the sixth test. No horizontal scrolling at ten widths from 390 to 1920 px (nav wraps below 1180 px, engine status moved to the live card).
+- Proposal regenerated in project-management order, 16 slides: section tracker, methodology with pipeline and measured accuracy, assumption register with status, inputs from the business with owners and dates, risk register, lease roadmap, stage gates with what to measure first.
+- Definition v1.1: Section 7 completed (tools and roles, LLM uses and checks, where it was wrong, my decisions and corrections, run history, guardrails, sources); Section 5 test register; Section 6 risk register; no reference to review or grading roles.
+- Checks: demo offline clean, 28 finder jumps, every slide free of collisions and template leftovers, `verify.py` 29/29.
