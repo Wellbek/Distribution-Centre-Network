@@ -125,6 +125,10 @@ details.log { margin-top: 10px; } details.log summary { cursor: pointer; font-we
 .formula { background: #fbf9fc; border: 1px solid var(--lav-2); border-radius: 14px; padding: 4px 12px; margin: 10px 0; overflow-x: auto; }
 .formula .katex-display { margin: .5em 0; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
 .tw { overflow-x: auto; }
+.step { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+.step .num { width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: var(--lime); display: grid; place-items: center; font-weight: 900; }
+.step .why { margin-top: 4px; font-size: 13px; color: var(--ink-2); background: var(--lav); border-radius: 10px; padding: 5px 9px; }
+.step .why b { color: var(--purple-ink); }
 .rung { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px dashed var(--line); }
 .rung .tick { width: 24px; height: 24px; border-radius: 50%; background: var(--lime); color: var(--purple-ink); display: grid; place-items: center; font-weight: 900; font-size: 13px; }
 .seg.wrap { flex-wrap: wrap; border-radius: 16px; margin-bottom: 6px; }
@@ -235,6 +239,14 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 
 <!-- 4 · DATA AND BASELINE -->
 <section class="view" id="v-data">
+  <div class="stitle" id="made"><span class="deco">⚙</span><h2>How the data was made, and why this way</h2><span class="rule"></span><span class="chip">generated from seed 437 · real geography</span></div>
+  <div class="grid g2">
+    <div class="card"><h3>Seven steps from a population map to a year of orders</h3><p class="sub">The company hands over no data (brief §2.5), so the chain is generated: real places, fictional stores, demand and costs</p><div id="made-steps"></div></div>
+    <div class="grid" style="align-content:start">
+      <div class="card"><h3>The company's eight tables</h3><p class="sub">What one row is, and what it cannot tell us; files in <code>code/results/full/tables/</code></p><div class="tw"><table id="tables8"></table></div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h3>What we assumed, for the business to confirm</h3><p class="sub">Everywhere else the brief's own figures are used; the same register is in the proposal and the problem definition</p><div class="tw"><table id="register"></table></div></div>
   <div class="stitle"><span class="deco">◎</span><h2>Where the numbers come from</h2><span class="rule"></span><span class="chip">fictional chain · public geography</span></div>
   <div class="grid g2">
     <div class="card"><div class="row spread"><h3 id="data-map-h"></h3><div class="seg" id="data-seg"><button data-n="type" class="on">Store type</button><button data-n="dc">Today's DC</button></div></div>
@@ -1262,6 +1274,41 @@ RENDER.data = () => {
   const row = (a, c) => `<tr><td>${a}</td><td>${c}</td></tr>`;
   $("#data-map-h").textContent = `${f0(n)} stores, placed where people live`;
   $("#data-map-sub").textContent = `Each dot is one store open at the planning horizon (${f0(n)} of ${f0(10000 * M.fraction)} generated); Jeju and ferry-only islands are left out.`;
+  const yrs = S.year || [], share = y => yrs.length ? pct(yrs.filter(x => x <= y).length / yrs.length) : "";
+  const STEPS = [
+    ["Where the stores are", `${f0(10000 * M.fraction)} points drawn in proportion to people on 71,015 Kontur Population hexagons (2023), jittered inside each hexagon; Jeju, sea points and ferry-only islands removed; province and district from geoBoundaries.`, "Stores follow people (brief §2.3), and real places keep the rivers, mountains and coasts that make road km differ from map km, the Field Manager's point."],
+    ["What kind of store", `Office and mixed near big-city centres, roadside along the countryside, residential elsewhere: ${types.map(([t, c]) => `${t} ${f0(c)}`).join(", ")}.`, "Weekends rise at residential stores and fall at office stores (brief §2.3), so a store's type sets its weekly shape."],
+    ["When each store opened", `Denser places first, along a growth curve: ${share(2000)} of today's stores open by 2000, ${share(2010)} by 2010, ${share(2016)} by 2016; 6% opened and 3% closed during the history year.`, "A chain grows from the city centres outward. This gives the short histories the brief asks for, and a network drawn in 2016 that has grown since."],
+    ["How much each store orders", "A true level per store (lognormal around 2.2 cages, clipped to 0.5-6) × the weekday profile of its type × a summer peak × Korean holidays × a chain-wide AR(1) shock × store-day noise; Poisson counts for 365 days.", "The brief's demand features (§2.3, §2.6). The shared shock and holidays move every DC at once, which is why sampled days cost more than an average day."],
+    ["Where a DC could go", `${R.sites.length} sites at motorway interchanges and logistics zones, today's 12 among them; rent 180 M in the capital region, 157.5 M in metro cities, 132 M elsewhere.`, "The brief's 40-80 candidate sites, dearer near Seoul (§2.5)."],
+    ["Today's network", "The 12 sites a planner would have chosen in 2016 for the stores of 2016, with the stores opened since added to the nearest DC with room; leases expire from 2027-03 to 2029-12.", "The brief penalises a strawman baseline (§2.5, R5): this is a real planning rule, applied when the network was last redrawn (below)."],
+    ["Today's operation", `Our own lower level run on today's network over the 365 history days: ${f0(R.history_ops.deliveries)} deliveries, ${f0(R.history_ops.vehicles_day)} vehicles and ${f0(R.history_ops.km_day)} km a day.`, "The brief asks for the outcome tables to be produced by our own lower level and labelled as such (§2.5)."],
+  ];
+  $("#made-steps").innerHTML = STEPS.map(([t, how, why], i) => `<div class="step"><span class="num">${i + 1}</span><div><b>${t}</b><div>${how}</div><div class="why"><b>Why:</b> ${why}</div></div></div>`).join("");
+  const H8 = R.history_ops;
+  $("#tables8").innerHTML = `<tr><th>Table</th><th>One row is</th><th>Here</th><th>Used for</th><th>What it cannot tell us</th></tr>` + [
+    ["stores", "one store", `${f0(n)} open`, "locations, types, today's DC", "why a store is assigned where it is"],
+    ["demand_history", "one store's order for the next day", `365 days`, "the demand model (Q2)", "shelf demand: these are orders placed under today's network"],
+    ["dcs", "one of today's DCs", "12, leases 2027-2029", "the baseline and the lease sequence", "the real rents and terms"],
+    ["candidate_sites", "one site that could be leased", `${R.sites.length}, today's 12 included`, "the upper level's choice set", "sites the real-estate team has not listed"],
+    ["cost_parameters", "one cost figure", "brief defaults + relay price", "every cost in E", "the real figures (Finance)"],
+    ["deliveries", "one store on one day", f0(H8.deliveries), "today's service level", "what any other network would cost"],
+    ["vehicle_days", "one vehicle on one day", `${f0(H8.vehicles_day)} a day`, "today's fleet and km", "router accuracy: our router produced it"],
+    ["spot_hires", "one DC on one day", `${f0(H8.spot_month / 1e6)} M KRW a month`, "today's spot cost", "the spot market's real supply"],
+  ].map(r => `<tr><td><code>${r[0]}</code></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("");
+  const rv = R.reversals, strict = rv.find(x => x.assumption === "vehicle limits"), strictMin = rv.find(x => x.assumption === "vehicle limits and minimum");
+  $("#register").innerHTML = `<tr><th>Item</th><th>The brief</th><th>We use</th><th>Why</th></tr>` + [
+    ["<b>Far stores</b>", "250 km, 10-hour shift", "A second driver on far routes (500 km, until 19:00, every stop still before noon)", `Otherwise far east-coast and mountain stores get no daily delivery${strict ? `; without it the saving is ${fM(strict.saving)} M${strictMin ? `, unless a small coastal DC below 500 stores is allowed (${fM(strictMin.saving)} M)` : ""}` : ""}`],
+    ["<b>Second driver's price</b>", "Not given", `${f0(P.relay_day)} KRW a day, a full owned vehicle-day`, "Upper bound: truck and fuel are already counted, so a cheaper driver raises the saving"],
+    ["Shift and departure", "10 h incl. loading; leave 04:00-07:00", "Load 03:00, leave 04:00, back with a break by 13:00", "Not timed in the brief; checked with departure waves"],
+    ["Docks per DC", "Not given", `${R.waves.docks}`, `Needed only for the wave check; ${R.waves.docks_more} gives the same answer`],
+    ["Delivery window", "98% before noon", "Every stop before noon", "Conservative; the 2% slack is not used"],
+    ["DC rent", "150 M; dearer near Seoul", "180 / 157.5 / 132 M by region", "No regional figures given; tested at 100 and 200 M"],
+    ["Spot trucks", "550,000 KRW a day", "As many as needed", "No supply limit given"],
+    ["Store orders", "Not addressed", "Independent of the delivery time", "No data; a redesign serves some stores later"],
+    ["Today's network", "Placed as a grown chain would be", "A 2016 design with ten years of growth", "No real network given; if it is near-optimal the saving reverses"],
+    ["Scope", "Fresh food optional", "Fresh food, Jeju, moving costs left out", "Allowed by the brief, or not costable without data"],
+  ].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
   $("#data-public").innerHTML = `<table><tr><th>Input</th><th>Source and use</th></tr>
     ${row("Population", "Kontur Population, South Korea, 2023-11-01, H3 resolution 8 (CC BY 4.0): stores are drawn in proportion to people, 71,015 hexagons")}
     ${row("Provinces, districts", "geoBoundaries ADM1 and ADM2: the store's region and the mountain class of the distance model")}
