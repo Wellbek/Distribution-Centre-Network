@@ -864,6 +864,8 @@ function drawDay(m) {
   });
   const open = LIVE_ROUTES ? [LIVE.dc] : DAY.open;
   for (const j of open) drawDC(c, m, SITES[j], colorOf(j, DAY.open), m.z > 2.5);
+  // A short fading tail behind each truck: its positions over the last few minutes, no extra data
+  if (!LIVE_ROUTES) { c.lineCap = "round"; routes.forEach(r => { if (!truckPos(r, T)) return; const q = [0, 1, 2, 3, 4].map(i => truckPos(r, T - i * 0.12)).filter(Boolean).map(p => m.P(p[0][0], p[0][1])); for (let i = 1; i < q.length; i++) { c.strokeStyle = `rgba(157,201,42,${0.85 - i * 0.17})`; c.lineWidth = Math.max(2, Math.min(1.5 + m.z * 0.6, 6)) * (1.15 - i * 0.18); c.beginPath(); c.moveTo(q[i - 1][0], q[i - 1][1]); c.lineTo(q[i][0], q[i][1]); c.stroke(); } }); c.lineCap = "butt"; }
   if (!LIVE_ROUTES) routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; drawTruck(c, x, y, p[1], Math.min(0.55 + m.z * 0.09, 1.6), r.over || r.relay ? "#b02f2f" : "#751485", k === FOLLOW); });
   $("#clock").textContent = hhmm(Math.max(T, P.depart)); $("#scrub").value = T;
 }
