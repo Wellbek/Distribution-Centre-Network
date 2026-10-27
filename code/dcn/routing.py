@@ -135,16 +135,19 @@ def _savings(D, q, p, improve):
     routes = {k: [k] for k in range(1, n + 1)}
     of = list(range(n + 1))
     load = {k: float(q[k - 1]) for k in range(1, n + 1)}
+    # A store inside a route never becomes an end again (merges only join ends), so its pairs can be skipped at once
+    inner = [False] * (n + 1)
+    cap, max_stops = p.cap, p.max_stops
     for i, j, s in zip(*pairs):
         if s <= 0:
             break
+        if inner[i] or inner[j]:
+            continue
         ri, rj = of[i], of[j]
         if ri == rj:
             continue
         A, B = routes[ri], routes[rj]
-        if (A[0] != i and A[-1] != i) or (B[0] != j and B[-1] != j):
-            continue
-        if load[ri] + load[rj] > p.cap or len(A) + len(B) > p.max_stops:
+        if load[ri] + load[rj] > cap or len(A) + len(B) > max_stops:
             continue
         cand = (A if A[-1] == i else A[::-1]) + (B if B[0] == j else B[::-1])
         if not ok_time(cand, D, p):
@@ -156,6 +159,8 @@ def _savings(D, q, p, improve):
         del routes[rj]
         for v in cand:
             of[v] = ri
+        for v in cand[1:-1]:
+            inner[v] = True
     out = []
     for k, seq in routes.items():
         if improve and len(seq) >= 4:
