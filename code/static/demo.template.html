@@ -129,6 +129,17 @@ details.log { margin-top: 10px; } details.log summary { cursor: pointer; font-we
 .step .why { margin-top: 4px; font-size: 13px; color: var(--ink-2); background: var(--lav); border-radius: 10px; padding: 5px 9px; }
 .step .why b { color: var(--purple-ink); }
 .kpi-tag { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+[id] { scroll-margin-top: 84px; }
+.finder-btn { white-space: nowrap; }
+#finder { position: fixed; z-index: 40; top: 62px; right: max(16px, calc(50vw - 704px)); width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 16px 48px rgba(92,15,105,.18); padding: 14px; }
+#finder input { width: 100%; box-sizing: border-box; border: 2px solid var(--lav-2); border-radius: 12px; padding: 9px 12px; font: inherit; }
+#finder input:focus { outline: none; border-color: var(--purple); }
+#finder .grp { font-size: 11.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 12px 4px 4px; }
+#finder button.q { all: unset; display: flex; justify-content: space-between; gap: 10px; width: 100%; box-sizing: border-box; padding: 7px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+#finder button.q:hover, #finder button.q:focus-visible { background: var(--lav); }
+#finder button.q span { font-size: 12px; color: var(--purple); font-weight: 700; white-space: nowrap; }
+.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { 0%, 30% { box-shadow: 0 0 0 4px var(--lime); } 100% { box-shadow: var(--shadow); } }
 .rung { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px dashed var(--line); }
 .rung .tick { width: 24px; height: 24px; border-radius: 50%; background: var(--lime); color: var(--purple-ink); display: grid; place-items: center; font-weight: 900; font-size: 13px; }
 .seg.wrap { flex-wrap: wrap; border-radius: 16px; margin-bottom: 6px; }
@@ -155,7 +166,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 .pre-tag code { font-size: 10.5px; }
 .heat td { text-align: center; font-family: var(--num); font-weight: 700; border: 2px solid #fff; border-radius: 8px; }
 @media (max-width: 1560px) { .nav-right #engine { display: none; } .tabs button { padding: 9px 12px; } }
-@media (max-width: 1280px) { .nav-right { display: none; } }
+@media (max-width: 1680px) { .nav-right { display: none; } }
 @media (max-width: 1100px) { .g2, .lec, .hero { grid-template-columns: minmax(0, 1fr); } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: 1fr; } }
 @media (max-width: 720px) { .nav-in { flex-wrap: wrap; gap: 10px; padding: 8px 14px; } .tabs { order: 3; width: 100%; overflow-x: auto; } .nav-right { display: none; } main { padding: 14px; } .g2e { grid-template-columns: minmax(0, 1fr); } .hero h1 { font-size: 26px; } .mapbox { height: 62vh; } }
 @media (prefers-reduced-motion: reduce) { .view.on { animation: none; } }
@@ -165,8 +176,10 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 <header class="nav"><div class="nav-in">
   <a class="logo" href="#answer" aria-label="Dasol network lab"><b>dasol<i>.</i></b><span class="bubble">network lab</span></a>
   <nav class="tabs" id="tabs"></nav>
+  <button class="btn small finder-btn" id="finder-btn" aria-expanded="false" aria-controls="finder">Find an answer</button>
   <div class="nav-right"><span class="pill pre"><span class="dot"></span><span id="run-pill"></span></span><span id="engine" class="pill warn"><span class="dot"></span>checking engine</span></div>
 </div></header>
+<div id="finder" hidden><input id="finder-q" type="search" placeholder="Type a question or a word: fleet, rent, held-out, PyVRP ..." aria-label="filter questions"><div id="finder-list"></div></div>
 <main>
 
 <!-- 1 · THE ANSWER -->
@@ -367,6 +380,29 @@ function show(id) {
   document.querySelectorAll(`#v-${id} .card h3`).forEach(h => { if (!h.querySelector(".pre-tag") && !h.closest("#live-card")) h.insertAdjacentHTML("beforeend", ` <span class="pre-tag">${PRE}</span>`); });
 }
 $("#run-pill").textContent = `precomputed · ${M.command}${SCALED}`;
+// Find an answer: business and analyst questions, each jumping to the card that answers it
+const FIND = [
+  ["The decision", [["How many DCs, and where?", "answer", "hero-stats"], ["What does it save, and how sure are we?", "answer", "hero-stats", "saving uncertainty interval held-out"], ["Why is this the best network?", "answer", "why"], ["What does each DC look like: stores, vehicles, rent?", "answer", "net-card", "fleet owned trucks per dc lease"], ["What would change the answer?", "answer", "reversal"], ["How does cost change with the number of DCs?", "answer", "sweep"], ["Were Strategy, Operations, the Data Team and the Field Manager right?", "answer", "stmts"]]],
+  ["Getting there", [["How do we get there, lease by lease?", "ext", "seq-time"], ["What should we measure first?", "ext", "voi-grid"], ["Does the answer hold if demand shifts?", "ext", "rob-chart"], ["How far has today's network drifted?", "ext", "drift-wrap"], ["Could a learned generator find better networks?", "ext", "gen-table"]]],
+  ["Operations", [["What does a delivery day look like?", "day", "daymap"], ["Can I re-plan one DC with my own settings?", "day", "live-card"], ["Which stores change DC, and are they still on time?", "checks", "storehist"], ["What happens on a day the fleet cannot cover?", "checks", "cases"]]],
+  ["The method", [["What is decided, and what judges it?", "how", "q1"], ["How is demand forecast, and why sampled days?", "how", "q2"], ["How is one DC's morning planned?", "how", "q3"], ["How is a network priced?", "how", "q4", "fleet newsvendor quantile assignment lp evaluation"], ["How were networks searched under a budget, and the log?", "how", "q5", "gp ei bayesian random selection evaluation log"], ["Can the quick estimate be trusted?", "how", "q6"], ["What was simplified, and does it matter?", "how", "q7"]]],
+  ["Data and checks", [["How was the data made, and why?", "data", "made"], ["What did we assume, for the business to confirm?", "data", "register", "assumption relay driver rent scope fresh food"], ["How was today's network built?", "data", "data-flow"], ["Is the routing accurate?", "checks", "routercheck", "pyvrp exact heuristic router"], ["Can I reproduce every number?", "checks", "about"]]],
+];
+const TABNAME = { answer: "The answer", day: "Delivery day", how: "How it works", data: "Data", checks: "Checks", ext: "Extensions" };
+function finderList(q) {
+  const t = q.trim().toLowerCase();
+  $("#finder-list").innerHTML = FIND.map(([g, qs]) => { const m = qs.filter(x => !t || (x[0] + " " + TABNAME[x[1]] + " " + (x[3] || "")).toLowerCase().includes(t)); return m.length ? `<div class="grp">${g}</div>` + m.map(x => `<button class="q" data-tab="${x[1]}" data-id="${x[2]}">${x[0]}<span>${TABNAME[x[1]]}</span></button>`).join("") : ""; }).join("") || `<p class="note">No question matches; try a shorter word.</p>`;
+  document.querySelectorAll("#finder button.q").forEach(b => b.onclick = () => jumpTo(b.dataset.tab, b.dataset.id));
+}
+function jumpTo(tab, id) {
+  finderOpen(false); show(tab);
+  setTimeout(() => { const e = document.getElementById(id); if (!e) return; e.scrollIntoView({ behavior: "smooth", block: "start" }); const c = e.closest(".card, .lec, .hero") || e; c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); }, 120);
+}
+function finderOpen(on) { $("#finder").hidden = !on; $("#finder-btn").setAttribute("aria-expanded", on); if (on) { finderList($("#finder-q").value); $("#finder-q").focus(); } }
+$("#finder-btn").onclick = () => finderOpen($("#finder").hidden);
+$("#finder-q").oninput = e => finderList(e.target.value);
+document.addEventListener("keydown", e => { if (e.key === "Escape") finderOpen(false); if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); finderOpen(true); } });
+document.addEventListener("pointerdown", e => { if (!$("#finder").hidden && !e.target.closest("#finder, #finder-btn")) finderOpen(false); });
 let BACKEND = false;
 if (location.protocol.startsWith("http")) fetch("/api/health").then(r => r.ok && r.json()).then(j => { BACKEND = !!(j && j.ok); setEngine(); }).catch(setEngine); else setEngine();
 function setEngine() { const e = $("#engine"); e.className = "pill " + (BACKEND ? "live" : "pre"); e.innerHTML = `<span class="dot"></span>${BACKEND ? "live engine: Python" : "live engine: in-browser (simplified)"}`; }
@@ -913,7 +949,7 @@ RENDER.how = () => {
       right: `<div class="seg" id="g-seg"><button data-n="G2" class="on">G2 (with the clock)</button><button data-n="G1">G1 (load only)</button></div><svg class="chart" viewBox="0 0 440 300" id="fig-scatter"></svg><svg class="chart" viewBox="0 0 440 90" id="fig-bound"></svg>` },
   ];
   L.push(balanceLec());
-  $("#lectures").innerHTML = L.map(x => `<div class="lec${x.wide ? " wide" : ""}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.left}</div><div>${x.right}</div></div>`).join("");
+  $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.left}</div><div>${x.right}</div></div>`).join("");
   figHierarchy(); figGamma(); figPPC(); figSavings(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
   document.querySelectorAll("#log-seg button").forEach(b => b.onclick = () => { document.querySelectorAll("#log-seg button").forEach(z => z.classList.toggle("on", z === b)); logTable(b.dataset.n); });
 };
