@@ -59,6 +59,13 @@ If the cache is missing the code warns and falls back to an uncalibrated placeho
 ## Assumptions that are business decisions
 
 Two-driver relay routes for far stores (up to 500 km, on duty until 19:00, noon deadline unchanged), the dock count of the departure-wave check, the 30 min break and unlimited spot trucks are modelling choices the company has to confirm; the demo flags them.
+The full register is in the demo's Data tab, proposal slide 6 and the problem definition, Section 3.
+
+## Scope
+
+In the model: every store served every day with every stop before noon, the vehicle limits (48 cages, 25 stops, 250 km, the shift), 500-1,400 stores per new DC, road distances, sampled and held-out demand days, and today's network priced exactly like every redesign.
+Left out, because the brief does not detail them; flagged for the business to confirm (proposal slide 7): several trips per vehicle and day, loading-dock congestion, returns and empty cages, the fresh-food second wave (out of scope in the brief unless brought in), Jeju and island stores, and one-off moving costs.
+Next, with real data: speeds by time of day (the first simplification to remove), real dock counts, a stronger router inside the evaluation, and store sales next to orders.
 
 ## Sources
 
