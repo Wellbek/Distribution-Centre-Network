@@ -89,6 +89,7 @@ def main():
         ("appendix-c", "C. Rolling record: LLM use", to_html(drop_title(HERE / "LLM_USE.md"), store, seen)),
         ("appendix-d", "D. Rolling record: decisions", to_html(drop_title(HERE / "DECISIONS.md"), store, seen)),
         ("appendix-e", "E. Rolling record: work log", to_html(drop_title(HERE / "WORK_LOG.md"), store, seen)),
+        ("appendix-f", "F. Algorithm review", to_html(drop_title(HERE / "ALGORITHM_REVIEW.md"), store, seen)),
     ]
     toc += [(a, t) for a, t, _ in appendices]
 
@@ -173,6 +174,7 @@ code { font-family: ui-monospace, Consolas, "Roboto Mono", monospace; font-size:
 pre { background: var(--code); border-radius: 12px; padding: 14px 16px; overflow-x: auto; border: 1px solid var(--line); }
 pre code { background: none; padding: 0; }
 .table { overflow-x: auto; margin: 14px 0; border: 1px solid var(--line); border-radius: 12px; }
+p, li { overflow-wrap: anywhere; }
 table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
 th { background: var(--purple-tint); color: var(--th); text-align: left; font-weight: 700; }
 th, td { padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
