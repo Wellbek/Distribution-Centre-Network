@@ -6,13 +6,17 @@ from scipy import sparse
 from scipy.optimize import linprog
 
 from . import config as C
-from . import distances, geo
+from . import geo
 
 TYPES = np.array(["residential", "office", "mixed", "roadside"])
 TYPE_LEVEL = np.array([1.00, 0.95, 1.05, 1.10])
 HIST_START = date(2025, 10, 1)
 HIST_DAYS = 365
 RURAL_HEX = 500                             # people per hexagon (about 700 per km2): 15% of stores are rural
+# Share of today's pre-history stores open by each year [ASSUMPTION: the shape of a Korean convenience chain's growth]
+GROWTH = np.array([[1990, 0.0], [2000, 0.12], [2010, 0.41], [2016, 0.62], [2020, 0.76], [2026, 1.0]])
+DESIGN_YEAR = 2016                          # the network was last designed ten years ago (prep/current_network.py)
+HIST_YEAR = 2026                            # stores opened during the history year
 
 
 def transport_lp(cost, lo, hi, size=None):
@@ -40,14 +44,81 @@ def _sample_points(n, rng):
     city = d.argmin(1)
     r = d[np.arange(n), city] / sigma[city]
     city = np.where(h["pop"][k] < RURAL_HEX, -1, city)
-    return lat, lon, h["province"][k].astype(object), h["district"][k].astype(object), city, r, pop
+    return lat, lon, h["province"][k].astype(object), h["district"][k].astype(object), city, r, pop, h["pop"][k]
+
+
+def opening_years(hexpop, opened, seed):
+    """Year each store opened: denser hexagons earlier, following the chain's growth curve; history-year openings get HIST_YEAR."""
+    rng = np.random.default_rng(seed + 7)
+    n = len(hexpop)
+    score = (np.argsort(np.argsort(hexpop, kind="stable"), kind="stable") + 0.5) / n + rng.normal(0, 0.25, n)
+    old = np.flatnonzero(opened < 0)
+    rank = np.empty(n)
+    rank[old[np.argsort(-score[old], kind="stable")]] = (np.arange(len(old)) + 0.5) / len(old)
+    return np.where(opened < 0, np.floor(np.interp(rank, GROWTH[:, 1], GROWTH[:, 0])), HIST_YEAR).astype(int)
+
+
+def era_assignment(lat, lon, rate, year, dlat, dlon, hi, design_year=DESIGN_YEAR):
+    """The design-year planner's assignment on straight-line km (every store within one driver-day, at most hi per DC);
+    stores opened since join the nearest DC with room, in order of opening; nothing is rebalanced."""
+    d = geo.haversine(lat[:, None], lon[:, None], dlat[None], dlon[None])
+    m = year <= design_year
+    res = transport_lp(rate[m, None] * d[m] + 1e12 * (d[m] > C.FAR_KM / C.DETOUR), 0, hi)
+    a = np.full(len(lat), -1)
+    a[m] = res.x.reshape(m.sum(), -1).argmax(1)
+    load = np.bincount(a[m], minlength=len(dlat))
+    for i in np.flatnonzero(~m)[np.argsort(year[~m], kind="stable")]:
+        o = np.argsort(d[i], kind="stable")
+        room = o[load[o] < hi]
+        a[i] = room[0] if len(room) else o[0]
+        load[a[i]] += 1
+    return a
+
+
+def era_design(world, year, k=12):
+    """The planner of `year`: capacitated p-median on straight-line km over the stores open then, every store within one
+    driver-day, at most MAX_STORES per DC, no minimum; greedy add, then exchange search on 5 km cells (prep/current_network.py)."""
+    st, sites = world["stores"], world["sites"]
+    m = st["year"] <= year
+    lat, lon, q = st["lat"][m], st["lon"][m], st["rate_true"][m]
+    slat = np.array([s["lat"] for s in sites]); slon = np.array([s["lon"] for s in sites])
+    d = geo.haversine(lat[:, None], lon[:, None], slat[None], slon[None])
+    cell = np.floor(lat / 0.045).astype(int) * 100_000 + np.floor(lon / 0.056).astype(int)
+    _, inv = np.unique(cell, return_inverse=True)
+    wq, cnt = np.bincount(inv, q), np.bincount(inv)
+    D = np.array([np.bincount(inv, q * d[:, j]) for j in range(len(sites))]).T / wq[:, None]
+    far = np.array([np.maximum.reduceat(d[np.argsort(inv, kind="stable"), j], np.r_[0, np.cumsum(cnt)[:-1]]) for j in range(len(sites))]).T > C.FAR_KM / C.DETOUR
+    ban = 1e12
+
+    def cost(open_):
+        res = transport_lp(wq[:, None] * D[:, open_] + ban * far[:, open_], 0, round(C.MAX_STORES * world["fraction"]), size=cnt)
+        return np.inf if res is None else res.fun
+
+    cur, best_d = [], np.full(len(wq), np.inf)
+    for _ in range(k):
+        s_ = min((j for j in range(len(sites)) if j not in cur), key=lambda j: (wq * np.minimum(best_d, D[:, j] + ban * far[:, j])).sum())
+        cur.append(s_); best_d = np.minimum(best_d, D[:, s_] + ban * far[:, s_])
+    best = cost(cur)
+    near = np.argsort(geo.haversine(slat[:, None], slon[:, None], slat[None], slon[None]), 1, kind="stable")[:, 1:13]
+    improved = True
+    while improved:
+        improved = False
+        for o in list(cur):
+            for s_ in near[o]:
+                if o not in cur or s_ in cur:
+                    continue
+                cand = [s_ if x == o else x for x in cur]
+                c = cost(cand)
+                if c < best - 1e-6:
+                    cur, best, improved = cand, c, True
+    return sorted(cur), best / q.sum(), int(m.sum())
 
 
 def make_world(fraction=1.0, seed=C.SEED):
     """Build all input tables of brief §2.5 for one seed; fraction thins stores nationwide."""
     rng = np.random.default_rng(seed)
     provinces = geo.load_land()
-    lat, lon, prov, dist, city, r, pop = _sample_points(C.FULL_STORES, rng)
+    lat, lon, prov, dist, city, r, pop, hexpop = _sample_points(C.FULL_STORES, rng)
     n = len(lat)
 
     # Store types from location: office near big-city centres, roadside in the countryside
@@ -91,19 +162,13 @@ def make_world(fraction=1.0, seed=C.SEED):
     )
     stores["id"] = np.array([f"ST{i:05d}" for i in keep])
     stores["full"] = keep
+    stores["year"] = opening_years(hexpop, opened, seed)[keep]
 
-    # Historical assignment: the planner's assignment on demand-weighted road km, every store within one driver-day,
-    # no DC above the cap, no minimum (prep/current_network.py), for the stores open before the history year;
-    # stores opened during it go to the nearest DC by road (the baseline is exempt from the bounds); never rebalanced
+    # Historical assignment: the 2016 planner's (prep/current_network.py), then growth without rebalancing;
+    # the baseline is exempt from the bounds imposed on new designs (brief §2.3)
     dlat = np.array([d["lat"] for d in dcs]); dlon = np.array([d["lon"] for d in dcs])
-    dm = distances.site_km(keep, stores["lat"], stores["lon"], stores["mountain"], dlat, dlon, [d["id"] for d in dcs])
-    hi = round(C.MAX_STORES * fraction)
-    old = stores["opened"] < 0
-    res = transport_lp(stores["rate_true"][old, None] * dm[old] + 1e12 * (dm[old] > C.MAX_KM / 2), 0, hi)
-    cur = np.full(len(keep), -1)
-    cur[old] = res.x.reshape(old.sum(), -1).argmax(1)
-    cur[~old] = dm[~old].argmin(1)
-    stores["current_dc"] = cur
+    stores["current_dc"] = era_assignment(stores["lat"], stores["lon"], stores["rate_true"], stores["year"], dlat, dlon,
+                                          round(C.MAX_STORES * fraction))
 
     return dict(
         seed=seed, fraction=fraction, stores=stores, dcs=dcs, sites=sites, provinces=provinces,

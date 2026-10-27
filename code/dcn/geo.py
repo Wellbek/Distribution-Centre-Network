@@ -97,12 +97,15 @@ SITES = [
 
 # Today's 12 DCs and their lease ends: the sites a planner picks by p-median on road km with every store within one
 # driver-day and no DC above the store cap (prep/current_network.py); the baseline is exempt from the store minimum
+# Today's 12 DCs: the 2016 planner's sites (prep/current_network.py); ten-year leases from move-ins 2016-2019 [ASSUMPTION]
 CURRENT = {
-    "S22": "2027-03-31", "S16": "2028-06-30", "S02": "2029-09-30",
-    "S19": "2027-12-31", "S13": "2030-03-31", "S60": "2028-12-31",
-    "S35": "2031-06-30", "S58": "2029-03-31", "S51": "2030-09-30",
-    "S11": "2027-09-30", "S41": "2031-03-31", "S44": "2028-09-30",
+    "S02": "2027-03-31", "S04": "2027-06-30", "S12": "2027-09-30",
+    "S01": "2027-12-31", "S11": "2028-03-31", "S58": "2028-06-30",
+    "S06": "2028-09-30", "S05": "2028-12-31", "S09": "2029-03-31",
+    "S40": "2029-06-30", "S55": "2029-09-30", "S22": "2029-12-31",
 }
+# Run 3's baseline: p-median on road km over today's stores, i.e. today's network if it were already optimal (reversal check)
+PMEDIAN_12 = ["S22", "S16", "S02", "S19", "S13", "S60", "S35", "S58", "S51", "S11", "S41", "S44"]
 
 CAPITAL = {"Seoul", "Gyeonggi", "Incheon"}
 METRO = {"Busan", "Daegu", "Daejeon", "Gwangju", "Ulsan", "Sejong"}
