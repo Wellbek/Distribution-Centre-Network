@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dasol: how many distribution centres, and where</title>
+<style>
+:root { --purple: #751485; --purple-ink: #5c0f69; --lav: #f6eff8; --lav-2: #ecdcf0; --lime: #9dc92a; --lime-ink: #4f6b0c; --lime-soft: #eef7d6;
+  --amber: #e8950f; --red: #d23f3f; --ink: #1f1f24; --ink-2: #4a4a52; --muted: #63636b; --num: "Roboto", "Noto Sans", system-ui, sans-serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #2a0b31; overflow: hidden; font: 20px/1.45 "Noto Sans", "Noto Sans KR", system-ui, sans-serif; color: var(--ink); }
+#stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: 0 0; overflow: hidden; border-radius: 18px; }
+.slide { position: absolute; inset: 0; background: #fff; border-radius: 18px; overflow: hidden; padding: 48px 64px 70px; opacity: 0; pointer-events: none; transform: translateX(40px); transition: opacity .45s ease, transform .45s ease; }
+.slide.on { opacity: 1; pointer-events: auto; transform: none; }
+.slide.prev { transform: translateX(-40px); }
+.slide.dark { background: var(--purple); color: #fff; isolation: isolate; }
+.slide.dark::after { content: ""; z-index: -1; position: absolute; right: -120px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: rgba(157,201,42,.22); }
+.kick { display: inline-block; background: var(--lime); color: #24320a; font-weight: 800; font-size: 15px; border-radius: 999px; padding: 3px 14px; margin-bottom: 14px; }
+h1 { font-size: 52px; line-height: 1.08; margin: 0 0 18px; letter-spacing: -1.5px; } h1 em { font-style: normal; color: var(--lime); }
+h2 { font-size: 34px; margin: 0 0 8px; letter-spacing: -.8px; color: var(--purple-ink); } h2 em { font-style: normal; color: var(--purple); background: var(--lime-soft); padding: 0 8px; border-radius: 8px; }
+.lead { font-size: 19px; color: var(--ink-2); margin: 0 0 18px; max-width: 1050px; }
+.dark .lead { color: #f0e2f3; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.cols.w { grid-template-columns: 1.25fr 1fr; }
+.card { background: var(--lav); border-radius: 16px; padding: 14px 18px; }
+.card b { color: var(--purple-ink); }
+.big { font-family: var(--num); font-weight: 900; font-size: 46px; letter-spacing: -1px; color: var(--purple); line-height: 1; }
+.big small { font-size: 18px; font-weight: 700; color: var(--muted); margin-left: 6px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 22px; position: relative; z-index: 1; }
+.stat { background: rgba(255,255,255,.12); border-radius: 16px; padding: 14px 16px; }
+.stat .l { font-size: 14px; color: #ead6ef; } .dark .stats.big3 .l { font-size: 17px; line-height: 1.45; } .stat .v { font-family: var(--num); font-size: 34px; font-weight: 900; } .stat .v small { font-size: 15px; color: #ead6ef; margin-left: 4px; }
+table { border-collapse: collapse; width: 100%; font-size: 16px; }
+th { text-align: left; color: var(--purple-ink); background: var(--lav); padding: 7px 10px; } td { padding: 6px 10px; border-bottom: 1px solid #efedf1; font-variant-numeric: tabular-nums; }
+table.tight { font-size: 14px; } table.tight td, table.tight th { padding: 3px 10px; }
+tr.bad td { background: #fdecec; font-weight: 700; } tr.hl td { background: var(--lime-soft); font-weight: 700; }
+.tag { display: inline-block; font-size: 12.5px; font-weight: 800; border-radius: 999px; padding: 2px 10px; vertical-align: middle; }
+.tag.demo { background: var(--lime-soft); color: var(--lime-ink); } .tag.real { background: #fff1d9; color: #7a4a00; }
+.ev { position: absolute; left: 64px; bottom: 24px; font-size: 15px; } .ev a { color: var(--purple); font-weight: 800; text-decoration: none; border-bottom: 2px solid var(--lime); }
+.dark .ev a { color: #fff; }
+ul { margin: 6px 0; padding-left: 22px; } li { margin: 5px 0; }
+.voice { border-left: 5px solid var(--purple); background: var(--lav); border-radius: 0 14px 14px 0; padding: 10px 14px; margin-bottom: 10px; font-size: 17px; }
+.voice .q { color: var(--muted); }
+.flow { display: flex; gap: 10px; margin: 10px 0; } .flow div { flex: 1; background: var(--lav); border-radius: 14px; padding: 10px 12px; font-size: 16px; } .flow div b { display: block; color: var(--purple-ink); }
+.flow div.hot { background: var(--purple); color: #fff; } .flow div.hot b { color: var(--lime); }
+.key { border-left: 6px solid var(--lime); background: var(--lime-soft); border-radius: 0 14px 14px 0; padding: 10px 16px; margin-top: 14px; font-size: 18px; }
+svg text { font-family: "Noto Sans", system-ui, sans-serif; }
+#bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 10px; justify-content: center; padding: 8px; z-index: 5; }
+#bar button { all: unset; cursor: pointer; background: #fff; color: var(--purple); font-weight: 900; border-radius: 999px; padding: 6px 16px; font-size: 15px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+#bar button:focus-visible { outline: 3px solid var(--lime); }
+#count { color: #fff; font-family: var(--num); font-weight: 800; font-size: 14px; min-width: 70px; text-align: center; }
+#dots { display: flex; gap: 6px; } #dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.35); cursor: pointer; } #dots i.on { background: var(--lime); }
+.foot { position: absolute; right: 64px; bottom: 24px; font-size: 13px; color: var(--muted); }
+.dark .foot { color: #ead6ef; }
+@media (prefers-reduced-motion: reduce) { .slide { transition: none; } }
+@media print { html, body { overflow: visible; background: #fff; } #bar { display: none; } #stage { position: static; transform: none !important; } .slide { position: relative; opacity: 1; transform: none; page-break-after: always; margin-bottom: 10px; } }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="bar"><button id="prev" aria-label="previous slide">← Back</button><div id="dots"></div><span id="count"></span><button id="next" aria-label="next slide">Next →</button></div>
+<script id="data" type="application/json">/*__DATA__*/null</script>
+<script>
+const R = JSON.parse(document.getElementById("data").textContent);
+const F = R.finals, b = F.baseline, r = F.recommended, sv = R.saving, SITES = R.sites, X = R.extensions, M = R.meta;
+const fM = v => (v / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 }), f0 = v => Math.round(v).toLocaleString("en-US");
+const rec = R.networks.recommended, base = R.networks.baseline;
+const kept = rec.filter(j => base.includes(j)), opened = rec.filter(j => !base.includes(j)), closed = base.filter(j => !rec.includes(j));
+const names = js => js.map(j => SITES[j].name).join(", ");
+const DEMO = (tab, txt) => `<div class="ev">Evidence: <a href="demo.html#${tab}">${txt} →</a> <span style="opacity:.7">(demo.html, same folder, opens offline)</span></div>`;
+const DEMOTAG = `<span class="tag demo">shown in the fictional instance</span>`, REAL = `<span class="tag real">needs Dasol's real data</span>`;
+const rev = R.reversals, opt = rev.find(x => x.assumption === "today's network"), sw = R.sweep, best = sw.filter(s => s.ok98).reduce((a, s) => (s.total < a.total ? s : a));
+const k8 = F.best_k8, prox = F.proxy_only, g0 = R.pool.filter(p => p.origin.startsWith("G0") && p.ok98).reduce((a, p) => (p.E < a.E ? p : a));
+const re = sv.waterfall[0].total - sv.waterfall[1].total;
+const lowCheck = Math.min(...rev.filter(x => x.assumption === "distance model").map(x => x.saving), R.routing_check ? sv.final_mean - R.routing_check.saving_month_shift : Infinity);
+const strict = rev.find(x => x.assumption === "vehicle limits"), strictMin = rev.find(x => x.assumption === "vehicle limits and minimum");
+const near = sw.filter(s => s.ok98 && s !== best && s.total - best.total < 50e6);
+const Q = X && X.sequence, V = X && X.voi, RB = X && X.robustness;
+const best5 = R.top5.map(t => R.pool[t.cand].sites), inAll = rec.filter(j => best5.every(s => s.includes(j)));
+const L_ = Q ? Q.leases : [], keepAll = L_.find(L => L.in_rec && inAll.some(j => SITES[j].name === L.site)), drop = L_.find(L => !L.in_rec);
+
+// Small map of Korea: stores as dots, DCs as squares
+function map(w, h, net, asg, mark) {
+  const BB = { lon0: 125.9, lon1: 129.8, lat0: 34.1, lat1: 38.75 }, KX = Math.cos(36.5 * Math.PI / 180), s = Math.min(w / ((BB.lon1 - BB.lon0) * KX), h / (BB.lat1 - BB.lat0));
+  const P = (lon, lat) => [((lon - BB.lon0) * KX * s).toFixed(1), ((BB.lat1 - lat) * s).toFixed(1)];
+  let o = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+  for (const pr of R.geo.provinces) for (const ring of pr.rings) o += `<path d="${ring.map((p, i) => `${i ? "L" : "M"}${P(p[0], p[1]).join(" ")}`).join("")}Z" fill="#f6f3f8" stroke="#ddd3e2" stroke-width=".6"/>`;
+  const S = R.stores, step = Math.max(1, Math.floor(S.lat.length / 4000));
+  for (let i = 0; i < S.lat.length; i += step) { const [x, y] = P(S.lon[i], S.lat[i]); const moved = S.base_dc[i] !== S.rec_dc[i]; o += `<circle cx="${x}" cy="${y}" r="1.1" fill="${mark === "change" ? (moved ? "#751485" : "#d6cbdb") : "#b89cc2"}"/>`; }
+  const all = mark === "change" ? [...closed.map(j => [j, "c"]), ...kept.map(j => [j, "k"]), ...opened.map(j => [j, "n"])] : net.map(j => [j, "k"]);
+  for (const [j, t] of all) { const [x, y] = P(SITES[j].lon, SITES[j].lat); o += `<rect x="${x - 6}" y="${y - 6}" width="12" height="12" rx="3" fill="${t === "c" ? "#b5b5bb" : "#5c0f69"}" stroke="#fff" stroke-width="1.5"/>${t === "n" ? `<circle cx="${+x + 6}" cy="${y - 6}" r="4" fill="#9dc92a" stroke="#fff"/>` : ""}`; }
+  return o + "</svg>";
+}
+function sweepChart(w, h) {
+  const mx = Math.max(...sw.map(s => s.total), R.baseline_search.total) * 1.05, bw = (w - 60) / sw.length;
+  const Y = v => h - 30 - v / mx * (h - 50);
+  let o = `<svg width="${w}" height="${h}">`;
+  sw.forEach((s, i) => { const x = 50 + i * bw;
+    o += `<rect x="${x + 4}" y="${Y(s.fixed)}" width="${bw - 8}" height="${h - 30 - Y(s.fixed)}" fill="#5c0f69" rx="3"/><rect x="${x + 4}" y="${Y(s.total)}" width="${bw - 8}" height="${Y(s.fixed) - Y(s.total)}" fill="${s === best ? "#9dc92a" : "#c9a6d1"}" rx="3"/>`;
+    o += `<text x="${x + bw / 2}" y="${h - 10}" text-anchor="middle" font-size="15" font-weight="${s === best ? 900 : 600}" fill="${s === best ? "#751485" : "#4a4a52"}">${s.k}</text>`; });
+  const yb = Y(R.baseline_search.total);
+  o += `<line x1="50" x2="${w}" y1="${yb}" y2="${yb}" stroke="#d23f3f" stroke-dasharray="7 5" stroke-width="2"/><text x="${w - 4}" y="${yb - 8}" text-anchor="end" font-size="14" font-weight="700" fill="#b02f2f">today's 12 DCs: ${fM(R.baseline_search.total)} M</text>`;
+  o += `<text x="${50 + (best.k - sw[0].k + .5) * bw}" y="${Y(best.total) - 8}" text-anchor="middle" font-size="14" font-weight="900" fill="#4f6b0c">${fM(best.total)} M</text>`;
+  return o + `</svg>`;
+}
+
+function seqChart(w, h) {
+  const n = Q.months, lines = [["today, leases renewed", Array(n).fill(Q.base_total), "#d23f3f", "7 5"], ["switch at once", Q.one_shot, "#9dc92a", ""], ["follow the leases", Q.committed.monthly, "#751485", ""]];
+  const all = lines.flatMap(l => l[1]), lo = Math.min(...all) * 0.98, hi = Math.max(...all) * 1.01, X = m => 60 + m / n * (w - 230), Y = v => h - 24 - (v - lo) / (hi - lo) * (h - 40);
+  let o = `<svg width="${w}" height="${h}">`;
+  for (const yv of [6000e6, 6500e6, 7000e6]) if (yv > lo && yv < hi) o += `<line x1="60" x2="${w - 170}" y1="${Y(yv)}" y2="${Y(yv)}" stroke="#eee"/><text x="54" y="${Y(yv) + 4}" text-anchor="end" font-size="13" fill="#63636b">${fM(yv)}</text>`;
+  for (const yr of [0, 12, 24, 36]) o += `<text x="${X(yr)}" y="${h - 4}" text-anchor="middle" font-size="13" fill="#63636b">${2027 + yr / 12}</text>`;
+  lines.forEach(([nm, ys, c, d], li) => { o += `<path d="${ys.map((v, i) => `${i ? `L${X(i)} ${Y(ys[i - 1])}L` : "M"}${X(i)} ${Y(v)}`).join("")}L${X(n)} ${Y(ys[n - 1])}" fill="none" stroke="${c}" stroke-width="3.5" stroke-dasharray="${d}"/><text x="${X(n) + 8}" y="${Y(ys[n - 1]) + 5 + [0, -7, 8][li]}" font-size="14" font-weight="800" fill="${c}">${nm}</text>`; });
+  return o + `</svg>`;
+}
+
+const SL = [
+  // 1 · the answer up front
+  { dark: true, html: `<span class="kick">Recommendation · Dasol logistics redesign</span>
+    <h1>Run <em>${r.k} distribution centres</em>, not eight and not twelve</h1>
+    <p class="lead">Keep ${names(kept)}; open ${names(opened)}; give up ${closed.length} sites as their leases expire. In our model of the chain this saves about ${fM(sv.final_mean)} M KRW a month with every store still served before noon.</p>
+    <div class="stats"><div class="stat"><div class="l">Saving per month (fictional instance)</div><div class="v">${fM(sv.final_mean)}<small>M KRW</small></div><div class="l">${fM(sv.final_ci[0])}-${fM(sv.final_ci[1])} over demand days; about ${fM(Math.round(lowCheck / 50e6) * 50e6)}-${fM(Math.round(sv.final_mean / 50e6) * 50e6)} across the model checks${R.routing_check ? ` (${fM(sv.final_mean - R.routing_check.saving_month_shift)} with a stronger router)` : ""}</div></div>
+    <div class="stat"><div class="l">On days the search never saw</div><div class="v">${fM(sv.held_mean)}<small>M KRW</small></div><div class="l">${M.days[2]} held-out days</div></div>
+    <div class="stat"><div class="l">Of which no lease involved</div><div class="v">${fM(re)}<small>M KRW</small></div><div class="l">redraw today's territories</div></div>
+    <div class="stat"><div class="l">Deliveries before noon</div><div class="v">100<small>%</small></div><div class="l">today and recommended</div></div></div>
+    <p class="lead" style="margin-top:22px;position:relative;z-index:1"><b>The decision asked of you today:</b> approve three data requests and two lease steps (last slide). The saving is a result of a fictional chain; for Dasol it depends on facts only the real tables can show.</p>${DEMO("answer", "The answer tab")}` },
+  // 2 · two questions
+  { html: `<h2>Your two questions: <em>how many DCs, and where?</em></h2>
+    <div class="cols w"><div>${map(560, 480, rec, null, "change")}<p style="font-size:14px;color:var(--muted);margin:2px 0 0">Purple dots: stores that change DC. Squares: DCs (grey closes; lime dot: new).</p></div>
+    <div style="font-size:18px"><div class="card"><b>How many?</b> ${r.k}. ${near.length ? `${near.map(s => s.k).join(" and ")} DCs are within ${fM(Math.max(...near.map(s => s.total - best.total)) + 1e6)} M a month (near-ties);` : ""} eight costs ${fM(k8.total - r.total)} M a month more; twelve or more cost more in rent than they save on the road. ${DEMOTAG}</div>
+    <div class="card" style="margin-top:12px"><b>Where?</b> Keep ${names(kept)}. Open ${names(opened)}. ${inAll.length ? `<br><b>In all five best networks:</b> ${names(inAll)}.` : ""} ${DEMOTAG}</div>
+    <div class="card" style="margin-top:12px"><b>Stores affected.</b> ${f0(R.stores_view.moved)} stores change DC; all are served before noon on every tested day. ${DEMOTAG}</div></div></div>${DEMO("answer", "Map, waterfall and reversals")}` },
+  // 3 · the four statements
+  { html: `<h2>The four voices are <em>four different kinds of claim</em></h2><p class="lead">They cannot be ranked against each other until they are written on one scale: total monthly cost.</p>
+    <div class="voice"><b>Strategy & Planning</b> <span class="q">"From twelve to eight, lease and staff costs fall."</span> A <b>decision</b> argued from one cost line. True for rent, incomplete: the best eight-DC network costs ${fM(k8.total)} M a month against ${fM(r.total)} M for ${r.k}.</div>
+    <div class="voice"><b>Delivery Operations</b> <span class="q">"Wider areas, longer drives, more vehicles."</span> An <b>evaluation</b> of that decision through daily routing. Right in kind: eight DCs need ${f0(k8.vehicles_day)} vehicles a day, ${r.k} need ${f0(r.vehicles_day)}.</div>
+    <div class="voice"><b>Data Team</b> <span class="q">"Centre of gravity is optimal."</span> A <b>method</b>, optimal for its own criterion (squared straight-line distance), not for cost: its best network costs ${fM(g0.E - R.pool_best)} M a month more than the best found, and it cannot choose the number of DCs.</div>
+    <div class="voice"><b>Field Manager</b> <span class="q">"Close on the map, far by road."</span> A claim about <b>model validity</b>: checked, every distance is a real road distance from OpenStreetMap or calibrated on one.</div>${DEMO("answer", "The four voices, answer tab")}` },
+  // 4 · hierarchy and I/O
+  { html: `<h2>One decision on top, <em>judged by the day-to-day operation</em> below it</h2>
+    <div class="flow"><div class="hot"><b>D1 · Network</b>how many DCs, where · once, years</div><div><b>D2 · Territories</b>which DC serves each store · months</div><div><b>D3 · Fleet</b>owned vehicles per DC · contracts</div><div><b>D4 · Routing</b>vehicles and routes · every evening</div></div>
+    <p class="lead">Each network is judged by routing its stores on many sampled days and adding rent, vehicles, fuel, spot trucks and relay drivers: the network is <i>evaluated by</i> the operation it creates.</p>
+    <div class="cols"><div class="card"><b>What the system takes in</b><ul><li>Store locations and a year of daily orders</li><li>60 candidate sites with rents, today's 12 DCs and their leases</li><li>Road distances; vehicle rules: 48 cages, 25 stops, 250 km, delivered by 12:00</li></ul></div>
+    <div class="card"><b>What it gives out</b><ul><li>The number of DCs, their sites and each store's DC</li><li>Owned vehicles per DC</li><li>Monthly cost and its parts, the saving with its uncertainty, service before noon</li><li>When the answer would change</li></ul></div></div>${DEMO("how", "How it works, Q1")}` },
+  // 5 · data
+  { html: `<h2>What we assumed about the data, and <em>what the real tables must show</em></h2>
+    <div class="cols"><div><div class="card"><b>Generated for this study</b> ${DEMOTAG}<ul><li>${f0(M.stores_planning)} stores placed where people live (real population map), with a year of orders</li><li>Today's network as a 2016 design that has grown for ten years without rebalancing</li><li>Rents by region and the cost figures of the brief</li></ul></div>
+    <div class="card" style="margin-top:12px"><b>Real</b><ul><li>Geography and road distances (OpenStreetMap)</li></ul></div></div>
+    <div><div class="card"><b>To measure with Dasol's tables</b> ${REAL}<ul><li><b>Today's real cost:</b> 12 months of deliveries, vehicle-days and spot hires, scored the same way. The whole saving hangs on this.</li><li><b>Stop time and road speed:</b> one month of GPS traces at one DC; they decide how far a vehicle gets before noon.</li><li><b>Rents and lease terms</b> of today's and the shortlisted sites.</li><li>Store sales next to orders: orders are not shelf demand.</li></ul></div></div></div>${DEMO("data", "Data & baseline tab")}` },
+  // 5b · the assumption register, for the business to confirm
+  { html: `<h2>What we assumed, and <em>what you need to confirm</em></h2><p class="lead" style="margin-bottom:10px">Everywhere else the brief's own figures are used. ${REAL}</p>
+    <table class="tight" style="font-size:13.5px"><tr><th>Item</th><th>The brief</th><th>We use</th><th>Why</th></tr>
+    <tr><td><b>Far stores</b></td><td>250 km, 10-hour shift per vehicle</td><td>A second driver on far routes (500 km, until 19:00, still before noon)</td><td>Otherwise far east-coast and mountain stores get no daily delivery${strict ? `; without it: ${strict.saving == null ? "no redesign meets 98%" : `saving ${strict.saving < 0 ? "−" : ""}${fM(Math.abs(strict.saving))} M`}${strictMin && strictMin.saving != null ? `, unless a small coastal DC below 500 stores is allowed (${fM(strictMin.saving)} M)` : ""}` : ""}</td></tr>
+    <tr><td><b>Second driver's price</b></td><td>No price</td><td>180,822 KRW a day: a full owned vehicle-day</td><td><b>Upper bound</b>: truck and fuel already counted; a cheaper driver raises the saving</td></tr>
+    <tr><td>Shift and departure</td><td>10 h incl. loading; leave 04:00-07:00</td><td>Load 03:00, leave 04:00, back with a break by 13:00</td><td>Not timed in the brief; checked with departure waves</td></tr>
+    <tr><td>Docks per DC</td><td>Not given</td><td>23</td><td>Needed only for the wave check; 29 gives the same answer</td></tr>
+    <tr><td>Delivery window</td><td>98% before noon</td><td>Every stop before noon</td><td>Conservative; the 2% slack is not used</td></tr>
+    <tr><td>DC rent</td><td>150 M; dearer near Seoul</td><td>180 / 157.5 / 132 M by region</td><td>The brief gives no regional figures; tested at 100 and 200 M</td></tr>
+    <tr><td>Spot trucks</td><td>550,000 KRW a day</td><td>As many as needed</td><td>No supply limit given</td></tr>
+    <tr><td>Store orders</td><td>Not addressed</td><td>Independent of the delivery time</td><td>No data; 24% of stores would be served over 2 h later</td></tr>
+    <tr><td>Today's network</td><td>Placed as a grown chain would be</td><td>A 2016 design with ten years of growth</td><td>No real network given; if it is near-optimal the saving reverses</td></tr>
+    <tr><td>Scope</td><td>Fresh food optional</td><td>Fresh food, Jeju, moving costs left out</td><td>Allowed or not costable without data</td></tr></table>${DEMO("data", "Data & baseline tab; full register in the problem definition, Section 3")}` },
+  // 6 · how it works
+  { html: `<h2>How the answer is computed, <em>in plain words</em></h2>
+    <div class="cols"><div><div class="card"><b>1 · One DC, one morning.</b> Vehicles leave at 04:00 and must reach every store by noon; routes are built by merging stores while load, stops, kilometres and the clock allow. Checked against an exact solver and a state-of-the-art one.</div>
+    <div class="card" style="margin-top:12px"><b>2 · One network, one month.</b> Stores go to the nearest suitable open DC (500-1,400 stores each); every DC is routed on ${M.days[0]}-${M.days[1]} demand days drawn from what each store has ordered; enough vehicles are owned to cover two days in three, spot trucks above.</div></div>
+    <div><div class="card"><b>3 · Which networks to try.</b> A quick estimate proposes about ${R.pool.length} candidate networks for 7 to 19 DCs; a learning search spends ${M.budget} full evaluations on the most promising, then checks the whole list.</div>
+    <div class="key">The search found the best network on the list after ${R.log_bo.findIndex(x => Math.abs(x.E - R.pool_best) < 1) + 1} of ${M.budget} evaluations; picking at random with the same budget did not.</div></div></div>${DEMO("how", "How it works, Q3-Q5")}` },
+  // 7 · cheap criterion
+  { html: `<h2>Where a quick estimate <em>would have misled you</em></h2>
+    <p class="lead">A quick cost estimate counts vehicles by load. It ignores the clock: a vehicle from a large territory spends its morning driving out and cannot reach 25 stores by noon.</p>
+    <div class="cols"><div class="card"><div class="big">${fM(prox.total - r.total)}<small>M KRW a month lost</small></div><p>Trusting the quick estimate alone picks <b>${prox.k} DCs</b>, the Strategy team's number: it looks cheapest on paper and costs that much more once routed. ${DEMOTAG}</p></div>
+    <div class="card"><div class="big">${R.r3.spearman.toFixed(2)}<small>rank agreement</small></div><p>Adding the clock to the estimate lifts its agreement with the full evaluation from ${R.r3_g1.spearman.toFixed(2)} to ${R.r3.spearman.toFixed(2)}, and it then picks ${R.r3.g_pick_k} DCs, the right number. We still evaluate in full before recommending. ${DEMOTAG}</p></div></div>${DEMO("how", "G versus E, How it works Q6")}` },
+  // 8 · sweep and uncertainty
+  { html: `<h2>Cost against the number of DCs: <em>${best.k} DCs is the bottom of the curve</em></h2>
+    <div class="cols w"><div>${sweepChart(640, 400)}<p style="font-size:14px;color:var(--muted);margin:4px 0 0">Monthly cost, M KRW: dark = DC rent, light = vehicles, fuel, spot trucks, relay drivers (${M.days[0]} sampled days).</p></div>
+    <div><div class="card"><b>Saving against today</b> ${DEMOTAG}<div class="big" style="margin-top:6px">${fM(sv.final_mean)}<small>M a month</small></div>90% band ${fM(sv.final_ci[0])}-${fM(sv.final_ci[1])} over ${M.days[1]} demand days; ${fM(sv.held_mean)} M on ${M.days[2]} days the search never saw.</div>
+    <div class="card" style="margin-top:12px"><b>Where it comes from</b><ul><li>${fM(re)} M: redraw today's territories (no lease)</li><li>${fM(sv.waterfall[1].total - sv.waterfall[2].total)} M: better sites for twelve DCs</li><li>${fM(sv.waterfall[2].total - sv.waterfall[3].total)} M: ${r.k} DCs instead of twelve</li></ul></div></div></div>${DEMO("answer", "Sweep and waterfall")}` },
+  // 9 · reversals
+  { html: `<h2>What would <em>reverse</em> the recommendation</h2><p class="lead" style="font-size:16px;margin-bottom:8px">Each row changes one assumption and re-scores today's network against the best network of every size.</p>
+    <table class="tight"><tr><th>If…</th><th>Best number of DCs</th><th>Saving, M KRW a month</th></tr>${rev.map(x => `<tr class="${x.saving < 0 ? "bad" : x.assumption === "as reported" ? "hl" : ""}"><td>${x.assumption === "as reported" ? "as assumed" : `${x.assumption}: ${x.value}`}</td><td>${x.k_star}</td><td>${x.saving < 0 ? "−" : ""}${fM(Math.abs(x.saving))}</td></tr>`).join("")}</table>
+    ${X && X.drift ? `<p style="font-size:14px;margin:8px 0 0">Whatever year today's network was last redesigned (${X.drift[0].year}-${X.drift[X.drift.length - 1].year}), the saving stays ${fM(Math.min(...X.drift.map(d => d.saving)))}-${fM(Math.max(...X.drift.map(d => d.saving)))} M a month; only a design on road km for today's stores removes it.</p>` : ""}
+    ${R.routing_check ? `<p style="font-size:14px;margin:4px 0 0">Our routing heuristic is weaker on today's small rural territories than a state-of-the-art solver (PyVRP): with that solver's routes the saving would be about <b>${fM(sv.final_mean - R.routing_check.saving_month_shift)} M</b> a month instead of ${fM(sv.final_mean)} M. Still positive; most of it is then rent.</p>` : ""}
+    <div class="key" style="font-size:15px;margin-top:8px;padding:8px 14px">${(() => { const flips = rev.filter(x => x.saving != null && x.saving < 0); return `${flips.length === 1 ? "One condition reverses it" : `${["", "One", "Two", "Three", "Four"][flips.length] || flips.length} conditions reverse it`}: <b>if Dasol's real network is already close to the best design for today's stores</b> (−${fM(-opt.saving)} M a month)${strict && strict.saving < 0 ? `; and <b>if far routes may have no second driver while every DC must keep 500 stores</b> (−${fM(-strict.saving)} M; allowing either restores the saving)` : ""}. The real tables and the two business rules must be settled first.`; })()} ${REAL}</div>${DEMO("answer", "Reversal table")}` },
+  // 10 · sequence, robustness, VOI
+  Q ? { html: `<h2>How to get there: <em>follow the leases</em>, measure travel times first</h2>
+    <div class="cols" style="font-size:17px;line-height:1.4"><div class="card"><b>A sequence, not a switch.</b> Sites can only be given up when their leases end (${L_[0].date.slice(0, 7)} to ${L_[L_.length - 1].date.slice(0, 7)}). Following the leases to the ${r.k}-DC network saves ${((Q.cum_never - Q.committed.cum) / 1e9).toFixed(1)} bn KRW over 36 months; switching everything at once costs ${((Q.cum_one_shot - Q.cum_never) / 1e9).toFixed(1)} bn <i>more</i> than changing nothing, because the old leases must be paid out. Redrawing territories now, with no lease involved, brings ${((Q.cum_never - Q.cum_redrawn) / 1e9).toFixed(1)} bn of the saving. ${DEMOTAG}</div>
+    <div><div class="card"><b>Robust to demand shifts.</b> With chain volume −15% or +20%, or the capital region +30%, the redesign still pays (at least ${fM(Math.min(...RB.filter(x => /volume|region/.test(x.name)).map(x => x.saving)))} M a month) and the best number of DCs moves by at most one. ${DEMOTAG}</div>
+    <div class="card" style="margin-top:12px"><b>What information is worth.</b> Knowing stop time and speed exactly is worth ${fM(V.travel.evpi)} M a month to this decision; knowing every store's demand exactly, ${fM(V.rates.evpi)} M. Measure travel times before more demand history; if the measured speed is near 30 km/h, eleven DCs is the better choice. ${DEMOTAG}</div></div></div><div style="margin-top:4px">${seqChart(1150, 175)}<p style="font-size:13px;color:var(--muted);margin:0">Monthly cost of today's network, of switching at once (old leases paid out) and of following the leases, M KRW, January 2027 to December 2029.</p></div>${DEMO("ext", "Extensions tab")}` } : null,
+  // 11 · measure first, conditions
+  { html: `<h2>What to measure first, and <em>when to proceed, revise or stop</em></h2>
+    <div class="cols"><div class="card"><b>First real-data check</b> ${REAL}<p>Score today's real network with 12 months of real deliveries, vehicle-days and spot hires under the same evaluation, and compare it with the best redesign. Ready by April 2027 if the data arrive by February.</p></div>
+    <div><div class="card"><b>Proceed</b> with the lease sequence if today's real network costs more than the best redesign by more than the one-off moving cost (at ${fM(sv.final_mean)} M a month, 7 bn KRW of moving cost pays back within a year).</div>
+    <div class="card" style="margin-top:10px"><b>Revise</b> the number of DCs if the measured stop time or speed lies outside 10-20 min or 30-45 km/h: rerun the model, about 20 minutes.</div>
+    <div class="card" style="margin-top:10px"><b>Stop</b> and renew leases as they expire if the real network comes within the moving cost of the best redesign.</div></div></div>${DEMO("checks", "Checks tab")}` },
+  // 12 · decision
+  { dark: true, html: `<span class="kick">Decision requested</span><h1>Three approvals <em>today</em></h1>
+    <div class="stats big3" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="v" style="font-size:24px">Data</div><div class="l">12 months of deliveries, vehicle-days and spot hires; one month of GPS traces at one DC; real rents, due end of February 2027. And one rule: a second driver on far routes, or a small coastal DC below 500 stores.</div></div>
+    <div class="stat"><div class="v" style="font-size:24px">Renew ${keepAll ? keepAll.site : SITES[inAll[0]].name}</div><div class="l">${keepAll ? `Lease ends ${keepAll.date.slice(0, 7)}. ` : ""}It is in every one of the five best networks, so renewing is right whatever the real data show.</div></div>
+    <div class="stat"><div class="v" style="font-size:24px">Defer ${drop ? drop.site : "the next renewal"}</div><div class="l">${drop ? `Lease ends ${drop.date.slice(0, 7)}; ` : ""}the first site the plan gives up. Decide after the real-data check in April 2027. No new site is leased before then.</div></div></div>
+    <div class="flow" style="margin-top:22px;position:relative;z-index:1"><div><b>Feb 2027</b>data delivered</div><div><b>Mar 2027</b>renew ${keepAll ? keepAll.site.split(" ")[0] : "the first site"}</div><div><b>Apr 2027</b>real-data check: proceed, revise or stop</div><div class="hot"><b>Jun 2027</b>${drop ? drop.site.split(" ")[0] : "next"} lease: first step of the sequence</div></div>
+    <p class="lead" style="margin-top:18px;position:relative;z-index:1">Numbers on these slides come from <code>code/</code> (${M.command}, seed ${M.seed}); stores, demand and costs are fictional, geography and roads are real.</p>${DEMO("answer", "Open the demonstration")}` },
+].filter(Boolean);
+
+const stage = document.getElementById("stage");
+SL.forEach((s, i) => { const d = document.createElement("section"); d.className = "slide" + (s.dark ? " dark" : ""); d.innerHTML = s.html + `<div class="foot">${i + 1} / ${SL.length}</div>`; stage.appendChild(d); const dot = document.createElement("i"); dot.title = `slide ${i + 1}`; dot.onclick = () => go(i); document.getElementById("dots").appendChild(dot); });
+let cur = 0;
+function go(i) {
+  cur = Math.max(0, Math.min(SL.length - 1, i));
+  document.querySelectorAll(".slide").forEach((s, k) => { s.classList.toggle("on", k === cur); s.classList.toggle("prev", k < cur); });
+  document.querySelectorAll("#dots i").forEach((d, k) => d.classList.toggle("on", k === cur));
+  document.getElementById("count").textContent = `${cur + 1} / ${SL.length}`;
+  history.replaceState(null, "", "#" + (cur + 1));
+}
+function fit() { const s = Math.min(innerWidth / 1300, (innerHeight - 50) / 740); stage.style.transform = `scale(${s}) translate(-50%, -52%)`; }
+document.getElementById("prev").onclick = () => go(cur - 1); document.getElementById("next").onclick = () => go(cur + 1);
+addEventListener("keydown", e => { if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); go(cur + 1); } if (["ArrowLeft", "PageUp"].includes(e.key)) go(cur - 1); });
+addEventListener("resize", fit); fit(); go((+location.hash.slice(1) || 1) - 1);
+</script>
+</body>
+</html>
