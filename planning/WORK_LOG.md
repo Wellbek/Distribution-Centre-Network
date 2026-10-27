@@ -400,3 +400,13 @@ Fixes:
 - Greedy assignment: overloaded DCs' stores moved with plain-list lookups instead of one numpy call per store; identical on 2,400 random networks, identical reduced pool (103 s to 85 s on one core).
 - Reduced run on two pinned laptop cores: 6 min 48 s (was 10 min 22 s); registry equal to the shipped one except 16 EI values and the timing fields; shipped Spark registry kept.
 - Demo: data tab states the baseline rule was adopted after an earlier baseline beat every redesign; the failure-case button resets the live-solve sliders first (checked in Chromium, no errors).
+
+### Brief coverage audit and the demo additions (27 Oct, evening)
+
+- Side-by-side audit of assignment.md against demo.html and proposal.html (lavish review page, `.lavish/`, not in the ZIP): 45 brief items, 24 clear in the demo, 16 partial, 4 missing, 1 definition-only; the user annotated 11 items.
+- Answer tab: why this network is the best found (all 402 evaluated networks on one axis, challengers head to head, five tests, what "best" means) and the recommended network DC by DC (per-DC fleet columns appear after the next full run, which now stores `owned_by_dc`, `need_mean_by_dc`, `need_max_by_dc`).
+- How it works: I/O schema; sampled against average-day cost with the non-linearity stated; hard window; cost and return of one solve; in and out of the model; what passes down and up; the assignment's place; linear against combinatorial parts; budget; an evaluation log table; Q7 the balance table with a decision chip per row.
+- Data tab: seven generation steps with how and why, the eight tables with what one row cannot tell, the assumption register.
+- Checks: reduced run and how it differs; Delivery day: one command tag for the KPIs, fading truck tails (about 10% more draw time, no extra data); a "Find an answer" index of 28 business and analyst questions.
+- Proposal (15 slides): scope as must, should, could, won't (left-out items flagged for the business); why the answer is right; linear against combinatorial; owned vehicles in the four voices as in the demo.
+- README: scope section. Checks: demo offline at 1440 and 390 px clean, all 15 slides clean, `verify.py` 29/29.
