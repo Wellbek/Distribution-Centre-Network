@@ -257,3 +257,138 @@ Then `scp -r spark:~/dcn/code/results code/`, and with the OSRM tunnel open `pyt
 **Open.**
 
 - `verify.py` on run 3; demo QA; definition and proposal.
+
+## 2026-10-21 (day 2)
+
+### Algorithm review (laptop only)
+
+**Why.** Run 3 says today's network beats every bounded redesign; the user asked whether the algorithms are the reason.
+
+**Runs.** Laptop, one core each (`taskset`, `nice -n 19`), scratch `uv` environment with pyvrp 0.11.3; full world of run 3 rebuilt in 2 s.
+
+| Experiment | Run time | Result |
+|---|---|---|
+| Savings against PyVRP, today's network, search day 0, 0.1 s per store | 17 min | 587 vs 558 vehicles (-4.9%), km equal |
+| Same, k = 10 alternative (Naju and Gimhae rerun at 0.3 s per store, 9 min) | 17 + 9 min | 620 vs 596 vehicles (-3.9%); at 0.1 s per store PyVRP found no feasible solution for Naju and Gimhae |
+| Selection-rule replay on the 390 evaluated pool candidates, 30 repetitions | about 15 min | Every model-based rule finds the pool best; random 13% |
+| Full-swap check of G1's site search, k = 8..13 | seconds | Already a local optimum |
+
+**Problems hit.** PyVRP with one vehicle per store returned all single-store routes on rural territories; bounding the fleet at the savings count + 25% fixed it. My first relay setup (one model, prohibitive edges for relay vehicles) gave infeasible routes; replaced by E's own split (one-driver routes, then relay routes for far stores).
+
+**What it means.** See `ALGORITHM_REVIEW.md`: the router's error (about 4% of daily cost) shifts both networks alike, the selection rule is fine, the weak part is G1 without the clock and the pool built from it. No Spark run needed for the decision; two optional scripts are in `experiments/`.
+
+### Baseline checks X1-X5 (laptop only)
+
+| Check | Run time | Result |
+|---|---|---|
+| X1-X3: reproduce run 3, then change one rule at a time (7 search days) | 2 min, one core | Run 3 reproduced (5,736 / 5,828); today's sites and the best redesign within 0.2% under identical rules |
+| X4: local search on E from today's sites, no minimum, cap 1,400 | 41 min, one core | 328 evaluations; 12 DCs; final days 5,824 vs today 5,874 (-50 M) |
+| X5: local search on E from run 3's best redesign, within 500-1,400 | 24 min, one core (parallel to X4) | 193 evaluations; 10 DCs; final days 5,943 (+69 M vs today) |
+
+**What it means.** The redesigns lose because of the 500-store minimum and today's exemption from the bounds, not because of weak algorithms; on the same feasible set the optimiser wins (review Section 9).
+
+### Demo tab and Omelet papers (laptop only)
+
+- `code/static/demo.template.html`: new "Data & baseline" tab; `python build_demo.py` rebuilt `demo.html` (4.82 MB); Playwright check at 1920, 1440 px and iPhone 13: no console errors, no horizontal overflow.
+- X6 learned territory cost (`experiments/territory_surrogate.py`), one core, 46 min, peak 1.4 GB: 421 training territories; held-out Spearman 0.92 (G1 0.60); learned-cost MILP 14 DCs, final days 6,909 M within bounds and 6,128 M without the minimum (today 5,874 M); both MILPs stopped at the 600 s limit.
+- A first run was stopped after its regression gave negative per-store costs; the rerun uses non-negative least squares and caches the training territories in `territory_surrogate_train.npz`.
+
+## 2026-10-27 (day 3)
+
+### New baseline, G2, run 4 (Spark)
+
+**Why.** Run 3 said every redesign loses to today's network; its baseline was the optimum of the search's own objective (D-069).
+
+**Runs.** Laptop reduced run of the new code (2 workers, 1,008 s): saving 124.5 M, k = 11. Spark run 4 (`run_reduced.py` 109 s, `run_full.py` 908 s): baseline 6,564.8 M on the final days, recommended k = 10 at 5,974.5 M, saving 590.3 M (581.4-599.8), held-out 576.7 M (564.4-589.5); G2 Spearman 0.86 (G1 0.56); only the "today already optimal" reversal flips the sign (-61 M). The results landed in `~/code/` because `scp` ran from the home directory; moved into `code/results/`, run 3 archived in `archive/run3_results/`.
+
+**Problem hit.** The Spark's reduced run differed from the laptop's (pool differs from the k = 7 G1-best on; saving 117.2 vs 124.5 M): unstable `np.argsort` on ties orders differently per processor (D-075). Fixed with stable sorts everywhere; the 2016 planner's 12 sites are unchanged.
+
+**PyVRP check (laptop, one core each, 17 min).** Run 4's networks, day 0, 0.1 s per store: where both solvers are feasible savings is 1.4-4.4% above PyVRP, but 18% on Gangneung (116 stores: 17 vs 14 vehicles); PyVRP finds no feasible solution on 4 baseline and 2 recommended territories at this time limit. To redo on run 5's networks with a longer limit for those territories.
+
+### Extensions, demo, proposal (laptop)
+
+- `dcn/extensions.py` (D-076): reduced test on run 4's reduced registry, 147 evaluations, 438 s on one core; the myopic sequence renews Hanam and Gangneung and ends at 13 DCs, the committed one reaches the recommendation.
+- Demo: Extensions tab (animated lease timeline, policies' monthly cost, robustness curves, VOI grid), growth animation 1990-2026, G2/G1 toggle in R3, new baseline text, waterfall with a cut axis, every precomputed card tagged with its command; Playwright offline: no console errors, no horizontal overflow on any tab at 1440 px.
+- `proposal.html` (D-077): 11-12 slides from the registry; Playwright: no errors.
+- Definition §5 and §6 written from run 4; placeholders left for run-5 timings, verify, PyVRP and extensions.
+
+### Spark run 5 (v1.0, reportable)
+
+**Code.** Stable sorts (D-075), extensions (D-076), timing and store years in the registry (D-078), proposal built with the demo (D-077).
+
+**Commands** (user, from the laptop and in tmux on the Spark): copy `code/` with `tar | ssh`, then `cd ~/dcn/code && (~/dcn-venv/bin/python run_reduced.py && ~/dcn-venv/bin/python run_full.py) 2>&1 | tee run5.log`; results copied back with `scp` into `code/results/`.
+
+| Measure | Reduced (1,938 stores) | Full (9,718 stores) |
+|---|---|---|
+| Run time, Spark, 16 workers | 106.5 s pipeline + 32.4 s extensions | 909 s pipeline + 160.5 s extensions |
+| Baseline E, search days | 1,581.0 M | 6,418.9 M |
+| Recommended k | 12 | 10 |
+| Saving, final days (90% interval) | 117.2 M | 592.4 M (584.0-601.0) |
+| Saving, held-out days | 126.4 M | 582.6 M (570.9-593.7) |
+| G2 / G1 Spearman | 0.92 / 0.37 | 0.86 / 0.56 |
+| Search | pool best found | pool best found at evaluation 18; random selection ends at the best seed |
+
+**Cross-machine check.** The laptop's reduced run of the same code (x86_64, 1 worker) and the Spark's (aarch64, 16 workers) agree in 52,205 of 52,206 registry numbers to 1e-9; the exception is the expected-improvement value of the last search step (1e-7, 0.07% apart), which changes no choice.
+
+**Extensions rerun on the laptop** (2 workers, reduced 390 s, full 1,411 s) after fixing how the myopic path's end state is priced (D-076); every other extension number identical to the Spark's.
+
+| Extension | Result |
+|---|---|
+| 36 months, bn KRW | keep everything 231.1; redraw territories only 217.6; committed sequence 214.5; one-shot switch 240.5 (30.7 bn of rent on released sites) |
+| Myopic sequence | renews Yongin, Andong, Gangneung; 1.0 bn cheaper over 36 months, end state 15.8 M a month dearer than the committed one |
+| Robustness | k* = 10 under chain volume -15%, +20% and capital region +30% (saving 580-602 M); k* = 9 with the calibrated distance model only (saving 393 M, regret of k = 10: 4 M) |
+| Value of information | travel times: EVPI 27.2 M a month (a* = 11 under the prior, k = 10 regret 40.4 M); chain volume: 0; true store rates: 0 |
+
+**Laptop checks after run 5.**
+
+- `osrm/build_shapes.py full` through the tunnel: 28,333 legs, 0 without a route.
+- `verify.py` (Playwright 1.61 installed in `.venv310`): 28/28.
+- Offline browser check of `demo.html` (Chromium 149, every non-file request blocked) at 1440 and 390 px: no console errors, no requests, no overflow; live solve 67 vehicles, 4,878 km, 100% before noon; `proposal.html`: 12 slides, no errors, no overflow.
+- Store impact on the shown weekday: 2,346 stores (24%) served more than 2 h later under the recommendation, 3,219 more than 1 h earlier.
+
+**PyVRP on run 5's networks** (laptop, one core each, day 0): first pass at 0.1 s per store (17 min each), then the territories PyVRP could not route at 0.5 s per store (baseline DCs 0, 1, 5, 8, 54, 57; recommended DCs 6, 40, 47). Recommended network, all ten territories feasible: savings 0.3% below to 7.0% above PyVRP per territory. Baseline: Yongin (1,356 stores) unrouted by PyVRP even at 0.5 s per store.
+
+**Problems hit.**
+
+- `scp` run from the home directory put the results in `~/code/` (moved into place).
+- PyVRP does not build on the Spark (no aarch64 wheel for 0.11.3, source build fails); the check stays on the laptop.
+- A grader running the reduced run with the default worker count could exhaust the laptop's 6.8 GB; added `DCN_WORKERS` (README).
+
+### Fresh-environment reproduction (laptop)
+
+`tools/make_zip.py` (53.6 MB, 61 files), extracted into the scratchpad; `uv venv --python 3.10` and `uv pip install -r code/requirements.txt` (numpy 2.2.6, scipy 1.15.3); `unshare -rn env DCN_WORKERS=2 python run_reduced.py` (no network): 17 min 15 s.
+Against the shipped reduced registry: 54,642 numbers compared, 27 differ by more than 1e-9, all of them expected-improvement values in the search log (at most 0.07%); every search choice, the recommendation and every cost identical.
+
+### PyVRP comparison complete, and what it changed
+
+Baseline reruns at 0.5 s per store finished (Daejeon 51 vs 43, Andong 33 vs 24, Daegu 67 vs 59, Gwangju 39 vs 35, Gimpo 76 vs 72; Yongin still unrouted by PyVRP).
+`checks/routing_summary.py`: today's network 654 vs 608 vehicles (operating cost 6.6% above PyVRP), recommended 620 vs 599 (2.9%); day-0 operating saving 6.3 M a day by savings, 1.2 M by PyVRP; monthly saving about 156 M lower, about 437 M.
+Two cheap router repairs prototyped in the scratchpad: route elimination by cheapest insertion (Daejeon 51 -> 50) and a sweep construction with insertion (worse than savings everywhere); neither adopted.
+The summary is embedded by `build_demo.py` (demo Checks tab card, reversal row, hero note; proposal slides 1 and 9) and stated in the definition (Sections 2a, 4, 5, 6, 7, header).
+
+### Midterm grading round 1 and fixes
+
+Three fresh graders with the frozen prompt v2 on the hand-in ZIP: base 92 / 94 / 92, bonus 6.5 / 6 / 6 (`../../grading/GRADING_LOG.md`).
+All three ran the reduced run and hit their 15-minute limit on two cores; every number they reached matched the shipped log to the digit.
+Fixes:
+- Per-type calendar multipliers explained with numbers (office weekend 0.70, residential 1.12, a pooled profile 1.04; DC-level error up to 2.7%) in Section 3 and the demo.
+- The 9-, 10- and 11-DC networks take the same action at every lease expiry; the 10-vs-11 choice (Jinju Sabong) waits for the GPS study.
+- Model uncertainty next to the demand interval (about 400-600 M across the checks), the baseline rule's history stated, catch-up orders traced, and wording fixed (distance check, sweep source, reduced k*, slide 10, `C-fleet-cost`).
+- Reduced profile without the report-only steps (`checks=False`): 10 min 22 s on two workers of the laptop while other jobs ran; against run 5's reduced registry, 53,902 numbers compared, only the same 27 EI values differ; the full run's thinning rows stay valid. Run 5's reduced outcome tables archived in `archive/run5_reduced_outcome_tables/`.
+- PyVRP on the best 9- and 11-DC networks started (laptop, 0.3 s per store) to test whether the router bias moves k.
+
+### Spark run 6 (reported) and the assumption register
+
+**Code.** Stock-out penalty applied (D-079); strict-brief reversal rows (D-080); reduced profile without report-only steps.
+**Run.** Spark, user: reduced 74 s, full 966 s + extensions 160 s; registry 2026-10-27T11:24:50.
+**Against run 5.** Every final-day figure, the recommendation, the saving and its intervals, the extensions and the router check are unchanged. Changed because penalised candidates cost more: G2 Spearman 0.83 (0.91 pool, 0.72 within k), G1 0.58; G2's R² 0.36; sweep k = 7 7,807 M and k = 18 7,331 M; budget-of-one case 8,686 M; the pool's best found at evaluation 16 instead of 18.
+**New reversal rows.** Strict brief (no relay, far stores are stock-outs): best network checked k = 11, saving -511 M; strict brief and no minimum: k = 12, saving +625 M. The redesign therefore needs one of two business rules: a second driver on far routes, or a small coastal DC below 500 stores.
+**Checks.** Road shapes rebuilt (28,333 legs); `verify.py` 28/28; demo offline at 1440 and 390 px and all 13 slides: no errors, no overflow.
+**Scratchpad.** The session scratchpad was wiped while the session was paused (grader folders, fresh environment, scripts); grader results survive in `../../grading/GRADING_LOG.md`.
+
+### After grading round 2: drift sweep, candidate generation, redraw check
+
+- Full extensions recomputed on the laptop (2 workers, 38.5 min, 178 evaluations): drift sweep (saving 675 / 488 / 591 / 323 / 302 / 357 M for redesign years 2010 / 2013 / 2016 / 2019 / 2022 / 2026; the 2016 row equals the baseline); candidate generation (best new network 6,009 M against the pool's 5,828 M).
+- PyVRP on today's sites with redrawn territories (laptop, 0.3 s per store): the redraw step is worth 12.4 M a day with savings routes and 8.9 M with PyVRP's, about 270 M a month instead of 375 M.
+- Corrected: the saving is not "entirely" today's drift (definition Sections 3, 5, 6; demo drift card).
+- `verify.py` 29/29 (new: drift 2016 row = baseline); QA scripts kept in `tools/qa/` because the session scratchpad was wiped twice; demo and all 13 slides clean (no errors, no overflow, no cut formulas).
