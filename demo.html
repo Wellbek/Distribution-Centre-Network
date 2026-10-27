@@ -607,15 +607,9 @@ class MapView {
   inv(x, y) { const s = this.s(); return [-((y - this.H / 2) / s + this.cy), ((x - this.W / 2) / s + this.cx) / KX]; }
   zoomAt(f, x = this.W / 2, y = this.H / 2) { const [la, lo] = this.inv(x, y); this.z = Math.min(Math.max(this.z * f, 0.7), 60); const [nx, ny] = this.P(la, lo); this.cx += (nx - x) / this.s(); this.cy += (ny - y) / this.s(); this.draw(); }
   centerOn(lat, lon, z) { if (z) this.z = z; this.cx = lon * KX; this.cy = -lat; }
-  draw() { if (!this.W) return; this._pend = []; this._marks = []; const c = this.ctx; c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, this.W, this.H); this.land(); this.layers(this); flushLabels(this); }
+  draw() { if (!this.W) return; const c = this.ctx; c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, this.W, this.H); this.land(); this.layers(this); }
   land() {
     const c = this.ctx;
-    if (this.shadowLand) {
-      // One shadowed silhouette under the provinces gives the land some depth
-      c.save(); c.shadowColor = "rgba(92,15,105,.18)"; c.shadowBlur = 22; c.shadowOffsetY = 6; c.fillStyle = "#ffffff"; c.beginPath();
-      for (const pr of R.geo.provinces) for (const ring of pr.rings) ring.forEach(([lo, la], i) => { const [x, y] = this.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); });
-      c.fill(); c.restore();
-    }
     for (const pr of R.geo.provinces) for (const ring of pr.rings) {
       c.beginPath(); ring.forEach(([lo, la], i) => { const [x, y] = this.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.closePath(); c.fillStyle = "#ffffff"; c.fill(); c.strokeStyle = "#dccfe2"; c.lineWidth = 1; c.stroke();
@@ -659,22 +653,11 @@ function drawDC(c, m, s, col, label, mark) {
   c.save(); c.shadowColor = "rgba(0,0,0,.25)"; c.shadowBlur = 5; rr(c, x - 9, y - 9, 18, 18, 5); c.fillStyle = mark === "closed" ? "#9a9aa2" : "#5c0f69"; c.fill(); c.restore();
   rr(c, x - 5, y - 5, 10, 10, 2.5); c.fillStyle = mark === "closed" ? "#e6e6ea" : col; c.fill();
   if (mark === "new") { c.fillStyle = "#9dc92a"; c.beginPath(); c.arc(x + 8, y - 8, 5, 0, 7); c.fill(); c.strokeStyle = "#fff"; c.lineWidth = 1.5; c.stroke(); }
-  (m._marks || (m._marks = [])).push([x - 10, y - 10, 20, 20]);
-  if (label && m.z >= (m.labelZ || 1.3)) (m._pend || (m._pend = [])).push([s.name, mark, x, y]);
-}
-function flushLabels(m) {
-  // After every marker is down: each label right of its marker, else left, else none, so labels cover neither each other nor a marker
-  const c = m.ctx, L = (m._marks || []).slice(), hit = ([bx, by, bw, bh]) => L.some(([ax, ay, aw, ah]) => bx < ax + aw && ax < bx + bw && by < ay + ah && ay < by + bh);
-  c.font = "700 11.5px Noto Sans, sans-serif";
-  for (const [name, mark, x, y] of m._pend || []) {
-    const w = c.measureText(name).width, own = L.findIndex(b => b[0] === x - 10 && b[1] === y - 10), mine = own >= 0 ? L.splice(own, 1)[0] : null;
-    const box = [[x + 12, y - 9], [x - 24 - w, y - 9]].map(([bx, by]) => [bx, by, w + 12, 19]).find(b => !hit(b));
-    if (mine) L.push(mine);
-    if (!box) continue;
-    L.push(box); rr(c, box[0], box[1], box[2], box[3], 9); c.fillStyle = "rgba(255,255,255,.95)"; c.fill(); c.strokeStyle = "#ecdcf0"; c.lineWidth = 1; c.stroke();
-    c.fillStyle = mark === "closed" ? "#63636b" : "#5c0f69"; c.fillText(name, box[0] + 6, y + 4.5);
+  if (label && m.z >= 1.3) {
+    c.font = "700 11.5px Noto Sans, sans-serif"; const w = c.measureText(s.name).width;
+    rr(c, x + 12, y - 9, w + 12, 19, 9); c.fillStyle = "rgba(255,255,255,.95)"; c.fill(); c.strokeStyle = "#ecdcf0"; c.stroke();
+    c.fillStyle = mark === "closed" ? "#63636b" : "#5c0f69"; c.fillText(s.name, x + 18, y + 4.5);
   }
-  m._pend = []; m._marks = [];
 }
 const colorOf = (j, open) => PAL[open.indexOf(j) % PAL.length];
 const TYPES = ["residential", "office", "mixed", "roadside"];
@@ -686,32 +669,6 @@ function nearestStore(m, x, y, filter) {
 
 // ---------- 1 · The answer ----------
 let ANS = null, ANSMODE = "change", MT = 0, MTH = null;
-const HULLS = {};
-function hullsOf(mode) {
-  // Each DC's territory as the convex hull of its stores, leaving out the farthest 3% so a few far stores do not balloon it
-  if (HULLS[mode]) return HULLS[mode];
-  const asg = mode === "baseline" ? S.base_dc : S.rec_dc, out = {};
-  for (const j of R.networks[mode]) {
-    const s = SITES[j], pts = [];
-    for (let i = 0; i < S.lat.length; i++) if (asg[i] === j) pts.push([S.lon[i] * KX, S.lat[i], Math.hypot((S.lon[i] - s.lon) * KX, S.lat[i] - s.lat)]);
-    pts.sort((a, b) => a[2] - b[2]); const keep = pts.slice(0, Math.max(3, Math.ceil(pts.length * 0.97))).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], hi = [];
-    for (const p of keep) { while (lo.length > 1 && cross(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
-    for (const p of keep.slice().reverse()) { while (hi.length > 1 && cross(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop(); hi.push(p); }
-    out[j] = lo.slice(0, -1).concat(hi.slice(0, -1)).map(p => [p[1], p[0] / KX]);
-  }
-  return (HULLS[mode] = out);
-}
-function drawHulls(c, m, mode, col, fill) {
-  c.save(); c.lineJoin = "round";
-  for (const [j, h] of Object.entries(hullsOf(mode))) {
-    c.beginPath(); h.forEach(([la, lo], i) => { const [x, y] = m.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.closePath();
-    if (fill) { c.fillStyle = col(+j) + "1f"; c.fill(); c.setLineDash([]); c.strokeStyle = col(+j) + "aa"; c.lineWidth = 1.6; }
-    else { c.setLineDash([5, 4]); c.strokeStyle = col(+j); c.lineWidth = 1.2; }
-    c.stroke();
-  }
-  c.restore();
-}
 function ansMode(n) { ANSMODE = n; document.querySelectorAll("#ans-seg button").forEach(z => z.classList.toggle("on", z.dataset.n === n)); $("#ans-legend").dataset.mode = n; legendAnsGlobal(); ANS.draw(); }
 function legendAnsGlobal() {
   $("#ans-legend").innerHTML = ANSMODE === "change"
@@ -761,29 +718,17 @@ RENDER.answer = () => {
   }
   if (!ANS) {
     ANS = new MapView($("#ansmap"));
-    ANS.shadowLand = true; ANS.labelZ = 1;
     ANS.layers = m => {
       const c = m.ctx, open = ANSMODE === "baseline" ? R.networks.baseline : R.networks.recommended, asg = ANSMODE === "baseline" ? S.base_dc : S.rec_dc;
-      const sz = Math.min(1.6 + m.z * 0.5, 5);
-      // Territories: today's as dashed outlines in the change view, the shown network's as tinted regions with faint spokes to each store
-      if (ANSMODE === "change") { drawHulls(c, m, "baseline", () => "#8f8698", false); drawHulls(c, m, "recommended", j => colorOf(j, R.networks.recommended), true); }
-      if (ANSMODE === "baseline" || ANSMODE === "recommended") {
-        drawHulls(c, m, ANSMODE, j => colorOf(j, open), true);
-        c.lineWidth = 0.5;
-        for (const j of open) {
-          const [dx, dy] = m.P(SITES[j].lat, SITES[j].lon); c.strokeStyle = colorOf(j, open) + "26"; c.beginPath();
-          for (let i = 0; i < S.lat.length; i++) if (asg[i] === j) { const [x, y] = m.P(S.lat[i], S.lon[i]); c.moveTo(dx, dy); c.lineTo(x, y); }
-          c.stroke();
-        }
-      }
+      const sz = Math.min(1.4 + m.z * 0.5, 5);
       for (let i = 0; i < S.lat.length; i++) {
         const [x, y] = m.P(S.lat[i], S.lon[i]); if (x < -10 || y < -10 || x > m.W + 10 || y > m.H + 10) continue;
         let col = colorOf(asg[i], open);
         if (ANSMODE === "change") col = S.base_dc[i] === S.rec_dc[i] ? "#cfc4d4" : "#751485";
         if (ANSMODE === "morph") col = MT > MTH[i] ? colorOf(S.rec_dc[i], R.networks.recommended) : colorOf(S.base_dc[i], R.networks.baseline);
-        if (m.z > 5) drawStore(c, x, y, sz * 0.9, col); else { c.fillStyle = col; c.beginPath(); c.arc(x, y, sz / 2, 0, 7); c.fill(); }
+        if (m.z > 5) drawStore(c, x, y, sz * 0.9, col); else { c.fillStyle = col; c.fillRect(x - sz / 2, y - sz / 2, sz, sz); }
       }
-      if (ANSMODE === "change") { for (const j of kept) drawDC(c, m, SITES[j], "#751485", true); for (const j of opened) drawDC(c, m, SITES[j], "#751485", true, "new"); for (const j of closed) drawDC(c, m, SITES[j], "#ccc", m.z >= 1.6, "closed"); }
+      if (ANSMODE === "change") { for (const j of closed) drawDC(c, m, SITES[j], "#ccc", true, "closed"); for (const j of kept) drawDC(c, m, SITES[j], "#751485", true); for (const j of opened) drawDC(c, m, SITES[j], "#751485", true, "new"); }
       else if (ANSMODE === "morph") { c.globalAlpha = Math.max(0, 1 - MT * 1.6); for (const j of closed) drawDC(c, m, SITES[j], colorOf(j, R.networks.baseline), true); c.globalAlpha = Math.min(1, MT * 1.6); for (const j of opened) drawDC(c, m, SITES[j], colorOf(j, R.networks.recommended), true, "new"); c.globalAlpha = 1; for (const j of kept) drawDC(c, m, SITES[j], colorOf(j, R.networks.recommended), true); }
       else for (const j of open) drawDC(c, m, SITES[j], colorOf(j, open), true);
       if (HILITE >= 0) { const [x, y] = m.P(SITES[HILITE].lat, SITES[HILITE].lon); c.beginPath(); c.arc(x, y, 20, 0, 7); c.strokeStyle = "#9dc92a"; c.lineWidth = 5; c.stroke(); }
@@ -1021,7 +966,6 @@ function dayStores(m, routes, full) {
   return I;
 }
 function drawDay(m) {
-  m._pend = []; m._marks = [];
   const c = m.ctx, routes = LIVE_ROUTES || DAY.routes; routeIndex(routes);
   const full = dayStatic(m, routes), I = dayStores(m, routes, full);
   const v = m._lv, S0 = m.s(), ox = -PAD + (v.cx - m.cx) * S0, oy = -PAD + (v.cy - m.cy) * S0;
@@ -1036,7 +980,6 @@ function drawDay(m) {
     c.lineWidth = 4; c.strokeStyle = "rgba(255,255,255,.85)"; c.beginPath(); c.arc(x, y, 16, 0, 7); c.stroke();
     if (f > 0) { c.strokeStyle = "#9dc92a"; c.beginPath(); c.arc(x, y, 16, -Math.PI / 2, -Math.PI / 2 + f * 2 * Math.PI); c.stroke(); }
   }
-  flushLabels(m);
   if (!LIVE_ROUTES) {
     const pos = [];
     routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; pos.push([x, y, p[1], r, k]); });
