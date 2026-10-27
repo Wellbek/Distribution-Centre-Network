@@ -3,7 +3,7 @@
 **IE437 Midterm Project · Distribution-Centre Network Redesign - Formulating and Solving a Hierarchical Decision**
 
 Author / student ID: Louis Wellmeyer / 20264059  
-Date / version: 2026-10-27 / v1.0 (code run 6, `run_full.py` of 2026-10-27T11:24:50)  
+Date / version: 2026-10-28 / v1.1 (code run 6, `run_full.py` of 2026-10-27T11:24:50)  
 Summary: Run ten DCs instead of twelve (keep Gimpo Gochon and Cheonan Seobuk, open eight new sites); in the fictional instance this saves 592 M KRW a month (90% interval over demand days 584-601; about 400-600 M across the model checks, 437 M with routes from a stronger solver) with every delivery before noon, and the saving rests on how far today's real network has drifted from a good design, which the real outcome tables must measure first  
 Files: `problem-definition.md`, `code/` (README, three commands), `demo.html` (offline; the live solve also runs from `code/app.py`), `proposal.html`  
 LLM tools and use: Claude (Anthropic) in Claude Code, 19 Oct to 2 Nov 2026, for problem discussion, OSRM setup, code, checks, the demo and slides; every number in this file comes from `code/` (Section 5) and three discussions are reviewed in Section 7.
@@ -368,8 +368,13 @@ Each run writes `results/<profile>/registry.json` and the input tables of [A §2
 The hand-in ZIP, extracted into a fresh Python 3.10 environment from `requirements.txt` and run offline (`run_reduced.py`, 2 workers, 17 min on a laptop), reproduces the reduced registry produced on the Spark (aarch64, Python 3.12): of 54,642 numbers only 27 expected-improvement values differ by more than 1e-9 (at most 0.07%), and every search choice and result is the same.
 
 **The demonstration.**
-`demo.html` opens offline from the extracted folder (checked in Chromium 149 (Playwright 1.61) with the network disabled: every request other than `file://` blocked, none attempted; no console error on any tab at 1440 px and at 390 px (phone); no horizontal overflow).
-Its tabs follow the decision: *The answer* maps today's and the recommended network (`D1-network`, `D2-assignment`), with the saving's decomposition, the reversal table, the sweep with its two components against k and the four statements; *Delivery day* animates every route of one day on the road network for either network and solves one DC live (`D4-routing` with the owned fleet of `D3-fleet`) while the reader changes the demand day, the deadline, the stop time, the speed, capacity, stops and the fleet; *How it works* steps through the formulation by lecture, replays the 40 evaluations with the rule that chose each against random selection, and plots `G2` or `G1` against E for every evaluated candidate (R3); *Data & baseline* shows the instantiated data, the demand model, the posterior predictive check and how today's network grew from 1990; *Checks* holds the normal, boundary and failure cases, the two balance-table checks, the outcome tables, the store-level view and the verification record; *Extensions* shows the closure sequence, the robustness runs and the value of information.
+`demo.html` opens offline from the extracted folder (checked in Chromium 149 (Playwright 1.61) with the network disabled: every request other than `file://` blocked, none attempted; no console error on any tab; no horizontal scrolling at any of ten widths from 390 px (phone) to 1920 px; the delivery-day animation runs at 60 frames per second).
+Its tabs follow the decision, and a *Find an answer* index in the navigation bar jumps from 28 business and analyst questions to the card that answers each.
+*The answer* maps today's and the recommended network (`D1-network`, `D2-assignment`) and can play the change from today's territories to the new ones; it shows the saving's decomposition, every evaluated network on one cost axis with the six tests the recommendation passed, the recommended network DC by DC, the reversal table, the sweep with its two components against k and the four statements.
+*Delivery day* animates every route of one day on the road network for either network, with each DC's share of stores served and the day against the clock, and solves one DC live (`D4-routing` with the owned fleet of `D3-fleet`) while the reader changes the demand day, the deadline, the stop time, the speed, capacity, stops and the fleet.
+*How it works* steps through the formulation by lecture (Q1-Q7): the I/O schema; the demand model and the sampled against average-day cost; the lower level and what one solve returns; the connection and what passes down and up; the upper level with its linear and combinatorial parts, the 40 evaluations with the rule that chose each, a log table and random selection; `G2` or `G1` against E for every evaluated candidate (R3); and the balance table of Section 4.
+*Data & baseline* explains how and why the data were generated, lists the eight tables with what one row cannot tell, holds the assumption register and shows how today's network grew from 1990.
+*Checks* holds the normal, boundary and failure cases, the balance-table checks, the router check, the outcome tables, the store-level view and the verification record; *Extensions* shows the closure sequence, robustness, the value of information, the drift sweep and candidate generation.
 The page's live solve is a simplified copy of `dcn/routing.py` in JavaScript (no 2-opt, the calibrated distance model instead of the road cache) and says so; on the shipped day it gives the same vehicles and kilometres as the Python engine without 2-opt (`verify.py`).
 `python app.py` serves the same page on `http://localhost:8437` and answers the live solve with `dcn/routing.py` on the cached road distances, the exact rules of the reported run.
 Every precomputed number on the page carries a tag naming the command that reproduces it.
@@ -499,6 +504,23 @@ The four best new networks of each k, all absent from the pool, were evaluated i
 What it buys the search here is diversity, not a better optimum: the clock-aware seeds and their local moves already hold the best networks of this instance, and the generator's refits drift towards where the surrogate is wrong, the lecture's warning, which is why every generated network is judged by E.
 It would pay with a weaker pool (no clock-aware G, or a longer candidate list), where local moves never reach the good regions.
 
+**Register of runs and tests.**
+
+| What | Where, how | Result |
+|---|---|---|
+| Road-distance cache | Self-hosted OSRM v6.0.0 on a DGX Spark, Geofabrik extract of 2026-10-18, queried from the laptop | 9,718 × 60 store-site pairs and each store's 50 nearest stores, 0 unroutable; calibrated model error 20% / 9% / 4% by distance band |
+| Today's network (2016 planner) | `prep/current_network.py` | The 12 sites of `geo.CURRENT`, unchanged after the stable-sort fix |
+| Full and reduced pipelines | Six full runs on the Spark (16 workers), reduced runs on the laptop (two workers) | Run history in Section 7; the reported run is run 6 |
+| Cross-machine reproducibility | The reduced run on aarch64 (Spark) and x86_64 (laptop) | 52,205 of 52,206 numbers equal to 1e-9; one expected-improvement value 0.07% apart |
+| Fresh-environment reproduction | The hand-in ZIP extracted, a new Python 3.10 environment from `requirements.txt`, network cut off | Every search choice and result identical; 27 expected-improvement values differ by more than 1e-9 (at most 0.07%) |
+| Router against an exact solver | Set partitioning on 25 territories of 7 stores (`verify.py`) | 0 extra vehicles; km 0.4% above the optimum on average (at most 3.7%) |
+| Router against PyVRP 0.11.3 | Every territory of both networks, one search day | 654 against 608 vehicles today, 620 against 599 recommended; the saving would be about 437 M |
+| Router and assignment speed-ups | Route fingerprints of 108 territory-days under three parameter sets at both scales; 2,400 random networks | Results identical bit for bit; the reduced run fell from 10 min 22 s to 6 min 48 s on two laptop cores |
+| Reversal rows, departure waves, thinning, extensions | Inside the full run | Sections 4 and 5 |
+| `verify.py` | Independent re-check of the shown run | 29 of 29 pass |
+| Demo and proposal in a browser | Playwright, Chromium 149, offline, ten widths, every tab and all 16 slides | No console errors, no blocked requests, no overflow; 60 frames per second on the delivery day |
+| Lint | `ruff` on `dcn/`, `verify.py`, the run scripts | No errors in the error classes (F, E9) |
+
 **What the demonstration establishes and what it does not.**
 It establishes, in the fictional instance, that the evaluation is consistent (every route audited, cost identities hold, the saving is paired), that a stronger router would cut the saving by about a quarter but not remove it, that the search finds the best network of its pool, that the cheap criterion without the clock would have chosen eight DCs and lost 425 M a month, and that ten DCs beat today's network by about 580 M a month on days the search never saw.
 It does not establish any saving for Dasol's real network: the baseline's distance from a good design is an assumption (Section 3), and the first reversal above shows that this distance carries the saving.
@@ -518,6 +540,20 @@ For Dasol's real network the saving is unknown: it equals how far today's real n
 **What would reverse it.**
 A real network already close to the optimum for today's stores (−61 M a month), or a business that accepts neither relay drivers on far routes nor a small coastal DC below 500 stores (−511 M a month; Section 5, reversals); short of reversing it, a measured stop time or road speed far from the defaults (they move the best number of DCs between nine and eleven).
 Rent, the distance model, the relay price, the store minimum, departure waves, demand shifts and the routing method change the size of the saving, not its sign (Section 5 and the extensions).
+
+**Risks and mitigations** (likelihood is my assessment for the real chain; impact is measured in the fictional instance).
+
+| Risk | Likelihood | Measured impact | Mitigation |
+|---|---|---|---|
+| Today's real network is already close to a good design | Medium | Reverses: keeping it is 61 M a month cheaper | Real-data check before any new lease |
+| Neither a second driver on far routes nor a small coastal DC is allowed | Unknown, a business rule | Reverses: −511 M a month | Decide the rule now |
+| Stop time or speed differ from 15 min and 35 km/h | Medium | Best k between 9 and 11; saving 560-805 M | GPS study; 9, 10 and 11 DCs take the same lease steps until 2029 |
+| The routing heuristic over-states today's cost | High (measured) | Saving about 437 M instead of 592 M | Re-score with a stronger router before the 2027-12 steps |
+| Rents differ from the assumed tiers | Medium | Best k 9-11; saving 469-743 M | Real rents |
+| One-off moving and opening costs | Certain | Not costed; 7 bn KRW pays back within a year | Finance prices them; proceed gate |
+| Stores served later order differently | Medium | About a quarter of stores served two hours or more later | Store sales next to orders |
+| Demand shifts (−15% to +20%, capital region +30%) | Medium | Best k stays 10, saving at least 580 M | None needed; follow at the next expiry |
+| Spot trucks short on peak days | Medium | 125 spot trucks on the peak day | A framework contract, or a higher owned quantile |
 
 **What to obtain first, and the first real-data check** (requests in Section 3).
 1. The 12 months of `deliveries`, `vehicle_days` and `spot_hires`, with today's real territories: re-route today's real territories with our lower level under the same E and compare that with the best redesign, so that both sides use the same router; this is the check the whole saving hangs on.
@@ -543,14 +579,100 @@ No new site is leased before that check.
 
 ## 7. LLM Review & Key Revisions
 
-Tool: Claude (Anthropic) in Claude Code, used as a coding agent and as a sparring partner; role-played stakeholder reviews (operations, finance, a franchise owner, an examiner) were run at three gates.
-The three discussions below changed the result; each was checked by a calculation or an experiment, not by the model's word.
+**Tools and roles.**
+
+| Tool | Version | Role | What it was not trusted with |
+|---|---|---|---|
+| Claude Code, a coding agent | Claude Opus 5.5 (Anthropic), 19 Oct to 2 Nov 2026 | Reading the brief, template, classification reference and lectures; arithmetic checks; writing every module of `code/`, the demo and the proposal; diagnosing run anomalies; arguing against the formulation; drafting this document | Choosing scope and assumptions; typing any number (only `code/` produces them); accepting its own claims without a check |
+| Tools the agent ran | Playwright 1.61 with Chromium 149; PyVRP 0.11.3; cProfile; ruff | Offline browser checks of the demo and the slides; the router accuracy check; profiling; lint | |
+
+**What the LLM was used for, and how each use was checked.**
+
+| Use | What the LLM did | How it was checked |
+|---|---|---|
+| Reading the task | Mapped every requirement of the brief to a lecture tool and later audited the demo and the proposal item by item against the brief | Against the source text; gaps were added to the demo (Section 5) |
+| Arithmetic before code | Noon reach of a route, the thinning distortion, the bounds on k, the newsvendor fractile | Recomputed in Python; values in Sections 2 and 3 |
+| Road distances | Set up OSRM on a DGX Spark, built the cache through an SSH tunnel, read the extract date from the file header | 0 unroutable pairs; calibration error by distance band (Section 3) |
+| The pipeline | Wrote the generator, demand model, router, assignment LP, fleet rule, E, `G0`/`G1`/`G2`, the pool, the GP with EI and the extensions | `verify.py` (29 checks), route audits, cost identities, reproduction on two machines |
+| Run anomalies | Traced a non-monotone sweep, one-truck-per-far-store routes, a baseline at the search's own optimum and processor-dependent pools to their causes | Each cause confirmed by a targeted re-run before the fix (run history below) |
+| Arguing against the formulation [A §5] | Was asked to argue against the formulation and the evidence, at the plan, after the first version and after run 2 | Each objection traced to a section and either fixed (departure waves as a balance check, service to the east coast, stop density under thinning) or answered |
+| Router accuracy | Exact set partitioning on small territories; PyVRP on every territory | Section 2a; discussion 1 |
+| Speed | Profiled the reduced run; made the router and the assignment faster without changing any result | Route fingerprints identical bit for bit; `verify.py` |
+| Demo and proposal | Built both from the results registry, every precomputed number tagged with the command that produces it | Offline browser checks at ten widths; every slide; frame rate of the animation |
+| This document | Drafted from the registry and the decision log | Every sentence with a number re-read against `registry.json` |
+
+**Three discussions that changed the result.**
+Each was checked by a calculation or an experiment, not by the model's word.
 
 | Discussion / purpose | LLM suggestion | My assessment and verification evidence | Final decision or revision; location |
 |---|---|---|---|
 | 1. Is the routing heuristic good enough to rank networks? | Clarke-Wright savings with 2-opt is "close to optimal for depots of this size"; alternatively, put PyVRP (hybrid genetic search) inside E | Neither accepted without measurement. On run 3's networks PyVRP used 4.9% and 3.9% fewer vehicles than savings, a similar error on both networks, so I first concluded it could not move the ranking. I repeated the check on the reported networks of run 5, every territory, with a longer time limit where PyVRP left stores unrouted: the error is now 6.6% of operating cost on today's network and 2.9% on the recommended one, because savings is weakest on today's small rural territories (Andong 33 against 24 vehicles). The "error cancels" argument held for one pair of networks and failed for another. PyVRP inside E stays out: it is 300-700 times slower and stochastic; two cheap repairs gained at most one vehicle | Kept savings inside E; reported the measured gap per network and its effect: the saving would be about 437 M instead of 592 M a month with PyVRP's routes, still positive (Section 2a, balance table, reversal table; `code/checks/routing_gap.py`, `routing_summary.py`) |
-| 2. The baseline: why did every redesign lose to today's network? | First version: "today's network is simply good; recommend keeping it" (run 3: best redesign 100 M a month worse) | I suspected the setup, not the network. Checks on the same E: under identical rules today's sites and the best redesign were within 0.2%; the gap came from today's exemption from the cap and the minimum, and from today's 12 having been placed by a p-median on today's own stores and road km, the search's own objective. That is a near-optimum, not "a chain that grew over decades" [A §2.5] | Rebuilt today's network as the 2016 planner's design with growth since (Section 3), pre-registered before scoring (D-069); the old optimum kept as a reversal row (Section 5) |
+| 2. The baseline: why did every redesign lose to today's network? | First version: "today's network is simply good; recommend keeping it" (run 3: best redesign 100 M a month worse) | I suspected the setup, not the network. Checks on the same E: under identical rules today's sites and the best redesign were within 0.2%; the gap came from today's exemption from the cap and the minimum, and from today's 12 having been placed by a p-median on today's own stores and road km, the search's own objective. That is a near-optimum, not "a chain that grew over decades" [A §2.5] | Rebuilt today's network as the 2016 planner's design with growth since (Section 3), a rule fixed and recorded before any redesign was scored against it, though adopted after the earlier baseline had won; the old optimum kept as a reversal row and the design year swept (Section 5) |
 | 3. A better cheap criterion G | Learn a territory cost from routed territories and choose the network by a MILP on it (after published learned-cost location-routing work) | Fitted by non-negative least squares on 421 routed territories: it ranks held-out networks far better than G1 (Spearman 0.92 against 0.60) yet its own pick and its MILP optima lose 254-1,035 M a month under E, because it had no vehicle-per-territory term and the MILP left the region it was trained on: better prediction, worse decisions (Lecture 5) | Rejected as the decider; built G2 instead, the clock-aware criterion the brief names as system knowledge (Spearman 0.93 on that pool; in run 6, 0.83 on the evaluated candidates and 0.91 over the pool, and it picks the k E picks) and used it in the search (Section 4, the remedy) |
 
 Other suggestions accepted after checking: the newsvendor reading of the two-thirds fleet quantile (verified: 1 − 5.5 M / (30.42 × 0.55 M) = 0.671); the transportation LP's integrality (verified on every evaluation: the largest fractional part is reported as `lp_frac` in the registry).
 Rejected: thinning to 2,000 stores to save time (it changes stop density, the mechanism that sets k; Section 4 measures how much).
+
+**Where the LLM was wrong, and what caught it.**
+
+| Claim or output | Caught by | Correction |
+|---|---|---|
+| "Savings is close to optimal", later "its error is similar on both networks, so it cannot move the ranking" | PyVRP on every territory of the reported networks | Not similar: 6.6% of operating cost today, 2.9% recommended; the saving falls to about 437 M (discussion 1) |
+| "Today's network is simply good; keep it" (run 3) | Checks of the baseline under identical rules | The baseline was the search's own optimum; rebuilt (discussion 2) |
+| A learned territory cost as the decider | Its own picks priced under E lost 254-1,035 M a month | Rejected; `G2` built instead (discussion 3) |
+| Run 2: "today's network misses the noon deadline for geographic reasons" | Arithmetic: only 227 of 9,718 stores lie beyond one driver-day, so geography could not explain missing the 98% (1 − 227 / 9,718 = 97.7% within reach) | It was a late label on relay deliveries; relabelled, then the relay class was modelled properly |
+| The stock-out penalty was written to `cost_parameters` but never charged in E | Re-reading E against the brief's cost list | Charged (500,000 KRW per store without a delivery) |
+| `G2`'s remaining bias "nearly constant" | Recomputed on the reported run | Not constant; the text now says it grows for poor candidates (Section 4) |
+| "A one-week-old store sits close to its type's mean" | The fitted prior strength is about two store-days | Rewritten: after a week about 80% of the weight is on the store's own data (Section 3) |
+| The myopic lease policy's end state at 9,308 M a month | Priced with the store minimum while the transition months were not | Priced like for like: 5,792.9 against 5,777.1 M (Section 5) |
+| "The saving is entirely today's drift since 2016" | The design-year sweep | Rewritten: the saving rests on how today's network was planned as much as on when (Section 5) |
+| Page slips: tabs named that do not exist, unrendered template text, clipped labels, horizontal scrolling | Re-reading and browser screenshots at several widths | Fixed; the browser checks are now part of every rebuild |
+
+**My review: decisions I made and corrections I gave.**
+The LLM proposed and built; the decisions below were mine, and several reversed what it had done.
+
+| Date | My decision or correction | Why | Effect |
+|---|---|---|---|
+| 19 Oct | Evaluate at full store density; thinning only as a check | Thinning changes stop density, the mechanism that sets k | The reported run uses all stores (Section 4, instance size) |
+| 19 Oct | The live solve must follow the code's rules: a local app on the Python engine, and a static page that states its simplification | Brief §6.3 | `app.py` and the page's engine checked equal (`verify.py`) |
+| 19 Oct | No external engine inside the product unless it brings a proven large gain | The course's tools are the expected means | PyVRP stays a check, not part of E |
+| 20 Oct | Model realistic workarounds for far stores, a second driver, but flag them as assumptions | Without them far stores get no daily delivery | Relay route class; register row (Section 3) |
+| 21-27 Oct | Rejected "today's network is simply good" and asked why every redesign lost | The result contradicted a chain that grew for decades | The baseline was rebuilt (discussion 2) |
+| 27 Oct | The brief's values come first; every deviation or assumption goes into a register, in this document and the proposal, with a one-line reason, to be confirmed by the business | The brief is the client's specification | The register in Section 3 and proposal slide 10 |
+| 27 Oct | Keep the relay driver at a full vehicle-day, but state it as an upper bound | Only a driver is added; truck and fuel are already counted | The saving is conservative on this point |
+| 27 Oct | Every requirement of the brief must be answered clearly in the demo, not only here | The demo is what the analyst reads | Proof section, per-DC table, balance table, evaluation log, data-generation story, question index (Section 5) |
+| 27 Oct | Flag what the brief does not detail (several trips, dock congestion, returns) in a must/should/could/won't scope | Transparency about the model's edges | Proposal slide 6, `code/README.md` |
+| 28 Oct | No effect that makes the demo lag; the proposal in project-management form (assumptions, risks, inputs, proof, method) | The audience is management | 60 frames per second; proposal regenerated |
+| Throughout | Heavy runs only on the DGX Spark, started by me | The laptop resets under sustained load | Every reported number comes from a run I started |
+
+**Key revisions: how the answer changed, run by run.**
+
+| Run | Result | What it exposed, and what changed |
+|---|---|---|
+| v0.1-v0.2 (19 Oct, laptop) | First end-to-end pipeline on placeholder distances | Replaced by OSRM road distances and population-based stores |
+| Run 1 (20 Oct) | Saving 1,776 M, k = 13 | A non-monotone sweep (the 500-store minimum forced 515 km routes) and `G1` near random (Spearman 0.20): `G1`, the pool and the dock count fixed |
+| Run 2 (20 Oct) | Saving 1,776 M, k = 13 | Most of the saving came from one-truck-per-far-store routes counted late: the relay route class added, the baseline rebuilt |
+| Run 3 (20 Oct) | Saving −100 M: every redesign lost | The baseline was the optimum of the search's own objective (discussion 2) |
+| Algorithm review (21 Oct) | Router about 4% above PyVRP on both networks; GP with EI sound; `G1` lacks the clock | `G2` built (discussion 3) |
+| Run 4 (27 Oct) | Saving 590 M, k = 10 | The Spark and the laptop produced different pools: every sort made stable |
+| Run 5 (27 Oct) | Saving 592 M, k = 10; extensions added | Identical on both machines |
+| Run 6, reported (27 Oct) | Saving 592 M, k = 10 | Stock-out penalty charged; strict-brief rows: the strict brief reverses the answer unless a small coastal DC is allowed |
+| After run 6 | Same answer | PyVRP on every territory changed the accuracy conclusion (about 437 M); design-year sweep and candidate generation added; the reduced run made faster without changing a result |
+
+**Guardrails.**
+No number enters a deliverable unless `code/` produces it; the LLM never types results.
+Instructor-only material was never used as a source.
+External facts (data sources, software, methods) are cited below, not taken from the model's memory.
+
+**Sources.**
+- Clarke, G. and Wright, J. W. (1964). Scheduling of vehicles from a central depot to a number of delivery points. *Operations Research* 12(4), 568-581.
+- Croes, G. A. (1958). A method for solving traveling-salesman problems. *Operations Research* 6(6), 791-812 (the 2-opt move).
+- Daganzo, C. F. (1984). The length of tours in zones of different shapes. *Transportation Research Part B* 18(2), 135-145 (continuous approximation of route length).
+- Kennedy, M. C. and O'Hagan, A. (2001). Bayesian calibration of computer models. *Journal of the Royal Statistical Society B* 63(3), 425-464 (the discrepancy GP).
+- Jones, D. R., Schonlau, M. and Welch, W. J. (1998). Efficient global optimization of expensive black-box functions. *Journal of Global Optimization* 13, 455-492 (expected improvement).
+- Brookes, D., Park, H. and Listgarten, J. (2019). Conditioning by adaptive sampling for robust design. *Proceedings of ICML* (CbAS).
+- Wouda, N. A., Lan, L. and Kool, W. (2024). PyVRP: a high-performance VRP solver package. *INFORMS Journal on Computing* 36(4), 943-955.
+- Luxen, D. and Vetter, C. (2011). Real-time routing with OpenStreetMap data. *Proceedings of ACM SIGSPATIAL GIS* (OSRM); OpenStreetMap contributors, Geofabrik extract of South Korea, 2026-10-18 (ODbL).
+- Kontur Population: South Korea, 2023-11-01, H3 resolution 8 (CC BY 4.0).
+- Runfola, D. et al. (2020). geoBoundaries: a global database of political administrative boundaries. *PLoS ONE* 15(4), e0231866.
+- IE437 lecture notes 1-6 and the midterm brief v2.2 [A].
