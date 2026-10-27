@@ -1,4 +1,4 @@
-"""Reduced run (1 store in 5, a few minutes): python run_reduced.py"""
+"""Reduced run (1 store in 5, a few minutes; the structure of the results and the thinning check): python run_reduced.py"""
 from dcn import config as C
 from dcn.pipeline import run
 
