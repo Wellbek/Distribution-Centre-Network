@@ -1,0 +1,153 @@
+{
+ "sites": [
+  3,
+  11,
+  12,
+  15,
+  21,
+  28,
+  34,
+  40,
+  43,
+  47,
+  50,
+  56
+ ],
+ "names": [
+  "Hanam Gamil",
+  "Incheon Namdong",
+  "Hwaseong Hyangnam",
+  "Namyangju Jingeon",
+  "Gangneung Gujeong",
+  "Jecheon Bongyang",
+  "Nonsan Yeonmu",
+  "Naju Bitgaram",
+  "Gwangyang Port",
+  "Gimhae Hallim",
+  "Gyeongju Oedong",
+  "Chilgok Waegwan"
+ ],
+ "screen_E": 5694084589.394787,
+ "evaluations": 328,
+ "steps": [
+  {
+   "move": "swap",
+   "out": "Busan Gangseo",
+   "inp": "Gimhae Hallim",
+   "k": 12,
+   "screen_E": 5780061904.514923
+  },
+  {
+   "move": "swap",
+   "out": "Gwangju-si Opo",
+   "inp": "Hanam Gamil",
+   "k": 12,
+   "screen_E": 5776066540.828157
+  },
+  {
+   "move": "swap",
+   "out": "Gwangyang Port",
+   "inp": "Suncheon Haeryong",
+   "k": 12,
+   "screen_E": 5772086650.394934
+  },
+  {
+   "move": "swap",
+   "out": "Hanam Gamil",
+   "inp": "Gwangju-si Opo",
+   "k": 12,
+   "screen_E": 5770322980.804789
+  },
+  {
+   "move": "swap",
+   "out": "Daegu Dalseong",
+   "inp": "Chilgok Waegwan",
+   "k": 12,
+   "screen_E": 5752269727.220969
+  },
+  {
+   "move": "swap",
+   "out": "Suncheon Haeryong",
+   "inp": "Gwangyang Port",
+   "k": 12,
+   "screen_E": 5738726864.737917
+  },
+  {
+   "move": "swap",
+   "out": "Yeongju Munsu",
+   "inp": "Jecheon Bongyang",
+   "k": 12,
+   "screen_E": 5702670344.117001
+  },
+  {
+   "move": "swap",
+   "out": "Gwangju-si Opo",
+   "inp": "Hanam Gamil",
+   "k": 12,
+   "screen_E": 5698725653.423162
+  },
+  {
+   "move": "swap",
+   "out": "Gimpo Gochon",
+   "inp": "Incheon Namdong",
+   "k": 12,
+   "screen_E": 5694084589.394787
+  }
+ ],
+ "search": {
+  "total": 5676911492.543749,
+  "fixed": 1776000000.0,
+  "fleet": 3140500000.0,
+  "fuel": 695236492.5437493,
+  "spot": 59675000.0,
+  "relay": 5500000.0,
+  "vehicles_day": 567.4369863013699,
+  "km_day": 65305.97190234826,
+  "over_limit_day": 1.0,
+  "missed_routes_day": 0.0,
+  "service_min": 1.0,
+  "ok98": true,
+  "loads": [
+   1400,
+   1400,
+   1400,
+   1377,
+   109,
+   208,
+   878,
+   473,
+   222,
+   1184,
+   359,
+   708
+  ]
+ },
+ "final": {
+  "total": 5824293246.274489,
+  "fixed": 1776000000.0,
+  "fleet": 3228500000.0,
+  "fuel": 700644327.1015569,
+  "spot": 113648919.17293234,
+  "relay": 5500000.000000001,
+  "vehicles_day": 577.1246369348028,
+  "km_day": 65813.94853400142,
+  "over_limit_day": 1.0000000000000002,
+  "missed_routes_day": 0.0,
+  "service_min": 1.0,
+  "ok98": true,
+  "loads": [
+   1400,
+   1400,
+   1400,
+   1377,
+   109,
+   208,
+   878,
+   473,
+   222,
+   1184,
+   359,
+   708
+  ]
+ }
+}

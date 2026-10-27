@@ -1,0 +1,96 @@
+{
+ "sites": [
+  1,
+  4,
+  6,
+  11,
+  15,
+  34,
+  40,
+  45,
+  50,
+  56
+ ],
+ "names": [
+  "Gimpo Gochon",
+  "Cheonan Seobuk",
+  "Wonju Munmak",
+  "Incheon Namdong",
+  "Namyangju Jingeon",
+  "Nonsan Yeonmu",
+  "Naju Bitgaram",
+  "Changwon Jinyeong",
+  "Gyeongju Oedong",
+  "Chilgok Waegwan"
+ ],
+ "screen_E": 5833348554.694172,
+ "evaluations": 193,
+ "steps": [
+  {
+   "move": "swap",
+   "out": "Siheung Banwol",
+   "inp": "Incheon Namdong",
+   "k": 10,
+   "screen_E": 5839364282.226107
+  },
+  {
+   "move": "swap",
+   "out": "Gimhae Hallim",
+   "inp": "Changwon Jinyeong",
+   "k": 10,
+   "screen_E": 5833348554.694172
+  }
+ ],
+ "search": {
+  "total": 5805281101.982997,
+  "fixed": 1464000000.0,
+  "fleet": 3333000000.0,
+  "fuel": 840095685.3163301,
+  "spot": 74685416.66666667,
+  "relay": 93500000.0,
+  "vehicles_day": 603.7342465753425,
+  "km_day": 78913.09764223843,
+  "over_limit_day": 17.0,
+  "missed_routes_day": 0.0,
+  "service_min": 1.0,
+  "ok98": true,
+  "loads": [
+   1400,
+   1358,
+   500,
+   1400,
+   1400,
+   689,
+   598,
+   1177,
+   500,
+   696
+  ]
+ },
+ "final": {
+  "total": 5943313795.367012,
+  "fixed": 1464000000.0,
+  "fleet": 3426500000.0,
+  "fuel": 845649540.9810463,
+  "spot": 113664254.38596493,
+  "relay": 93500000.00000001,
+  "vehicles_day": 613.8302399835203,
+  "km_day": 79434.79054225089,
+  "over_limit_day": 17.000000000000004,
+  "missed_routes_day": 0.0,
+  "service_min": 1.0,
+  "ok98": true,
+  "loads": [
+   1400,
+   1358,
+   500,
+   1400,
+   1400,
+   689,
+   598,
+   1177,
+   500,
+   696
+  ]
+ }
+}
