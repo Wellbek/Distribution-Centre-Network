@@ -5,3 +5,8 @@ __pycache__/
 # Local archive of superseded runs (earlier runs are in the git history)
 planning/archive/
 .lavish/
+
+# Trailer build: dependencies, regenerable footage and render output (the finished video lives in media/)
+video/node_modules/
+video/out/
+video/public/
