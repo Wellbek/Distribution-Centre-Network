@@ -12,7 +12,7 @@ import numpy as np
 import scipy
 
 from . import config as C
-from . import demand, distances, evaluate, routing, search
+from . import demand, distances, evaluate, geo, routing, search
 from .world import HIST_DAYS, TYPES, make_world
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,7 +39,7 @@ def _boot(eb, er, seed, n=1000, fixed_fleet=False):
 
 
 def _spearman(a, b):
-    ra, rb = np.argsort(np.argsort(a)), np.argsort(np.argsort(b))
+    ra, rb = np.argsort(np.argsort(a, kind="stable"), kind="stable"), np.argsort(np.argsort(b, kind="stable"), kind="stable")
     return float(np.corrcoef(ra, rb)[0, 1])
 
 
@@ -60,7 +60,7 @@ def write_tables(world, hist, out):
         w = csv.writer(f)
         w.writerow(["store_id", "region", "lat", "lon", "store_type", "opened_on", "closed_on", "current_dc_id"])
         for i in range(len(st["id"])):
-            op = (start + demand.timedelta(int(st["opened"][i]))).isoformat() if st["opened"][i] >= 0 else ""
+            op = (start + demand.timedelta(int(st["opened"][i]))).isoformat() if st["opened"][i] >= 0 else f"{st['year'][i]}-07-01"
             cl = (start + demand.timedelta(int(st["closed"][i]))).isoformat() if st["closed"][i] < HIST_DAYS else ""
             w.writerow([st["id"][i], f"{st['province'][i]}, {st['district'][i]}", round(st["lat"][i], 5), round(st["lon"][i], 5), TYPES[st["type"][i]], op, cl, world["dcs"][st["current_dc"][i]]["id"]])
     with open(out / "dcs.csv", "w", newline="") as f:
@@ -154,8 +154,10 @@ def _run(profile):
     m = ctx["mask"]
     clock(f"world: {ctx['n']} planning stores, {len(world['sites'])} sites; prior strength {np.round(model['b0_type'], 2)}, kappa {model['kappa']:.1f}")
     write_tables(world, hist, RESULTS / profile["name"] / "tables")
-    hist_ops = write_outcomes(world, hist, RESULTS / profile["name"] / "tables")
-    clock(f"outcome tables: {hist_ops['days']} history days, service {hist_ops['service']:.4f}, {hist_ops['vehicles_day']:.0f} vehicles/day")
+    hist_ops = None
+    if profile["checks"]:
+        hist_ops = write_outcomes(world, hist, RESULTS / profile["name"] / "tables")
+        clock(f"outcome tables: {hist_ops['days']} history days, service {hist_ops['service']:.4f}, {hist_ops['vehicles_day']:.0f} vehicles/day")
 
     d_search = demand.sample_days(model, world, C.SEARCH_DAYS, seed + 11, m)
     d_final = demand.sample_days(model, world, C.FINAL_DAYS, seed + 12, m)
@@ -178,16 +180,22 @@ def _run(profile):
 
     base = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"])
     clock(f"baseline E = {base['total'] / 1e6:,.1f} M KRW/month, {base['over_limit_day']:.1f} over-limit routes/day")
+    t_pool = time.time() - t0
     log_bo = search.run_search(pool, ev, C.BUDGET, "ei", seed)
+    t_search = time.time() - t0 - t_pool
     clock(f"reported search done, best E = {min(r['E'] for r in log_bo) / 1e6:,.1f} M")
     log_rand = search.run_search(pool, ev, C.BUDGET, "random", seed + 5)
 
     # Validation only, after the reported search: every pool candidate once, then the exact random-selection band
+    n_before, t_val = len(cache), time.time()
     for p in pool:
         ev(p)
+    t_val = time.time() - t_val
+    timing = dict(workers=C.WORKERS, search_s=round(t_search, 1), per_eval_s=round(t_val / max(len(cache) - n_before, 1), 2),
+                  territory_days_per_eval=round(float(np.mean([p["k"] for p in pool])) * C.SEARCH_DAYS, 1))
     clock("whole pool evaluated (validation)")
     E_pool = np.array([cache[tuple(p["sites"])]["total"] for p in pool])
-    seeds_idx = [r["cand"] for r in log_bo if r["rule"] == "G1 seed"]
+    seeds_idx = [r["cand"] for r in log_bo if r["rule"] == "G2 seed"]
     rest = np.array([i for i in range(len(pool)) if i not in seeds_idx])
     rng = np.random.default_rng(seed + 99)
     curves = []
@@ -218,7 +226,7 @@ def _run(profile):
     b12 = best_k(12)
     finals = {
         "baseline": evaluate.evaluate(ctx, ctx["current"], d_final, assign=ctx["hist_assign"], keep_stores=True),
-        "reassigned12": evaluate.evaluate(ctx, list(ctx["current"]), d_final),
+        "reassigned12": evaluate.evaluate(dict(ctx, lo=0), list(ctx["current"]), d_final),
         "best12": evaluate.evaluate(ctx, pool[b12]["sites"], d_final) if b12 is not None else None,
         "recommended": evaluate.evaluate(ctx, rec, d_final, keep_stores=True),
         "proxy_only": evaluate.evaluate(ctx, pool[proxy_i]["sites"], d_final),
@@ -244,44 +252,61 @@ def _run(profile):
         good = [r for r in rows if r[ok]]
         return min(good, key=lambda r: r[key])["k"] if good else None
 
-    # Check 1: departure waves from 04:00 to 07:00, docks for a DC at the store cap, on the best candidate of every k
-    docks = int(np.ceil(ctx["hi"] * base["vehicles_day"] / ctx["n"] / len(C.WAVES)))
-    wave_rows = []
-    for s in sweep:
-        e = evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=docks)
-        wave_rows.append(dict(k=s["k"], total=e["total"], total_plain=s["total"], ok98=e["ok98"] and e["dock_over_day"] == 0,
-                              service_min=e["service_min"], dock_over_day=e["dock_over_day"], vehicles_day=e["vehicles_day"],
-                              vehicles_plain=s["vehicles_day"]))
-    wb = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"], docks=docks)
-    waves = dict(docks=docks, waves=list(C.WAVES), rows=wave_rows, baseline=_summary(wb), baseline_plain=_summary(base),
-                 k_star_plain=k_star(sweep), k_star_waves=k_star(wave_rows))
-    more = int(np.ceil(1.25 * docks))
-    waves["docks_more"] = more
-    waves["k_star_more_docks"] = k_star([dict(k=s["k"], total=e["total"], ok98=e["ok98"] and e["dock_over_day"] == 0)
-                                         for s in sweep for e in [evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=more)]])
-    clock(f"departure-wave check: k* {waves['k_star_plain']} -> {waves['k_star_waves']} ({docks} docks), {waves['k_star_more_docks']} ({more} docks)")
+    waves, reversals = None, []
+    if profile["checks"]:
+        # Check 1: departure waves from 04:00 to 07:00, docks for a DC at the store cap, on the best candidate of every k
+        docks = int(np.ceil(ctx["hi"] * base["vehicles_day"] / ctx["n"] / len(C.WAVES)))
+        wave_rows = []
+        for s in sweep:
+            e = evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=docks)
+            wave_rows.append(dict(k=s["k"], total=e["total"], total_plain=s["total"], ok98=e["ok98"] and e["dock_over_day"] == 0,
+                                  service_min=e["service_min"], dock_over_day=e["dock_over_day"], vehicles_day=e["vehicles_day"],
+                                  vehicles_plain=s["vehicles_day"]))
+        wb = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"], docks=docks)
+        waves = dict(docks=docks, waves=list(C.WAVES), rows=wave_rows, baseline=_summary(wb), baseline_plain=_summary(base),
+                     k_star_plain=k_star(sweep), k_star_waves=k_star(wave_rows))
+        more = int(np.ceil(1.25 * docks))
+        waves["docks_more"] = more
+        waves["k_star_more_docks"] = k_star([dict(k=s["k"], total=e["total"], ok98=e["ok98"] and e["dock_over_day"] == 0)
+                                             for s in sweep for e in [evaluate.evaluate(ctx, pool[s["cand"]]["sites"], d_search, docks=more)]])
+        clock(f"departure-wave check: k* {waves['k_star_plain']} -> {waves['k_star_waves']} ({docks} docks), {waves['k_star_more_docks']} ({more} docks)")
 
-    # R5 reversals: today's network and the best candidate of every k re-scored under one changed assumption
-    ctx_model = dict(ctx, use_cache=False, dsite=distances.model_km(ctx["lat"][:, None], ctx["lon"][:, None], ctx["site_lat"][None], ctx["site_lon"][None], ctx["mountain"][:, None]))
-    variants = [("stop time", "10 min", ctx, routing.Params(stop_h=10 / 60)), ("stop time", "20 min", ctx, routing.Params(stop_h=20 / 60)),
-                ("speed", "30 km/h", ctx, routing.Params(speed=30.0)), ("speed", "45 km/h", ctx, routing.Params(speed=45.0)),
-                ("distance model", "calibrated model only", ctx_model, None)]
-    reversals = []
-    for name, label, c, pp in variants:
-        b = evaluate.evaluate(c, c["current"], d_search, assign=c["hist_assign"], p=pp)
-        rows = [dict(k=s["k"], total=e["total"], ok98=e["ok98"]) for s in sweep for e in [evaluate.evaluate(c, pool[s["cand"]]["sites"], d_search, p=pp)]]
-        ok = [r for r in rows if r["ok98"]]
-        best = min(r["total"] for r in ok) if ok else None
-        reversals.append(dict(assumption=name, value=label, k_star=k_star(rows), baseline=b["total"], baseline_ok98=b["ok98"],
-                              best=best, saving=None if best is None else b["total"] - best))
-    for label, f in (("100 M", 100e6 / C.DC_FIXED), ("200 M", 200e6 / C.DC_FIXED)):
-        rows = [dict(k=s["k"], total=s["total"] + (f - 1) * s["fixed"], ok98=s["ok98"]) for s in sweep]
-        b = base["total"] + (f - 1) * base["fixed"]
-        best = min(r["total"] for r in rows if r["ok98"])
-        reversals.append(dict(assumption="DC fixed cost", value=label, k_star=k_star(rows), baseline=b, baseline_ok98=base["ok98"], best=best, saving=b - best))
-    reversals.insert(0, dict(assumption="as reported", value="", k_star=k_star(sweep), baseline=base["total"], baseline_ok98=base["ok98"],
-                             best=min(s["total"] for s in sweep if s["ok98"]), saving=base["total"] - min(s["total"] for s in sweep if s["ok98"])))
-    clock("reversals: " + ", ".join(f"{r['assumption']} {r['value']} k*={r['k_star']}" for r in reversals))
+        # R5 reversals: today's network and the best candidate of every k re-scored under one changed assumption
+        ctx_model = dict(ctx, use_cache=False, dsite=distances.model_km(ctx["lat"][:, None], ctx["lon"][:, None], ctx["site_lat"][None], ctx["site_lon"][None], ctx["mountain"][:, None]))
+        variants = [("stop time", "10 min", ctx, routing.Params(stop_h=10 / 60)), ("stop time", "20 min", ctx, routing.Params(stop_h=20 / 60)),
+                    ("speed", "30 km/h", ctx, routing.Params(speed=30.0)), ("speed", "45 km/h", ctx, routing.Params(speed=45.0)),
+                    ("distance model", "calibrated model only", ctx_model, None),
+                    ("vehicle limits", "strict brief: no relay routes, stores beyond one driver-day are stock-outs", ctx, routing.Params(relay=False)),
+                    ("vehicle limits and minimum", "strict brief and no 500-store minimum for redesigns", dict(ctx, lo=0), routing.Params(relay=False))]
+        reversals = []
+        for name, label, c, pp in variants:
+            b = evaluate.evaluate(c, c["current"], d_search, assign=c["hist_assign"], p=pp)
+            rows = [dict(k=s["k"], total=e["total"], ok98=e["ok98"]) for s in sweep for e in [evaluate.evaluate(c, pool[s["cand"]]["sites"], d_search, p=pp)]]
+            if pp is not None and not pp.relay:
+                # Without relay routes, networks that keep today's small far-away DCs may do better: add today's sites adjusted to each k
+                rows += [dict(k=q["k"], total=e["total"], ok98=e["ok98"]) for q in pool if q["origin"] in ("today's sites adjusted", "current sites")
+                         for e in [evaluate.evaluate(c, q["sites"], d_search, p=pp)] if e.get("feasible")]
+            ok = [r for r in rows if r["ok98"]]
+            best = min(r["total"] for r in ok) if ok else None
+            reversals.append(dict(assumption=name, value=label, k_star=k_star(rows), baseline=b["total"], baseline_ok98=b["ok98"],
+                                  best=best, saving=None if best is None else b["total"] - best))
+        for label, f in (("100 M", 100e6 / C.DC_FIXED), ("200 M", 200e6 / C.DC_FIXED)):
+            rows = [dict(k=s["k"], total=s["total"] + (f - 1) * s["fixed"], ok98=s["ok98"]) for s in sweep]
+            b = base["total"] + (f - 1) * base["fixed"]
+            best = min(r["total"] for r in rows if r["ok98"])
+            reversals.append(dict(assumption="DC fixed cost", value=label, k_star=k_star(rows), baseline=b, baseline_ok98=base["ok98"], best=best, saving=b - best))
+        opt12 = [i for i, s_ in enumerate(world["sites"]) if s_["id"] in geo.PMEDIAN_12]
+        b = evaluate.evaluate(dict(ctx, lo=0), opt12, d_search)
+        best = min(s["total"] for s in sweep if s["ok98"])
+        reversals.append(dict(assumption="today's network", value="already optimal for today's stores (p-median on road km)", k_star=k_star(sweep),
+                              baseline=b["total"], baseline_ok98=b["ok98"], best=best, saving=b["total"] - best))
+        rows = [dict(k=s["k"], total=e["total"], ok98=e["ok98"]) for s in sweep for e in [evaluate.evaluate(dict(ctx, lo=0), pool[s["cand"]]["sites"], d_search)]]
+        best0 = min(r["total"] for r in rows if r["ok98"])
+        reversals.append(dict(assumption="500-store minimum", value="dropped for redesigns", k_star=k_star(rows), baseline=base["total"], baseline_ok98=base["ok98"],
+                              best=best0, saving=base["total"] - best0))
+        reversals.insert(0, dict(assumption="as reported", value="", k_star=k_star(sweep), baseline=base["total"], baseline_ok98=base["ok98"],
+                                 best=min(s["total"] for s in sweep if s["ok98"]), saving=base["total"] - min(s["total"] for s in sweep if s["ok98"])))
+        clock("reversals: " + ", ".join(f"{r['assumption']} {r['value']} k*={r['k_star']}" for r in reversals))
 
     # Check 2: thinning, the reduced instance against this one (same stores, 1 in 5 kept); needs run_reduced.py first
     thinning = None
@@ -315,15 +340,19 @@ def _run(profile):
 
     # R3 on every candidate the reported search evaluated
     evald = sorted({r["cand"] for r in log_bo})
-    G = np.array([pool[i]["G1"] for i in evald]); E = E_pool[evald]
-    g_pick = evald[int(np.argmin(G))]; e_pick = evald[int(np.argmin(E))]
-    within = [ _spearman(G[[i for i, c in enumerate(evald) if pool[c]["k"] == k]], E[[i for i, c in enumerate(evald) if pool[c]["k"] == k]])
-               for k in ks if sum(pool[c]["k"] == k for c in evald) >= 3]
-    r3 = dict(spearman=_spearman(G, E), spearman_pool=_spearman(np.array([p["G1"] for p in pool]), E_pool), spearman_within_k=float(np.mean(within)) if within else None,
-              r2=float(1 - ((E - G) ** 2).sum() / ((E - E.mean()) ** 2).sum()), rmse=float(np.sqrt(((E - G) ** 2).mean())),
-              loss=float(E_pool[g_pick] - E.min()), g_pick_k=pool[g_pick]["k"], e_best_k=pool[e_pick]["k"],
-              A=float(pool[e_pick]["G1"] - E_pool[e_pick]), B=float(E_pool[g_pick] - pool[g_pick]["G1"]),
-              gap=float(pool[g_pick]["G1"] - pool[e_pick]["G1"]))
+    E = E_pool[evald]
+
+    def r3_for(key):
+        G = np.array([pool[i][key] for i in evald])
+        g_pick = evald[int(np.argmin(G))]; e_pick = evald[int(np.argmin(E))]
+        within = [_spearman(G[[i for i, c in enumerate(evald) if pool[c]["k"] == k]], E[[i for i, c in enumerate(evald) if pool[c]["k"] == k]])
+                  for k in ks if sum(pool[c]["k"] == k for c in evald) >= 3]
+        return dict(spearman=_spearman(G, E), spearman_pool=_spearman(np.array([p[key] for p in pool]), E_pool), spearman_within_k=float(np.mean(within)) if within else None,
+                    r2=float(1 - ((E - G) ** 2).sum() / ((E - E.mean()) ** 2).sum()), rmse=float(np.sqrt(((E - G) ** 2).mean())),
+                    loss=float(E_pool[g_pick] - E.min()), g_pick_k=pool[g_pick]["k"], e_best_k=pool[e_pick]["k"],
+                    A=float(pool[e_pick][key] - E_pool[e_pick]), B=float(E_pool[g_pick] - pool[g_pick][key]),
+                    gap=float(pool[g_pick][key] - pool[e_pick][key]))
+    r3, r3_g1 = r3_for("G2"), r3_for("G1")
 
     # Routes for the map: an ordinary weekday and the peak day, both networks
     show_day = next((d for d in d_final if d["label"] == "weekday"), d_final[0])
@@ -354,7 +383,7 @@ def _run(profile):
                   machine=platform.machine(),
                   distance_model=distances.describe(),
                   bounds=[ctx["lo"], ctx["hi"]], k_range=[kmin, kmax], budget=C.BUDGET, days=[C.SEARCH_DAYS, C.FINAL_DAYS, C.HELDOUT_DAYS],
-                  fleet_quantile=C.FLEET_Q),
+                  fleet_quantile=C.FLEET_Q, timing=timing),
         params=dict(cap=C.CAP, max_stops=C.MAX_STOPS, max_km=C.MAX_KM, stop_h=C.STOP_H, speed=C.SPEED, depart=C.DEPART,
                     deadline=C.DEADLINE, shift_end=C.SHIFT_END, break_h=C.BREAK_H, fail_at=C.FAIL_AT, detour=C.DETOUR,
                     detour_mountain=C.DETOUR_MOUNTAIN, road_coef=distances.cache() and distances.cache()['coef'].tolist(),
@@ -362,7 +391,7 @@ def _run(profile):
                     relay_day=C.RELAY_DAY, relay_km=C.RELAY_KM, relay_shift_end=C.RELAY_SHIFT_END, vehicle_month=C.VEHICLE_MONTH, days_month=C.DAYS_MONTH, fleet_q=C.FLEET_Q),
         geo=dict(provinces=[dict(name=n, rings=[np.round(r, 3).tolist() for r in rings]) for n, rings in world["provinces"]]),
         stores=dict(id=world["stores"]["id"][m].tolist(), lat=np.round(ctx["lat"], 4).tolist(), lon=np.round(ctx["lon"], 4).tolist(),
-                    type=world["stores"]["type"][m].tolist(), rate=np.round(ctx["w"], 3).tolist(),
+                    type=world["stores"]["type"][m].tolist(), rate=np.round(ctx["w"], 3).tolist(), year=world["stores"]["year"][m].tolist(),
                     base_dc=ctx["hist_assign"].tolist(), rec_dc=assign_rec.tolist(), mountain=ctx["mountain"].astype(int).tolist(),
                     ontime_base=np.round(st_b, 3).tolist(), ontime_rec=np.round(st_r, 3).tolist()),
         sites=[dict(id=s_["id"], name=s_["name"], province=s_["province"], lat=s_["lat"], lon=s_["lon"], current=s_["current"],
@@ -376,11 +405,11 @@ def _run(profile):
                     held_service_base=float(np.average(held_b["service"], weights=held_b["w"])),
                     held_service_rec=float(np.average(held_r["service"], weights=held_r["w"])),
                     waterfall=[dict(step="current network", total=fb["total"]),
-                               dict(step="today's sites, redrawn within 500-1,400", total=finals["reassigned12"]["total"]),
+                               dict(step="today's sites, territories redrawn (no minimum, as today)", total=finals["reassigned12"]["total"]),
                                dict(step="best 12 sites", total=finals["best12"]["total"]) if "best12" in finals else None,
                                dict(step=f"recommended ({fr['k']} DCs)", total=fr["total"])]),
         reversal=reversal, stores_view=stores_view,
-        pool=[dict(sites=p["sites"], k=p["k"], origin=p["origin"], G1=p["G1"], features=p["features"], E=float(E_pool[i]),
+        pool=[dict(sites=p["sites"], k=p["k"], origin=p["origin"], G1=p["G1"], G2=p["G2"], features=p["features"], E=float(E_pool[i]),
                    ok98=cache[tuple(p["sites"])]["ok98"]) for i, p in enumerate(pool)],
         feature_names=search.FEATURE_NAMES, top5=[dict(cand=i, k=pool[i]["k"], search_E=E_pool[i], final_E=top_final[i]["total"]) for i in top],
         log_bo=log_bo, log_random=log_rand, curve_bo=curve(log_bo), curve_random=curve(log_rand), random_band=band, pool_best=pool_best,
@@ -390,11 +419,11 @@ def _run(profile):
                 phi=model["phi"], sigma=model["sigma"], prior_strength=model["b0_type"].tolist(), kappa=model["kappa"], m_type=model["m_type"].tolist(),
                 chain_hist=[float(x) for x in (np.where(hist["y"] >= 0, hist["y"], 0).sum(0))], chain_rep=[float(x) for x in ppc],
                 hist_dates=hist["cal"]["date"], example=_example_store(world, model, hist)),
-        r3=r3,
+        r3=r3, r3_g1=r3_g1,
         show=dict(day=dict(date=show_day["date"], label=show_day["label"]), peak=dict(date=d_peak["date"], label=d_peak["label"]), **show),
         live=dict(dc=live_dc, stores=live_idx.tolist(), days=[dict(name=nm, q=np.round(d["q"][live_idx], 2).tolist()) for nm, d in live_days]),
-        cases=dict(failure=None, boundary_hi=[int(j) for j, l in zip(fr["open"], fr["loads"]) if l >= ctx["hi"]],
-                   boundary_lo=[int(j) for j, l in zip(fr["open"], fr["loads"]) if l <= ctx["lo"]],
+        cases=dict(failure=None, boundary_hi=[int(j) for j, n_ in zip(fr["open"], fr["loads"]) if n_ >= ctx["hi"]],
+                   boundary_lo=[int(j) for j, n_ in zip(fr["open"], fr["loads"]) if n_ <= ctx["lo"]],
                    budget_one=log_bo[0]["E"], budget_full=min(r["E"] for r in log_bo)),
     )
     if kmin > 1:
