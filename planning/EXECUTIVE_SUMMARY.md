@@ -72,6 +72,8 @@ First data to obtain: the real outcome tables (they measure today's network), on
 | PyVRP on the best 9- and 11-DC networks | Laptop, 0.3 s per store | Day cost with rent 189.0 / 187.3 / 187.0 M for k = 9 / 10 / 11 (savings 192.8 / 191.4 / 192.0): the router bias moves k at most within the 10-11 near-tie |
 | Reduced profile without report-only steps | Laptop, 2 workers | 10 min 22 s; 53,902 numbers equal to run 5's except 27 EI values |
 | Midterm grader round 2 (confirmation) | 3 fresh graders on the run-6 ZIP | Base 99.5 / 96.5 / 97, bonus 7 / 6.5 / 6.5: stop rule met again; remaining points: drift not swept, reduced run slow on two cores, candidate generation missing, slips (all addressed after the round) |
+| Midterm grader round 3 | 3 fresh graders on the ZIP after the round-2 fixes | Base 99.5 / 99 / 99, bonus 6.5 / 7.5 / 7; remaining points: reduced run slow on two cores (all three), demo caveat on the baseline history (fixed), headline uses the router measured as biased (PyVRP figure beside it, not in it) |
+| Router and pool speedups | Route fingerprints of 108 territory-days x 3 parameter sets at both scales; 2,400 random networks; reduced pool; reduced run | Routes, assignments and pool identical bit for bit; reduced run 6 min 48 s on two laptop cores (was 10 min 22 s), registry equal except 16 EI values |
 
 ## 5. How the LLM was used
 
@@ -95,4 +97,5 @@ Where the LLM was wrong and the check caught it:
 
 ## 6. Open items
 
-- Fill the drift sweep and candidate generation results, rebuild, a third round; then a final ZIP and a commit only when the user asks.
+- Decide with the user whether the headline should carry the PyVRP-corrected saving (437 M) instead of beside it.
+- Final ZIP after `verify.py` passes on the faster code; push only when the user asks.

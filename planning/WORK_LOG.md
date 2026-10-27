@@ -392,3 +392,11 @@ Fixes:
 - PyVRP on today's sites with redrawn territories (laptop, 0.3 s per store): the redraw step is worth 12.4 M a day with savings routes and 8.9 M with PyVRP's, about 270 M a month instead of 375 M.
 - Corrected: the saving is not "entirely" today's drift (definition Sections 3, 5, 6; demo drift card).
 - `verify.py` 29/29 (new: drift 2016 row = baseline); QA scripts kept in `tools/qa/` because the session scratchpad was wiped twice; demo and all 13 slides clean (no errors, no overflow, no cut formulas).
+
+### After grading round 3: faster reduced run, demo fixes
+
+- Grading round 3 (G7-G9): base 99.5 / 99 / 99, bonus 6.5 / 7.5 / 7; logged in `../../grading/GRADING_LOG.md`.
+- Router: feasibility check without the arrival list, plain-list lookups on small territories, savings pairs of stores already inside a route skipped; route fingerprints (108 territory-days x 3 parameter sets, fractions 0.2 and 1.0) identical to the old code.
+- Greedy assignment: overloaded DCs' stores moved with plain-list lookups instead of one numpy call per store; identical on 2,400 random networks, identical reduced pool (103 s to 85 s on one core).
+- Reduced run on two pinned laptop cores: 6 min 48 s (was 10 min 22 s); registry equal to the shipped one except 16 EI values and the timing fields; shipped Spark registry kept.
+- Demo: data tab states the baseline rule was adopted after an earlier baseline beat every redesign; the failure-case button resets the live-solve sliders first (checked in Chromium, no errors).
