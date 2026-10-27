@@ -22,6 +22,12 @@ h2 { font-size: 34px; margin: 0 0 8px; letter-spacing: -.8px; color: var(--purpl
 .dark .lead { color: #f0e2f3; }
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
 .cols.w { grid-template-columns: 1.25fr 1fr; }
+.moscow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+.moscow .card { border-top: 6px solid var(--purple); font-size: 15px; } .moscow .card ul { margin: 8px 0 0; padding-left: 18px; } .moscow .card li { margin: 4px 0; }
+.moscow .s { border-top-color: var(--purple-soft, #8d3a9c); } .moscow .c { border-top-color: var(--lime); } .moscow .w { border-top-color: #9a9aa2; background: #f3f2f5; }
+.moscow .note { display: block; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.tests { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.tests .card { font-size: 15px; } .tests .card p { margin: 6px 0 0; } .tests .tick { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--lime); color: var(--purple-ink); font-weight: 900; margin-bottom: 6px; }
 .card { background: var(--lav); border-radius: 16px; padding: 14px 18px; }
 .card b { color: var(--purple-ink); }
 .big { font-family: var(--num); font-weight: 900; font-size: 46px; letter-spacing: -1px; color: var(--purple); line-height: 1; }
@@ -71,6 +77,14 @@ const DEMOTAG = `<span class="tag demo">shown in the fictional instance</span>`,
 const rev = R.reversals, opt = rev.find(x => x.assumption === "today's network"), sw = R.sweep, best = sw.filter(s => s.ok98).reduce((a, s) => (s.total < a.total ? s : a));
 const k8 = F.best_k8, prox = F.proxy_only, g0 = R.pool.filter(p => p.origin.startsWith("G0") && p.ok98).reduce((a, p) => (p.E < a.E ? p : a));
 const re = sv.waterfall[0].total - sv.waterfall[1].total;
+function strip(w, h) {
+  // Every evaluated network as one dot on the cost axis, the recommendation ringed, today's network as a line
+  const pts = R.pool.map(p => p.E).concat(X ? X.generation.evaluated.map(g => g.E) : []), lo = R.pool_best * 0.985, hi = R.baseline_search.total * 1.12;
+  const x = v => 30 + (Math.min(v, hi) - lo) / (hi - lo) * (w - 60), off = pts.filter(v => v > hi).length;
+  const dots = pts.filter(v => v <= hi).map((v, i) => `<circle cx="${x(v).toFixed(1)}" cy="${(h / 2 + ((i * 7919) % 41 - 20) * h / 110).toFixed(1)}" r="4" fill="#8d3a9c" opacity=".55"/>`).join("");
+  return `<svg viewBox="0 0 ${w} ${h + 34}" style="width:100%"><line x1="${x(R.baseline_search.total)}" x2="${x(R.baseline_search.total)}" y1="4" y2="${h - 4}" stroke="#d23f3f" stroke-dasharray="5 4" stroke-width="2"/><text x="${x(R.baseline_search.total) + 6}" y="16" font-size="14" fill="#d23f3f" font-weight="700">today's network ${f0(R.baseline_search.total / 1e6)} M</text>${dots}<circle cx="${x(R.pool_best)}" cy="${h / 2}" r="12" fill="none" stroke="#9dc92a" stroke-width="5"/><text x="${x(R.pool_best) - 10}" y="${h / 2 + 34}" font-size="14" font-weight="800" fill="#5c0f69" stroke="#fff" stroke-width="4" paint-order="stroke">recommended ${f0(R.pool_best / 1e6)} M</text><text x="30" y="${h + 26}" font-size="13" fill="#63636b">Monthly cost of every evaluated network, M KRW on the ${M.days[0]} search days; ${off} more cost over ${f0(hi / 1e6)} M</text></svg>`;
+}
+function nChoose(n, k) { let c = 1; for (let i = 1; i <= k; i++) c = c * (n - k + i) / i; return c; }
 const lowCheck = Math.min(...rev.filter(x => x.assumption === "distance model").map(x => x.saving), R.routing_check ? sv.final_mean - R.routing_check.saving_month_shift : Infinity);
 const strict = rev.find(x => x.assumption === "vehicle limits"), strictMin = rev.find(x => x.assumption === "vehicle limits and minimum");
 const near = sw.filter(s => s.ok98 && s !== best && s.total - best.total < 50e6);
@@ -132,7 +146,7 @@ const SL = [
   // 3 · the four statements
   { html: `<h2>The four voices are <em>four different kinds of claim</em></h2><p class="lead">They cannot be ranked against each other until they are written on one scale: total monthly cost.</p>
     <div class="voice"><b>Strategy & Planning</b> <span class="q">"From twelve to eight, lease and staff costs fall."</span> A <b>decision</b> argued from one cost line. True for rent, incomplete: the best eight-DC network costs ${fM(k8.total)} M a month against ${fM(r.total)} M for ${r.k}.</div>
-    <div class="voice"><b>Delivery Operations</b> <span class="q">"Wider areas, longer drives, more vehicles."</span> An <b>evaluation</b> of that decision through daily routing. Right in kind: eight DCs need ${f0(k8.vehicles_day)} vehicles a day, ${r.k} need ${f0(r.vehicles_day)}.</div>
+    <div class="voice"><b>Delivery Operations</b> <span class="q">"Wider areas, longer drives, more vehicles."</span> An <b>evaluation</b> of that decision through daily routing. Right in kind: eight DCs need ${f0(k8.owned)} owned vehicles, ${r.k} need ${f0(r.owned)}.</div>
     <div class="voice"><b>Data Team</b> <span class="q">"Centre of gravity is optimal."</span> A <b>method</b>, optimal for its own criterion (squared straight-line distance), not for cost: its best network costs ${fM(g0.E - R.pool_best)} M a month more than the best found, and it cannot choose the number of DCs.</div>
     <div class="voice"><b>Field Manager</b> <span class="q">"Close on the map, far by road."</span> A claim about <b>model validity</b>: checked, every distance is a real road distance from OpenStreetMap or calibrated on one.</div>${DEMO("answer", "The four voices, answer tab")}` },
   // 4 · hierarchy and I/O
@@ -159,11 +173,17 @@ const SL = [
     <tr><td>Store orders</td><td>Not addressed</td><td>Independent of the delivery time</td><td>No data; 24% of stores would be served over 2 h later</td></tr>
     <tr><td>Today's network</td><td>Placed as a grown chain would be</td><td>A 2016 design with ten years of growth</td><td>No real network given; if it is near-optimal the saving reverses</td></tr>
     <tr><td>Scope</td><td>Fresh food optional</td><td>Fresh food, Jeju, moving costs left out</td><td>Allowed or not costable without data</td></tr></table>${DEMO("data", "Data & baseline tab; full register in the problem definition, Section 3")}` },
+  // 5c · scope, project-management style
+  { html: `<h2>Scope: <em>must, should, could, and won't have this time</em></h2><p class="lead" style="margin-bottom:12px">What the model covers, what rests on assumptions, and what it leaves out. The left-out items are not detailed in the brief; we flag them for you to confirm. ${REAL}</p>
+    <div class="moscow"><div class="card m"><b>Must have</b> <span class="note">in the model</span><ul><li>Every store served every day, every stop before noon</li><li>Vehicle limits: 48 cages, 25 stops, 250 km, the shift</li><li>500-1,400 stores per new DC</li><li>Road distances, not map distances</li><li>Uncertain demand: sampled days, held-out days</li><li>Today's network priced exactly like every redesign</li></ul></div>
+    <div class="card s"><b>Should have</b> <span class="note">in, as assumptions to confirm</span><ul><li>A second driver on far routes, priced as an upper bound</li><li>Owned fleet for two days in three, spot trucks above</li><li>Regional rents</li><li>Following the leases as they expire</li></ul></div>
+    <div class="card c"><b>Could have</b> <span class="note">next, with real data</span><ul><li>Speeds by time of day (first to add)</li><li>Real dock counts for departure waves</li><li>A stronger router in the evaluation</li><li>Store sales next to orders</li></ul></div>
+    <div class="card w"><b>Won't have this time</b> <span class="note">left out, flagged by us</span><ul><li>Several trips per vehicle and day</li><li>Loading-dock congestion</li><li>Returns and empty cages</li><li>The fresh-food second wave</li><li>Jeju and island stores</li><li>One-off moving costs</li></ul></div></div>${DEMO("how", "How it works, Q3 and Q7")}` },
   // 6 · how it works
   { html: `<h2>How the answer is computed, <em>in plain words</em></h2>
     <div class="cols"><div><div class="card"><b>1 · One DC, one morning.</b> Vehicles leave at 04:00 and must reach every store by noon; routes are built by merging stores while load, stops, kilometres and the clock allow. Checked against an exact solver and a state-of-the-art one.</div>
     <div class="card" style="margin-top:12px"><b>2 · One network, one month.</b> Stores go to the nearest suitable open DC (500-1,400 stores each); every DC is routed on ${M.days[0]}-${M.days[1]} demand days drawn from what each store has ordered; enough vehicles are owned to cover two days in three, spot trucks above.</div></div>
-    <div><div class="card"><b>3 · Which networks to try.</b> A quick estimate proposes about ${R.pool.length} candidate networks for 7 to 19 DCs; a learning search spends ${M.budget} full evaluations on the most promising, then checks the whole list.</div>
+    <div><div class="card"><b>3 · Which networks to try.</b> Two kinds of problem: assigning stores to a fixed set of DCs is linear, so it is solved exactly for every network; choosing the sites is combinatorial, ${nChoose(SITES.length, r.k).toExponential(1).replace("e+", " × 10^")} ways to pick ${r.k} of ${SITES.length} sites, so the sites are searched. A quick estimate proposes about ${R.pool.length} candidate networks for 7 to 19 DCs; a learning search spends ${M.budget} full evaluations on the most promising, then checks the whole list.</div>
     <div class="key">The search found the best network on the list after ${R.log_bo.findIndex(x => Math.abs(x.E - R.pool_best) < 1) + 1} of ${M.budget} evaluations; picking at random with the same budget did not.</div></div></div>${DEMO("how", "How it works, Q3-Q5")}` },
   // 7 · cheap criterion
   { html: `<h2>Where a quick estimate <em>would have misled you</em></h2>
@@ -175,6 +195,17 @@ const SL = [
     <div class="cols w"><div>${sweepChart(640, 400)}<p style="font-size:14px;color:var(--muted);margin:4px 0 0">Monthly cost, M KRW: dark = DC rent, light = vehicles, fuel, spot trucks, relay drivers (${M.days[0]} sampled days).</p></div>
     <div><div class="card"><b>Saving against today</b> ${DEMOTAG}<div class="big" style="margin-top:6px">${fM(sv.final_mean)}<small>M a month</small></div>90% band ${fM(sv.final_ci[0])}-${fM(sv.final_ci[1])} over ${M.days[1]} demand days; ${fM(sv.held_mean)} M on ${M.days[2]} days the search never saw.</div>
     <div class="card" style="margin-top:12px"><b>Where it comes from</b><ul><li>${fM(re)} M: redraw today's territories (no lease)</li><li>${fM(sv.waterfall[1].total - sv.waterfall[2].total)} M: better sites for twelve DCs</li><li>${fM(sv.waterfall[2].total - sv.waterfall[3].total)} M: ${r.k} DCs instead of twelve</li></ul></div></div></div>${DEMO("answer", "Sweep and waterfall")}` },
+  // 8b · why it is the right answer
+  { html: `<h2>Why we believe <em>${r.k} DCs at these sites</em> is the right answer</h2><p class="lead" style="margin-bottom:12px">${R.pool.length + (X ? X.generation.evaluated.length : 0)} networks were each priced the same full way; none is cheaper. Then the answer had to survive five tests. ${DEMOTAG}</p>
+    <div class="tests">${[
+      ["Found by the search, not by luck", `The learning search reached it at evaluation ${R.log_bo.findIndex(x => Math.abs(x.E - R.pool_best) < 1) + 1} of ${M.budget}; random picking with the same budget stops, in the median, ${fM(R.random_band.p50[R.random_band.p50.length - 1] - R.pool_best)} M a month worse.`],
+      ["Holds on days it never saw", `${fM(sv.held_mean)} M a month on ${M.days[2]} held-out days, against ${fM(sv.final_mean)} M on the final days.`],
+      ["Survives a stronger router", R.routing_check ? `With a state-of-the-art router the saving is about ${fM(sv.final_mean - R.routing_check.saving_month_shift)} M a month: smaller, still positive.` : "Router check not run."],
+      ["Survives changed assumptions", `${rev.slice(1).filter(x => x.saving > 0).length} of ${rev.length - 1} changes keep it paying; the two that do not are business facts to confirm (slide 12).`],
+      ["Beats every challenger", `Today's network, Strategy's eight DCs, the quick estimate's pick and the centre of gravity all cost more: by ${fM(b.total - r.total)}, ${fM(k8.total - r.total)}, ${fM(prox.total - r.total)} and ${fM(g0.E - R.pool_best)} M a month.`],
+    ].map(([t, d], i) => `<div class="card"><span class="tick">✓</span><b>${i + 1} · ${t}</b><p>${d}</p></div>`).join("")}</div>
+    <div style="margin-top:10px">${strip(1240, 110)}</div>
+    <p class="lead" style="margin-top:12px;font-size:15px">"Best" means the best of everything evaluated, not a proof: there are ${nChoose(SITES.length, r.k).toExponential(1).replace("e+", " × 10^")} possible sets of ${r.k} sites. A learned generator that sampled sets the search never held found none better.</p>${DEMO("answer", "Why this network, answer tab")}` },
   // 9 · reversals
   { html: `<h2>What would <em>reverse</em> the recommendation</h2><p class="lead" style="font-size:16px;margin-bottom:8px">Each row changes one assumption and re-scores today's network against the best network of every size.</p>
     <table class="tight"><tr><th>If…</th><th>Best number of DCs</th><th>Saving, M KRW a month</th></tr>${rev.map(x => `<tr class="${x.saving < 0 ? "bad" : x.assumption === "as reported" ? "hl" : ""}"><td>${x.assumption === "as reported" ? "as assumed" : `${x.assumption}: ${x.value}`}</td><td>${x.k_star}</td><td>${x.saving < 0 ? "−" : ""}${fM(Math.abs(x.saving))}</td></tr>`).join("")}</table>

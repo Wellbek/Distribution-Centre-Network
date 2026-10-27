@@ -35,7 +35,7 @@ def build(profile="reduced"):
     print(f"wrote {out} ({out.stat().st_size / 1e6:.2f} MB)")
     # The proposal reads the same registry, slimmed to what its slides show
     keep = ["meta", "routing_check", "finals", "saving", "sweep", "reversals", "r3", "r3_g1", "extensions", "networks", "sites", "geo", "top5", "pool_best",
-            "baseline_search", "stores_view", "log_bo"]
+            "baseline_search", "stores_view", "log_bo", "random_band"]
     slim = {k: r.get(k) for k in keep}
     slim["stores"] = {k: r["stores"][k] for k in ("lat", "lon", "base_dc", "rec_dc")}
     slim["pool"] = [dict(sites=p["sites"], k=p["k"], origin=p["origin"], E=p["E"], ok98=p["ok98"]) for p in r["pool"]]
