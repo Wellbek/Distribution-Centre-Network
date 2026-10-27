@@ -423,7 +423,7 @@ Fixes:
 ### User feedback, 28 Oct (second round)
 
 - Day map: night-to-day light, headlights and delivery pulses removed; DC progress rings kept; still 60 frames per second.
-- Answer map: territories as tinted convex hulls (farthest 3% of stores left out), faint spokes from each DC to its stores, a soft shadow under the land, today's territories as dashed outlines in the change view, DC labels placed after all markers so they never overlap.
+- Answer map: territory regions, spokes, land shadow and label placement tried, then reverted at the user's request.
 - How it works and Extensions: every method stated upfront ("Use X to achieve Y because Z") in the lectures' notation: Gamma(alpha, beta) update as a weighted average, negative-binomial posterior predictive, GP posterior mu(x|D) and sigma(x|D), EI as E[max(0, f_min - f(x))], EVPI via d*, a generator conditioned on a target (Lecture 6), formulas re-rendered with KaTeX.
 - Proposal (17 slides): source line for the four meeting statements (from the brief, not invented), method names with lectures, one colour per scope block, the quick estimate explained first (about 10 ms against about 20 core-seconds), "Further inputs required from the business", an operating-realities slide; the same items added to the definition's register.
 - Checks: demo offline clean, no overflow at 390-1920 px, every slide free of collisions and leftovers, `verify.py` 29/29.
