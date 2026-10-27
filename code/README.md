@@ -12,7 +12,7 @@ python run_reduced.py               # 1 store in 5: the same search and evaluati
 ```
 
 The shipped results were produced on a DGX Spark (Python 3.12.3, aarch64, 16 worker processes): `run_full.py` took 1,127 s and `run_reduced.py` 74 s, the extensions included in the full run.
-`run_reduced.py` takes about 10 minutes with 2 worker processes on an 8-core laptop (10 min 22 s, measured while other jobs ran) and a few minutes with one process per core; the full run takes roughly 5 to 10 times longer on a laptop than on the Spark.
+`run_reduced.py` takes about 7 minutes with 2 worker processes on an 8-core laptop (6 min 48 s on two pinned cores) and less with one process per core; the full run takes roughly 5 to 10 times longer on a laptop than on the Spark.
 The number of processes is one per core up to 16; set `DCN_WORKERS=2` (for example `DCN_WORKERS=2 python run_reduced.py`) on a machine with little memory.
 The numbers do not depend on it.
 Every sort that can meet ties is stable, so the numbers do not depend on the processor either: run 5's reduced run, repeated from the hand-in ZIP in a fresh Python 3.10 environment on x86_64 with the network cut off (`unshare -rn`, 2 workers, 17 min), reproduced the registry produced on the Spark (aarch64, Python 3.12): of 54,642 numbers, only 27 expected-improvement values differ by more than 1e-9 (at most 0.07%), and every choice the search makes is the same.
