@@ -51,7 +51,7 @@ def assign_lp(ctx, open_idx):
 
 def wquantile(x, w, q):
     # Weighted empirical quantile per row
-    o = np.argsort(x, axis=-1)
+    o = np.argsort(x, axis=-1, kind="stable")
     xs = np.take_along_axis(x, o, -1)
     cw = np.cumsum(w[o], -1) / w.sum()
     return np.array([xs[r][np.searchsorted(cw[r], q)] for r in range(x.shape[0])])
@@ -124,7 +124,7 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
     used = [int(j) for j in open_idx if (assign == j).any()]
     nd = len(days)
     w = np.array([d.get("w", 1.0) for d in days])
-    V = np.zeros((len(used), nd)); KM = np.zeros_like(V); FAIL = np.zeros_like(V); OVER = np.zeros_like(V); MISS = np.zeros_like(V); DOCK = np.zeros_like(V)
+    V = np.zeros((len(used), nd)); KM = np.zeros_like(V); FAIL = np.zeros_like(V); OVER = np.zeros_like(V); MISS = np.zeros_like(V); LOST = np.zeros_like(V); DOCK = np.zeros_like(V)
     ontime = np.zeros(nd); total = np.zeros(nd)
     store_ok = np.zeros(ctx["n"]) if keep_stores else None
     census, routes_out = {}, []
@@ -134,7 +134,9 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
              [(None, day["q"][idx]) for day in days], p, docks) for j, idx in zip(used, idx_by)]
     for a_i, (j, idx_all, res) in enumerate(zip(used, idx_by, territories(jobs))):
         for d_i, r in enumerate(res):
-            V[a_i, d_i], KM[a_i, d_i], FAIL[a_i, d_i] = r["vehicles"], r["km"], r["failed"]
+            V[a_i, d_i], KM[a_i, d_i] = r["vehicles"], r["km"]
+            # Stores without a delivery (beyond every route limit, or dropped without relay) are stock-outs [A §2.6]
+            LOST[a_i, d_i] = r.get("missed", 0); total[d_i] += r.get("missed", 0)
             DOCK[a_i, d_i] = r.get("dock_over", 0)
             for rr in r["routes"]:
                 census[rr["binding"]] = census.get(rr["binding"], 0) + w[d_i]
@@ -142,6 +144,8 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
                 OVER[a_i, d_i] += rr["binding"] == "relay"
                 over = rr["binding"] == "violates limit"
                 MISS[a_i, d_i] += over
+                LOST[a_i, d_i] += len(rr["seq"]) if over else 0
+                FAIL[a_i, d_i] += 0 if over else int((np.array(rr["arr"]) > C.FAIL_AT).sum())
                 good = 0 if over else int((np.array(rr["arr"]) <= p.deadline + 1e-9).sum())
                 ontime[d_i] += good; total[d_i] += len(rr["seq"])
                 if keep_stores and not over:
@@ -149,13 +153,13 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
             if keep_routes:
                 routes_out.append(dict(dc=j, day=d_i, routes=[dict(stores=idx_all[rr["seq"]].tolist(), arr=[round(x, 3) for x in rr["arr"]],
                                        ret=round(rr["ret"], 3), depart=rr.get("depart", p.depart), km=round(rr["km"], 1), load=round(rr["load"], 1), binding=rr["binding"]) for rr in r["routes"]]))
-    fuel_d = C.FUEL_KM * KM.sum(0); pen_d = C.LATE_PEN * FAIL.sum(0); over_d = OVER.sum(0)
+    fuel_d = C.FUEL_KM * KM.sum(0); pen_d = C.LATE_PEN * FAIL.sum(0) + C.STOCKOUT_PEN * LOST.sum(0); over_d = OVER.sum(0)
     parts, owned, daily = monthly(V, fuel_d, pen_d, over_d, w, float(ctx["fixed"][used].sum()), owned)
     service = ontime / np.maximum(total, 1)
     wn = w / w.sum()
     out = dict(feasible=True, open=used, k=len(used), **parts, owned=int(owned.sum()), owned_by_dc=owned.tolist(),
                V=V.tolist(), fuel_d=fuel_d.tolist(), pen_d=pen_d.tolist(), over_d=over_d.tolist(), w=w.tolist(),
-               vehicles_day=float(wn @ V.sum(0)), dock_over_day=float(wn @ DOCK.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d), missed_routes_day=float(wn @ MISS.sum(0)),
+               vehicles_day=float(wn @ V.sum(0)), dock_over_day=float(wn @ DOCK.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d), missed_routes_day=float(wn @ MISS.sum(0)), stockouts_day=float(wn @ LOST.sum(0)),
                daily_total=daily.tolist(), service=service.tolist(), service_min=float(service.min()),
                ok98=bool(service.min() >= 0.98), census={k: round(v, 2) for k, v in census.items()},
                loads=[int((assign == j).sum()) for j in used])

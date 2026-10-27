@@ -20,6 +20,7 @@ class Params:
     break_h: float = C.BREAK_H
     relay_km: float = C.RELAY_KM
     relay_shift_end: float = C.RELAY_SHIFT_END
+    relay: bool = True                     # False: the brief's limits strictly, far stores become stock-outs
 
 
 def dist_matrix(dc_lat, dc_lon, lat, lon, mountain):
@@ -92,7 +93,11 @@ def solve(D, q, p=None, improve=True):
     p = p or Params()
     routes = _savings(D, q, p, improve)
     bad = [r for r in routes if r["binding"] == "violates limit"]
-    if bad:
+    missed = 0
+    if bad and not p.relay:
+        missed = sum(len(r["seq"]) for r in bad)
+        routes = [r for r in routes if r["binding"] != "violates limit"]
+    elif bad:
         # Relay pass: the far stores share routes with a second driver (longer km and shift, same noon deadline)
         far = np.array(sorted(v for r in bad for v in r["seq"]))
         sub = np.r_[0, far + 1]
@@ -107,7 +112,7 @@ def solve(D, q, p=None, improve=True):
     return dict(
         routes=routes, vehicles=len(routes), km=float(sum(r["km"] for r in routes)),
         on_time=int((arr_all <= p.deadline + 1e-9).sum()), late=int((arr_all > p.deadline + 1e-9).sum()),
-        failed=int((arr_all > C.FAIL_AT).sum()), deliveries=int(len(arr_all)),
+        failed=int((arr_all > C.FAIL_AT).sum()), deliveries=int(len(arr_all)), missed=missed,
     )
 
 

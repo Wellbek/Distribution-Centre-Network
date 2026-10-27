@@ -31,7 +31,7 @@ BREAK_H = 0.5                               # legal break inside the shift (30 m
 WAVES = (4.0, 5.0, 6.0, 7.0)
 
 # Parallel territories (results do not depend on it)
-WORKERS = min(os.cpu_count() or 1, 16)
+WORKERS = int(os.environ.get("DCN_WORKERS", min(os.cpu_count() or 1, 16)))  # processes; DCN_WORKERS=2 for a gentle laptop run
 
 # Fleet policy: newsvendor fractile = 1 - owned cost per day / spot rate = 0.671
 FLEET_Q = 1 - VEHICLE_MONTH / DAYS_MONTH / SPOT_DAY
@@ -54,5 +54,5 @@ REACH_KM, FAR_KM = 55.0, 125.0              # noon reach of a full route; 250 km
 DEMO_PROFILE = "full"                    # only this profile rebuilds ../demo.html
 
 # Run profiles: fraction of stores kept (fixed cost and bounds scale with it)
-REDUCED = dict(name="reduced", fraction=0.2, pool_per_k=14)
-FULL = dict(name="full", fraction=1.0, pool_per_k=30)
+REDUCED = dict(name="reduced", fraction=0.2, pool_per_k=14, checks=False)  # structure only: no outcome tables, waves, reversals, extensions
+FULL = dict(name="full", fraction=1.0, pool_per_k=30, checks=True)
