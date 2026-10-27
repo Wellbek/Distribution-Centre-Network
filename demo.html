@@ -30,7 +30,6 @@ header.nav { position: sticky; top: 0; z-index: 30; background: rgba(255,255,255
 .tabs button:hover { background: var(--lav); color: var(--purple); }
 .tabs button.on { background: var(--purple); color: #fff; }
 .tabs button:focus-visible, .btn:focus-visible, .seg button:focus-visible { outline: 3px solid var(--lime); outline-offset: 2px; }
-.nav-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 12px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
 .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .pill.pre { background: var(--lav); color: var(--purple-ink); }
@@ -131,7 +130,8 @@ details.log { margin-top: 10px; } details.log summary { cursor: pointer; font-we
 .step .why b { color: var(--purple-ink); }
 .kpi-tag { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
 [id] { scroll-margin-top: 84px; }
-.finder-btn { white-space: nowrap; }
+.finder-btn { white-space: nowrap; margin-left: auto; }
+#live-card #engine { display: inline-flex; margin: 2px 0 6px; font-size: 12px; }
 #finder { position: fixed; z-index: 40; top: 62px; right: max(16px, calc(50vw - 704px)); width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 16px 48px rgba(92,15,105,.18); padding: 14px; }
 #finder input { width: 100%; box-sizing: border-box; border: 2px solid var(--lav-2); border-radius: 12px; padding: 9px 12px; font: inherit; }
 #finder input:focus { outline: none; border-color: var(--purple); }
@@ -141,6 +141,16 @@ details.log { margin-top: 10px; } details.log summary { cursor: pointer; font-we
 #finder button.q span { font-size: 12px; color: var(--purple); font-weight: 700; white-space: nowrap; }
 .flash { animation: flash 1.6s ease-out; }
 @keyframes flash { 0%, 30% { box-shadow: 0 0 0 4px var(--lime); } 100% { box-shadow: var(--shadow); } }
+.clockcard { margin-top: 12px; background: var(--lav); border-radius: 14px; padding: 10px 12px 2px; } .clockcard b { color: var(--purple-ink); font-size: 14px; }
+#ans-morph { margin-left: 8px; } .wfbar { cursor: pointer; } .wfbar:hover { filter: brightness(1.08); }
+@media (prefers-reduced-motion: no-preference) {
+  .view.on #sweep rect, .view.on #waterfall rect.wfbar { transform-box: fill-box; transform-origin: bottom; animation: grow .8s cubic-bezier(.2,.8,.2,1) both; }
+  .flowedge { animation: flowdash 1.2s linear infinite; }
+  .reveal .card:not(.in), .reveal .lec:not(.in) { opacity: 0; transform: translateY(14px); }
+  .reveal .card, .reveal .lec { transition: opacity .5s ease, transform .5s ease; }
+}
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes flowdash { to { stroke-dashoffset: -20; } }
 .rung { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px dashed var(--line); }
 .rung .tick { width: 24px; height: 24px; border-radius: 50%; background: var(--lime); color: var(--purple-ink); display: grid; place-items: center; font-weight: 900; font-size: 13px; }
 .seg.wrap { flex-wrap: wrap; border-radius: 16px; margin-bottom: 6px; }
@@ -166,10 +176,10 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 .pre-tag { display: inline-block; font-size: 11px; font-weight: 700; color: var(--purple-ink); background: var(--lav); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
 .pre-tag code { font-size: 10.5px; }
 .heat td { text-align: center; font-family: var(--num); font-weight: 700; border: 2px solid #fff; border-radius: 8px; }
-@media (max-width: 1560px) { .nav-right #engine { display: none; } .tabs button { padding: 9px 12px; } }
-@media (max-width: 1680px) { .nav-right { display: none; } }
-@media (max-width: 1100px) { .g2, .lec, .hero { grid-template-columns: minmax(0, 1fr); } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: 1fr; } }
-@media (max-width: 720px) { .nav-in { flex-wrap: wrap; gap: 10px; padding: 8px 14px; } .tabs { order: 3; width: 100%; overflow-x: auto; } .nav-right { display: none; } main { padding: 14px; } .g2e { grid-template-columns: minmax(0, 1fr); } .hero h1 { font-size: 26px; } .mapbox { height: 62vh; } }
+@media (max-width: 1560px) { .tabs button { padding: 9px 12px; } }
+@media (max-width: 1180px) { .nav-in { flex-wrap: wrap; gap: 8px 14px; padding: 8px 18px; } .tabs { order: 3; width: 100%; overflow-x: auto; } .finder-btn { margin-left: auto; } }
+@media (max-width: 1100px) { .hero::after { display: none; } .g2, .lec, .hero { grid-template-columns: minmax(0, 1fr); } .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .nav-in { flex-wrap: wrap; gap: 10px; padding: 8px 14px; } .tabs { order: 3; width: 100%; overflow-x: auto; } main { padding: 14px; } .g2e { grid-template-columns: minmax(0, 1fr); } .hero h1 { font-size: 26px; } .mapbox { height: 62vh; } }
 @media (prefers-reduced-motion: reduce) { .view.on { animation: none; } }
 </style>
 </head>
@@ -178,7 +188,6 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   <a class="logo" href="#answer" aria-label="Dasol network lab"><b>dasol<i>.</i></b><span class="bubble">network lab</span></a>
   <nav class="tabs" id="tabs"></nav>
   <button class="btn small finder-btn" id="finder-btn" aria-expanded="false" aria-controls="finder">Find an answer</button>
-  <div class="nav-right"><span class="pill pre"><span class="dot"></span><span id="run-pill"></span></span><span id="engine" class="pill warn"><span class="dot"></span>checking engine</span></div>
 </div></header>
 <div id="finder" hidden><input id="finder-q" type="search" placeholder="Type a question or a word: fleet, rent, held-out, PyVRP ..." aria-label="filter questions"><div id="finder-list"></div></div>
 <main>
@@ -191,11 +200,11 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   </div>
   <div class="stitle"><span class="deco">✓</span><h2>Where the DCs go</h2><span class="rule"></span><span class="chip"><span data-alt="pair">baseline vs recommended</span></span></div>
   <div class="grid g2">
-    <div class="card"><div class="row spread"><div class="seg" id="ans-seg"><button data-n="change" class="on">What changes</button><button data-n="baseline">Current 12</button><button data-n="recommended"><span data-alt="cap">Recommended</span></button></div><span class="note">scroll to zoom · drag to pan · hover a store</span></div>
+    <div class="card"><div class="row spread"><div class="seg" id="ans-seg"><button data-n="change" class="on">What changes</button><button data-n="baseline">Current 12</button><button data-n="recommended"><span data-alt="cap">Recommended</span></button></div><button class="btn small" id="ans-morph">▶ Play the change</button><span class="note">scroll to zoom · drag to pan · hover a store</span></div>
       <div class="mapbox" id="ansmap" style="margin-top:10px;height:min(86vh,800px)"></div>
       <div class="legend" id="ans-legend"></div></div>
     <div class="grid" style="align-content:start">
-      <div class="card"><h3>Where the saving comes from</h3><p class="sub">28 final days, paired; each bar is one step from today's network</p><svg class="chart" id="waterfall" viewBox="0 0 460 250"></svg></div>
+      <div class="card"><h3>Where the saving comes from</h3><p class="sub">28 final days, paired; each bar is one step from today's network; click a bar to see it on the map</p><svg class="chart" id="waterfall" viewBox="0 0 460 250"></svg></div>
       <div class="card"><h3>When would the answer change?</h3><p class="sub">Today's network and the best candidate of every k re-scored under one changed assumption (brief R5), 7 search days; saving = today minus the best candidate, M KRW per month.</p><div class="tw"><table id="reversal"></table></div></div>
     </div>
   </div>
@@ -204,8 +213,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="card"><h3>Every network we evaluated</h3><p class="sub" id="why-sub"></p><svg class="chart" id="whystrip" viewBox="0 0 760 420"></svg><div class="legend" id="why-legend"></div>
       <h3 style="margin-top:18px" id="net-card">The recommended network, DC by DC</h3><p class="sub" id="net-sub"></p><div class="tw"><table id="net-table"></table></div><p class="note" id="net-note"></p></div>
     <div class="grid" style="align-content:start">
-      <div class="card"><h3>Try to beat it</h3><p class="sub">Pick a challenger: each is priced on the same days as the recommendation; bars show where it gains and where it loses, M KRW a month</p><div class="seg wrap" id="ch-seg"></div><svg class="chart" id="chchart" viewBox="0 0 460 250"></svg><p class="note" id="ch-note"></p></div>
-      <div class="card"><h3>Five tests the answer had to pass</h3><div id="ladder"></div></div>
+      <div class="card"><h3>Six tests the answer had to pass</h3><div id="ladder"></div></div>
     </div>
   </div>
   <div class="stitle"><span class="deco">k</span><h2>Cost against the number of DCs</h2><span class="rule"></span><span class="chip">reported search · 7 search days</span></div>
@@ -224,14 +232,15 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
         <div class="row"><div class="seg" id="day-net"><button data-n="baseline">Current 12</button><button data-n="recommended" class="on"><span data-alt="cap">Recommended</span></button></div>
           <div class="seg" id="day-kind"><button data-n="weekday" class="on">Weekday</button><button data-n="peak">Peak day</button></div></div>
       </div>
-      <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">🚚 Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
+      <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
         <input type="range" id="scrub" min="3.5" max="14" step="0.01" value="3.5" style="flex:1;min-width:160px" aria-label="time of day"><select id="speed" aria-label="speed"><option value="0.5">slow</option><option value="1" selected>normal</option><option value="2.5">fast</option></select></div>
       <div class="mapbox" id="daymap"></div>
-      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span id="geom-note"></span></div>
+      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span>dark: before sunrise</span><span id="geom-note"></span></div>
+      <div class="clockcard"><div class="row spread"><b>The day against the clock</b><span class="note">trucks on the road by DC (areas) and stores served (lime line); deliveries end by 12:00, trucks are back by 13:00</span></div><svg class="chart" id="clockchart" viewBox="0 0 760 170"></svg></div>
     </div>
     <div class="grid" style="align-content:start">
       <div class="card"><div class="grid g2e" id="day-kpis"></div><div class="truckcard" id="truckcard"></div></div>
-      <div class="card" id="live-card"><h3>Solve one DC live <span class="badge live">computed in your browser or by app.py</span></h3><p class="sub" id="live-sub"></p>
+      <div class="card" id="live-card"><h3>Solve one DC live <span class="badge live">computed in your browser or by app.py</span></h3><span id="engine" class="pill warn"><span class="dot"></span>checking engine</span><p class="sub" id="live-sub"></p>
         <div class="ctrl"><label for="lv-day">Demand day</label><span></span><select id="lv-day" style="grid-column:1/-1"></select></div>
         <div class="ctrl"><label for="lv-dead">Delivery deadline</label><output id="o-dead"></output><input type="range" id="lv-dead" min="10" max="14" step="0.25" value="12"></div>
         <div class="ctrl"><label for="lv-stop">Stop time (min)</label><output id="o-stop"></output><input type="range" id="lv-stop" min="5" max="25" step="1" value="15"></div>
@@ -253,7 +262,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 
 <!-- 4 · DATA AND BASELINE -->
 <section class="view" id="v-data">
-  <div class="stitle" id="made"><span class="deco">⚙</span><h2>How the data was made, and why this way</h2><span class="rule"></span><span class="chip">generated from seed 437 · real geography</span></div>
+  <div class="stitle" id="made"><span class="deco">D</span><h2>How the data was made, and why this way</h2><span class="rule"></span><span class="chip">generated from seed 437 · real geography</span></div>
   <div class="grid g2">
     <div class="card"><h3>Seven steps from a population map to a year of orders</h3><p class="sub">The company hands over no data (brief §2.5), so the chain is generated: real places, fictional stores, demand and costs</p><div id="made-steps"></div></div>
     <div class="grid" style="align-content:start">
@@ -300,7 +309,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   </div>
   <div class="stitle"><span class="deco">▤</span><h2>Today's operation, last 12 months</h2><span class="rule"></span><span class="chip">outcome tables</span></div>
   <div class="grid g2e"><div class="card" id="histops"></div><div class="card" id="histcheck"></div></div>
-  <div class="stitle"><span class="deco">♥</span><h2>Stores like mine</h2><span class="rule"></span><span class="chip">franchise view</span></div>
+  <div class="stitle"><span class="deco">S</span><h2>Stores like mine</h2><span class="rule"></span><span class="chip">franchise view</span></div>
   <div class="grid g2"><div class="card"><h3>On-time share per store, 28 final days</h3><p class="sub">Each store's day-weighted share of deliveries before 12:00</p><svg class="chart" id="storehist" viewBox="0 0 760 260"></svg></div><div class="card" id="storeview"></div></div>
   <div class="stitle"><span class="deco">✓</span><h2>Verification and reproduction</h2><span class="rule"></span></div>
   <div class="grid g2e"><div class="card" id="verify"></div><div class="card" id="about"></div></div>
@@ -332,7 +341,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   <div id="drift-wrap"><div class="stitle"><span class="deco">⟳</span><h2>How far must today's network have drifted?</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2"><div class="card"><h3>The saving against the year of the last redesign</h3><p class="sub" id="drift-sub"></p><svg class="chart" id="drift-chart" viewBox="0 0 780 300"></svg></div>
     <div class="card" id="drift-text"></div></div></div>
-  <div id="gen-wrap"><div class="stitle"><span class="deco">✶</span><h2>Candidate generation: a learned distribution over networks</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
+  <div id="gen-wrap"><div class="stitle"><span class="deco">G</span><h2>Candidate generation: a learned distribution over networks</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2"><div class="card"><h3>CbAS on site sets (Lecture 6)</h3><p class="sub" id="gen-sub"></p><div class="tw"><table id="gen-table"></table></div></div>
     <div class="card" id="gen-text"></div></div></div>
 </section>
@@ -531,7 +540,7 @@ function show(id) {
   // Every card of precomputed results names its command; the live solve is computed in the page
   document.querySelectorAll(`#v-${id} .card h3`).forEach(h => { if (!h.querySelector(".pre-tag") && !h.closest("#live-card")) h.insertAdjacentHTML("beforeend", ` <span class="pre-tag">${PRE}</span>`); });
 }
-$("#run-pill").textContent = `precomputed · ${M.command}${SCALED}`;
+
 // Find an answer: business and analyst questions, each jumping to the card that answers it
 const FIND = [
   ["The decision", [["How many DCs, and where?", "answer", "hero-stats"], ["What does it save, and how sure are we?", "answer", "hero-stats", "saving uncertainty interval held-out"], ["Why is this the best network?", "answer", "why"], ["What does each DC look like: stores, vehicles, rent?", "answer", "net-card", "fleet owned trucks per dc lease"], ["What would change the answer?", "answer", "reversal"], ["How does cost change with the number of DCs?", "answer", "sweep"], ["Were Strategy, Operations, the Data Team and the Field Manager right?", "answer", "stmts"]]],
@@ -555,6 +564,12 @@ $("#finder-btn").onclick = () => finderOpen($("#finder").hidden);
 $("#finder-q").oninput = e => finderList(e.target.value);
 document.addEventListener("keydown", e => { if (e.key === "Escape") finderOpen(false); if (e.key === "/" && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); finderOpen(true); } });
 document.addEventListener("pointerdown", e => { if (!$("#finder").hidden && !e.target.closest("#finder, #finder-btn")) finderOpen(false); });
+if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  document.body.classList.add("reveal");
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -6% 0px" });
+  const watch = () => document.querySelectorAll(".card:not(.in), .lec:not(.in)").forEach(c => io.observe(c));
+  let wq = null; watch(); new MutationObserver(() => { clearTimeout(wq); wq = setTimeout(watch, 200); }).observe(document.querySelector("main"), { childList: true, subtree: true });
+}
 let BACKEND = false;
 if (location.protocol.startsWith("http")) fetch("/api/health").then(r => r.ok && r.json()).then(j => { BACKEND = !!(j && j.ok); setEngine(); }).catch(setEngine); else setEngine();
 function setEngine() { const e = $("#engine"); e.className = "pill " + (BACKEND ? "live" : "pre"); e.innerHTML = `<span class="dot"></span>${BACKEND ? "live engine: Python" : "live engine: in-browser (simplified)"}`; }
@@ -618,6 +633,14 @@ function drawTruck(c, x, y, dir, sc, col, hl) {
   c.fillStyle = "#1f1f24"; for (const wx of [-7, 7]) { c.beginPath(); c.arc(wx, 4, 2.4, 0, 7); c.fill(); }
   c.restore();
 }
+const SPRITES = {};
+function truckSprite(col, left, sc) {
+  const key = `${col}${left}${sc.toFixed(2)}`; if (SPRITES[key]) return SPRITES[key];
+  const d = devicePixelRatio || 1, w = Math.ceil(26 * sc), h = Math.ceil(22 * sc), cv = document.createElement("canvas");
+  cv.width = w * d; cv.height = h * d; const c = cv.getContext("2d"); c.setTransform(d, 0, 0, d, 0, 0);
+  drawTruck(c, w / 2, h / 2, left ? -1 : 1, sc, col, false); cv.w = w; cv.h = h;
+  return (SPRITES[key] = cv);
+}
 function drawStore(c, x, y, sz, col) {
   // A little shop: awning in the state colour, white front
   c.fillStyle = "#fff"; c.strokeStyle = "#9b8aa3"; c.lineWidth = 1; rr(c, x - sz, y - sz * 0.6, sz * 2, sz * 1.5, 2); c.fill(); c.stroke();
@@ -644,7 +667,23 @@ function nearestStore(m, x, y, filter) {
 }
 
 // ---------- 1 · The answer ----------
-let ANS = null, ANSMODE = "change";
+let ANS = null, ANSMODE = "change", MT = 0, MTH = null;
+function ansMode(n) { ANSMODE = n; document.querySelectorAll("#ans-seg button").forEach(z => z.classList.toggle("on", z.dataset.n === n)); $("#ans-legend").dataset.mode = n; legendAnsGlobal(); ANS.draw(); }
+function legendAnsGlobal() {
+  $("#ans-legend").innerHTML = ANSMODE === "change"
+    ? `<span><i class="sq" style="background:#5c0f69"></i>kept or new DC (lime dot = new)</span><span><i class="sq" style="background:#9a9aa2"></i>closed DC</span><span><i class="sw" style="background:#751485"></i>store that changes DC (${R.stores_view.moved})</span><span><i class="sw" style="background:#cfc4d4"></i>store that stays</span>`
+    : ANSMODE === "morph" ? `<span>Today's territories give way to the recommended ones, growing out from each DC; closed DCs fade, new ones appear</span>`
+    : `<span><i class="sq" style="background:#5c0f69"></i>open DC</span><span>stores coloured by territory; zoom in to see each shop</span>`;
+}
+function morphAns() {
+  // Each store switches to its new territory in order of its distance from the new DC, so territories grow outward
+  if (!MTH) {
+    const d = S.lat.map((la, i) => { const s = SITES[S.rec_dc[i]]; return Math.hypot(la - s.lat, (S.lon[i] - s.lon) * KX); });
+    const o = d.map((_, i) => i).sort((a, b) => d[a] - d[b]); MTH = new Float32Array(d.length); o.forEach((i, r) => MTH[i] = 0.08 + 0.84 * r / o.length);
+  }
+  ansMode("morph"); MT = 0; const t0 = performance.now(), dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 3200;
+  (function step(ts) { MT = Math.min(1, (ts - t0) / dur); ANS.draw(); if (MT < 1 && ANSMODE === "morph") requestAnimationFrame(step); else if (ANSMODE === "morph") ansMode("recommended"); })(t0);
+}
 RENDER.answer = () => {
   const F = R.finals, b = F.baseline, r = F.recommended, sv = R.saving;
   const base = new Set(R.networks.baseline), rec = new Set(R.networks.recommended);
@@ -670,7 +709,12 @@ RENDER.answer = () => {
     ["Saving per month", fM(sv.final_mean), "M KRW", `28 final days, 90% band ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])} (demand days only)${R.routing_check ? `; ${fM(sv.final_mean - R.routing_check.saving_month_shift)} with PyVRP-quality routes and ${fM(R.reversals.find(x => x.assumption === "distance model").saving)} with the calibrated distance model (model checks: Checks and reversal table)` : ""}`],
     ["Saving, unseen days", fM(sv.held_mean), "M KRW", `${M.days[2]} held-out days, 90% band ${fM(sv.held_ci[0])} to ${fM(sv.held_ci[1])}`],
     ["On time before noon", pct(r.service_mean), "", `worst day ${pct(r.service_min)}; today ${pct(b.service_mean)}`],
-  ].map(([l, v, u, n]) => `<div class="hstat"><div class="l">${l}</div><div class="v">${v}<small>${u}</small></div><div class="l">${n}</div></div>`).join("");
+  ].map(([l, v, u, n]) => `<div class="hstat"><div class="l">${l}</div><div class="v"><span class="cnt" data-v="${v}">${v}</span><small>${u}</small></div><div class="l">${n}</div></div>`).join("");
+  if (!window.COUNTED && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    window.COUNTED = true; const t0 = performance.now();
+    document.querySelectorAll("#hero-stats .cnt").forEach(e => { const txt = e.dataset.v, num = parseFloat(txt.replace(/,/g, "")), dec = (txt.split(".")[1] || "").replace(/[^0-9]/g, "").length, suf = txt.replace(/[0-9.,]/g, "");
+      (function step(ts) { const f = Math.min(1, (ts - t0) / 1100), v = num * (1 - Math.pow(1 - f, 3)); e.textContent = v.toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf; if (f < 1) requestAnimationFrame(step); else e.textContent = txt; })(t0); });
+  }
   if (!ANS) {
     ANS = new MapView($("#ansmap"));
     ANS.layers = m => {
@@ -680,22 +724,20 @@ RENDER.answer = () => {
         const [x, y] = m.P(S.lat[i], S.lon[i]); if (x < -10 || y < -10 || x > m.W + 10 || y > m.H + 10) continue;
         let col = colorOf(asg[i], open);
         if (ANSMODE === "change") col = S.base_dc[i] === S.rec_dc[i] ? "#cfc4d4" : "#751485";
+        if (ANSMODE === "morph") col = MT > MTH[i] ? colorOf(S.rec_dc[i], R.networks.recommended) : colorOf(S.base_dc[i], R.networks.baseline);
         if (m.z > 5) drawStore(c, x, y, sz * 0.9, col); else { c.fillStyle = col; c.fillRect(x - sz / 2, y - sz / 2, sz, sz); }
       }
       if (ANSMODE === "change") { for (const j of closed) drawDC(c, m, SITES[j], "#ccc", true, "closed"); for (const j of kept) drawDC(c, m, SITES[j], "#751485", true); for (const j of opened) drawDC(c, m, SITES[j], "#751485", true, "new"); }
+      else if (ANSMODE === "morph") { c.globalAlpha = Math.max(0, 1 - MT * 1.6); for (const j of closed) drawDC(c, m, SITES[j], colorOf(j, R.networks.baseline), true); c.globalAlpha = Math.min(1, MT * 1.6); for (const j of opened) drawDC(c, m, SITES[j], colorOf(j, R.networks.recommended), true, "new"); c.globalAlpha = 1; for (const j of kept) drawDC(c, m, SITES[j], colorOf(j, R.networks.recommended), true); }
       else for (const j of open) drawDC(c, m, SITES[j], colorOf(j, open), true);
       if (HILITE >= 0) { const [x, y] = m.P(SITES[HILITE].lat, SITES[HILITE].lon); c.beginPath(); c.arc(x, y, 20, 0, 7); c.strokeStyle = "#9dc92a"; c.lineWidth = 5; c.stroke(); }
     };
     ANS.hover = (x, y) => { const i = nearestStore(ANS, x, y); return i < 0 ? null : storeTip(i); };
-    document.querySelectorAll("#ans-seg button").forEach(bt => bt.onclick = () => { ANSMODE = bt.dataset.n; document.querySelectorAll("#ans-seg button").forEach(z => z.classList.toggle("on", z === bt)); legendAns(); ANS.draw(); });
+    document.querySelectorAll("#ans-seg button").forEach(bt => bt.onclick = () => ansMode(bt.dataset.n));
+    $("#ans-morph").onclick = morphAns;
   }
-  legendAns(); ANS.draw();
-  function legendAns() {
-    $("#ans-legend").innerHTML = ANSMODE === "change"
-      ? `<span><i class="sq" style="background:#5c0f69"></i>kept or new DC (lime dot = new)</span><span><i class="sq" style="background:#9a9aa2"></i>closed DC</span><span><i class="sw" style="background:#751485"></i>store that changes DC (${R.stores_view.moved})</span><span><i class="sw" style="background:#cfc4d4"></i>store that stays</span>`
-      : `<span><i class="sq" style="background:#5c0f69"></i>open DC</span><span>stores coloured by territory; zoom in to see each shop</span>`;
-  }
-  waterfall(); reversal(); sweep(); statements(); whyStrip(); challenger(); ladder(); netTable();
+  legendAnsGlobal(); ANS.draw();
+  waterfall(); reversal(); sweep(); statements(); whyStrip(); ladder(); netTable();
 };
 function storeTip(i) {
   const b = SITES[S.base_dc[i]].name, r = SITES[S.rec_dc[i]].name;
@@ -715,7 +757,8 @@ function waterfall() {
     const x = 70 + i * (380 / st.length), prev = i ? st[i - 1].total : null;
     const y0 = prev == null ? Y(s.total) : Math.min(Y(prev), Y(s.total)), h = prev == null ? 210 - Y(s.total) : Math.abs(Y(prev) - Y(s.total));
     const col = i === 0 ? "#9a9aa2" : s.total < prev ? "#9dc92a" : "#d23f3f";
-    el("rect", { x, y: y0, width: 380 / st.length - 18, height: Math.max(h, 2), rx: 5, fill: i === st.length - 1 ? "#751485" : col }, svg);
+    const bar = el("rect", { x, y: y0, width: 380 / st.length - 18, height: Math.max(h, 2), rx: 5, fill: i === st.length - 1 ? "#751485" : col, class: "wfbar" }, svg);
+    bar.onclick = () => (i === 0 ? ansMode("baseline") : i === st.length - 1 ? morphAns() : ansMode("change")); el("title", {}, bar, i === 0 ? "show today's network on the map" : i === st.length - 1 ? "play the change on the map" : "show the stores that change DC");
     el("text", { x: x + (380 / st.length - 18) / 2, y: y0 - 6, "text-anchor": "middle", "font-size": 11.5, "font-weight": 800, fill: "#1f1f24" }, svg, i === 0 || i === st.length - 1 ? fM(s.total) : (s.total < prev ? "−" : "+") + fM(Math.abs(s.total - prev)));
     if (i === 0) el("text", { x: 58, y: 222, "text-anchor": "end", "font-size": 10, fill: "#63636b" }, svg, "axis cut");
     el("foreignObject", { x: x - 6, y: 214, width: 380 / st.length - 4, height: 36 }, svg).innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:10.5px;line-height:1.2;color:#4a4a52;text-align:center">${s.step}</div>`;
@@ -818,7 +861,7 @@ function along(L, f) {
 RENDER.day = () => {
   if (!DM) {
     DM = new MapView($("#daymap"));
-    DM.layers = drawDay;
+    DM.layers = drawDay; DM.draw = function () { if (this.W) drawDay(this); };
     DM.hover = (x, y) => {
       const k = truckAt(x, y); if (k >= 0) { const r = DAY.routes[k]; return `<b>Truck ${k + 1}</b> from ${SITES[r.dc].name}<br>${r.stores.length} stores, ${r.load.toFixed(0)} cages, ${r.km.toFixed(0)} km<br>back at ${hhmm(r.ret)} · limit: ${r.binding}<br><span class="note">click to follow</span>`; }
       const i = nearestStore(DM, x, y, i => !isNaN(DAY.arrOf[i])); if (i < 0) return null;
@@ -832,7 +875,27 @@ RENDER.day = () => {
   }
   resetDay();
 };
-function resetDay() { $("#geom-note").textContent = SHAPES ? "🚚 truck · roads from OSRM; a live solve draws straight lines" : "🚚 truck · straight lines between stops; costs use road km"; DAY = buildDay(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
+function clockChart() {
+  // Stacked trucks on the road per DC over the day, the share of stores served, the noon and return lines, and a moving now line
+  const svg = $("#clockchart"); svg.innerHTML = ""; const t0 = 3.5, t1 = 14, X = t => 50 + (t - t0) / (t1 - t0) * 670, ts = [];
+  for (let t = t0; t <= t1 + 1e-9; t += 0.05) ts.push(t);
+  const open = DAY.open, n = DAY.routes.length, Y = v => 140 - v / n * 125;
+  let below = ts.map(() => 0);
+  for (const j of open) {
+    const rs = DAY.routes.filter(r => r.dc === j), top = ts.map((t, i) => below[i] + rs.filter(r => t >= P.depart && t <= r.ret).length);
+    el("path", { d: ts.map((t, i) => `${i ? "L" : "M"}${X(t).toFixed(1)} ${Y(top[i]).toFixed(1)}`).join("") + ts.slice().reverse().map((t, i) => `L${X(t).toFixed(1)} ${Y(below[ts.length - 1 - i]).toFixed(1)}`).join("") + "Z", fill: colorOf(j, open), opacity: 0.55 }, svg);
+    below = top;
+  }
+  const I = routeIndex(DAY.routes), tot = I.t.length;
+  el("path", { d: ts.map((t, i) => `${i ? "L" : "M"}${X(t).toFixed(1)} ${(140 - upperIdx(I.t, t) / tot * 125).toFixed(1)}`).join(""), fill: "none", stroke: "#4f6b0c", "stroke-width": 2.5 }, svg);
+  for (const [t, lab, col, left] of [[P.deadline, "12:00 deadline", "#d23f3f", true], [P.shift_end, "13:00 back", "#9a9aa2", false]]) { el("line", { x1: X(t), x2: X(t), y1: 30, y2: 140, stroke: col, "stroke-dasharray": "5 4", "stroke-width": 1.5 }, svg); el("text", { x: X(t) + (left ? -5 : 5), y: 40, "text-anchor": left ? "end" : "start", "font-size": 11, fill: col, "font-weight": 700, stroke: "#f6eff8", "stroke-width": 3, "paint-order": "stroke" }, svg, lab); }
+  for (let h = 4; h <= 14; h += 2) el("text", { x: X(h), y: 158, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, svg, `${String(h).padStart(2, "0")}:00`);
+  el("text", { x: 44, y: Y(n) + 4, "text-anchor": "end", "font-size": 10.5, fill: "#63636b" }, svg, f0(n)); el("text", { x: 44, y: 144, "text-anchor": "end", "font-size": 10.5, fill: "#63636b" }, svg, "0");
+  el("text", { x: 726, y: 13, "font-size": 10.5, fill: "#4f6b0c", "font-weight": 700 }, svg, "100% served");
+  el("line", { id: "clock-now", x1: X(T), x2: X(T), y1: 8, y2: 140, stroke: "#751485", "stroke-width": 2 }, svg);
+  svg._X = X;
+}
+function resetDay() { $("#geom-note").textContent = SHAPES ? "Trucks follow the roads from OSRM; a live solve draws straight lines" : "Straight lines between stops; costs use road km"; DAY = buildDay(); clockChart(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
 function truckAt(x, y) {
   let best = -1, bd = 400;
   DAY.routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
@@ -845,29 +908,93 @@ function truckCard() {
   if (FOLLOW < 0) return; const r = DAY.routes[FOLLOW], p = truckPos(r, T), done = r.arr.filter(a => a + P.stop_h <= T).length;
   const nxt = r.arr.findIndex(a => a > T);
   $("#truckcard").style.display = "block";
-  $("#truckcard").innerHTML = `<b style="color:var(--purple-ink)">🚚 Following truck ${FOLLOW + 1}</b> · ${SITES[r.dc].name}<br>${done}/${r.stores.length} stores served · ${r.load.toFixed(0)} cages · ${r.km.toFixed(0)} km route<br>${nxt >= 0 ? `next stop ${S.id[r.stores[nxt]]} at ${hhmm(r.arr[nxt])}` : p ? "driving back to the DC" : `back at ${hhmm(r.ret)}`}<div class="bar" style="margin-top:6px"><i style="width:${100 * done / r.stores.length}%"></i></div>`;
+  $("#truckcard").innerHTML = `<b style="color:var(--purple-ink)">Following truck ${FOLLOW + 1}</b> · ${SITES[r.dc].name}<br>${done}/${r.stores.length} stores served · ${r.load.toFixed(0)} cages · ${r.km.toFixed(0)} km route<br>${nxt >= 0 ? `next stop ${S.id[r.stores[nxt]]} at ${hhmm(r.arr[nxt])}` : p ? "driving back to the DC" : `back at ${hhmm(r.ret)}`}<div class="bar" style="margin-top:6px"><i style="width:${100 * done / r.stores.length}%"></i></div>`;
+}
+// The day map in layers: a cached static layer (land, routes) redrawn only when the view or the day changes,
+// a store layer updated only for the stores delivered since the last frame, and light per-frame overlays
+const upperIdx = (a, x) => { let lo = 0, hi = a.length; while (lo < hi) { const h = (lo + hi) >> 1; if (a[h] <= x) lo = h + 1; else hi = h; } return lo; };
+function routeIndex(routes) {
+  if (routes._idx) return routes._idx;
+  const ev = []; routes.forEach((r, k) => r.stores.forEach((s, q) => ev.push([r.arr[q], s, k]))); ev.sort((a, b) => a[0] - b[0]);
+  const byDc = {}; routes.forEach(r => { (byDc[r.dc] = byDc[r.dc] || []).push(...r.arr.filter(a => a < 99)); }); for (const j in byDc) byDc[j].sort((a, b) => a - b);
+  routes.forEach(r => { let a = 90, b = -90, c = 360, d = -360; for (const [la, lo] of (r.path || r.pts)) { if (la < a) a = la; if (la > b) b = la; if (lo < c) c = lo; if (lo > d) d = lo; } r.bb = [a, b, c, d]; });
+  return (routes._idx = { t: Float64Array.from(ev, e => e[0]), s: Int32Array.from(ev, e => e[1]), k: Int32Array.from(ev, e => e[2]), byDc });
+}
+const nightAlpha = t => Math.max(0, Math.min(1, (7.2 - t) / 3)) * 0.5, PAD = 320;
+function layerView(m) {
+  // The map's projection on a canvas PAD pixels larger on every side, fixed at the centre it was drawn for
+  const S0 = m.s(), v = { W: m.W + 2 * PAD, H: m.H + 2 * PAD, z: m.z, cx: m.cx, cy: m.cy, land: MapView.prototype.land };
+  v.P = (lat, lon) => [v.W / 2 + (lon * KX - v.cx) * S0, v.H / 2 + (-lat - v.cy) * S0];
+  v.inv = (x, y) => [-((y - v.H / 2) / S0 + v.cy), ((x - v.W / 2) / S0 + v.cx) / KX];
+  return v;
+}
+function dayStatic(m, routes) {
+  const d = devicePixelRatio || 1, S0 = m.s(), v0 = m._lv;
+  const moved = v0 ? Math.max(Math.abs((v0.cx - m.cx) * S0), Math.abs((v0.cy - m.cy) * S0)) : Infinity;
+  const key = [m.W, m.H, m.z, FOLLOW].join();
+  if (m._sk === key && m._sr === routes && moved < PAD * 0.8) return false;
+  m._sk = key; m._sr = routes;
+  const v = m._lv = layerView(m);
+  const sc = m._sc || (m._sc = document.createElement("canvas")); sc.width = v.W * d; sc.height = v.H * d;
+  const c = sc.getContext("2d"); c.setTransform(d, 0, 0, d, 0, 0);
+  v.ctx = c; v.land();
+  const [la1, lo0] = v.inv(-20, -20), [la0, lo1] = v.inv(v.W + 20, v.H + 20);
+  routes.forEach((r, k) => {
+    if (r.bb[1] < la0 || r.bb[0] > la1 || r.bb[3] < lo0 || r.bb[2] > lo1) return;
+    const hot = k === FOLLOW && !LIVE_ROUTES;
+    c.strokeStyle = r.over || r.relay ? "#d23f3f99" : (hot ? r.col : r.col + "55"); c.lineWidth = hot ? 3 : (m.z > 4 ? 2 : 0.8);
+    c.setLineDash(r.relay ? [6, 4] : []);
+    c.beginPath(); (r.path || r.pts).forEach(([la, lo], i) => { const [x, y] = v.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.stroke();
+  });
+  c.setLineDash([]);
+  return true;
+}
+function storeState(c, m, routes, I, e) {
+  const s = I.s[e], [x, y] = m.P(S.lat[s], S.lon[s]); if (x < -12 || y < -12 || x > m.W + 12 || y > m.H + 12) return;
+  const a = I.t[e], done = T >= a, sz = Math.min(1.6 + m.z * 0.45, 6);
+  const col = !done ? "#cfc4d4" : routes[I.k[e]].over ? "#d23f3f" : a > P.deadline ? "#e8950f" : "#9dc92a";
+  if (m.z > 4.5) drawStore(c, x, y, sz * 0.85, col); else { c.fillStyle = col; c.beginPath(); c.arc(x, y, done ? sz * 0.75 : sz * 0.55, 0, 7); c.fill(); }
+}
+function dayStores(m, routes, full) {
+  const d = devicePixelRatio || 1, I = routeIndex(routes), st = m._st || (m._st = document.createElement("canvas")), v = m._lv;
+  if (full || m._stR !== routes || T < m._stT) {
+    st.width = v.W * d; st.height = v.H * d; const c = st.getContext("2d"); c.setTransform(d, 0, 0, d, 0, 0);
+    for (let e = 0; e < I.t.length; e++) storeState(c, v, routes, I, e);
+  } else { const c = st.getContext("2d"); for (let e = upperIdx(I.t, m._stT); e < I.t.length && I.t[e] <= T; e++) storeState(c, v, routes, I, e); }
+  m._stT = T; m._stR = routes;
+  return I;
 }
 function drawDay(m) {
-  const c = m.ctx, routes = LIVE_ROUTES || DAY.routes;
-  c.lineWidth = m.z > 4 ? 2 : 0.8;
-  routes.forEach((r, k) => {
-    c.strokeStyle = r.over || r.relay ? "#d23f3f99" : (k === FOLLOW && !LIVE_ROUTES ? r.col : r.col + "55"); if (k === FOLLOW && !LIVE_ROUTES) c.lineWidth = 3;
-    c.setLineDash(r.relay ? [6, 4] : []);
-    c.beginPath(); (r.path || r.pts).forEach(([la, lo], i) => { const [x, y] = m.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.stroke(); c.lineWidth = m.z > 4 ? 2 : 0.8; c.setLineDash([]);
-  });
-  const sz = Math.min(1.6 + m.z * 0.45, 6);
-  for (const r of routes) r.stores.forEach((s, q) => {
-    const [x, y] = m.P(S.lat[s], S.lon[s]); if (x < -12 || y < -12 || x > m.W + 12 || y > m.H + 12) return;
-    const a = r.arr[q]; let col = "#cfc4d4";
-    if (r.over && T >= a) col = "#d23f3f"; else if (T >= a) col = a > P.deadline ? "#e8950f" : "#9dc92a";
-    if (m.z > 4.5) drawStore(c, x, y, sz * 0.85, col); else { c.fillStyle = col; c.beginPath(); c.arc(x, y, T >= a ? sz * 0.75 : sz * 0.55, 0, 7); c.fill(); }
-  });
+  const c = m.ctx, routes = LIVE_ROUTES || DAY.routes; routeIndex(routes);
+  const full = dayStatic(m, routes), I = dayStores(m, routes, full), night = LIVE_ROUTES ? 0 : nightAlpha(T);
+  const v = m._lv, S0 = m.s(), ox = -PAD + (v.cx - m.cx) * S0, oy = -PAD + (v.cy - m.cy) * S0;
+  c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, m.W, m.H); c.drawImage(m._sc, ox, oy, v.W, v.H);
+  if (night > 0) { c.fillStyle = `rgba(42,8,50,${night})`; c.fillRect(0, 0, m.W, m.H); }
+  c.drawImage(m._st, ox, oy, v.W, v.H);
+  // A ring that fades out where a store has just been served
+  c.lineWidth = 2;
+  for (let e = upperIdx(I.t, T - 0.08); e < I.t.length && I.t[e] <= T; e++) {
+    const f = (T - I.t[e]) / 0.08, [x, y] = m.P(S.lat[I.s[e]], S.lon[I.s[e]]); if (x < 0 || y < 0 || x > m.W || y > m.H) continue;
+    c.strokeStyle = `rgba(157,201,42,${0.9 * (1 - f)})`; c.beginPath(); c.arc(x, y, 3 + f * 12, 0, 7); c.stroke();
+  }
+  // Each DC with a ring that fills as its stores are served
   const open = LIVE_ROUTES ? [LIVE.dc] : DAY.open;
-  for (const j of open) drawDC(c, m, SITES[j], colorOf(j, DAY.open), m.z > 2.5);
-  // A short fading tail behind each truck: its positions over the last few minutes, no extra data
-  if (!LIVE_ROUTES) { c.lineCap = "round"; routes.forEach(r => { if (!truckPos(r, T)) return; const q = [0, 1, 2, 3, 4].map(i => truckPos(r, T - i * 0.12)).filter(Boolean).map(p => m.P(p[0][0], p[0][1])); for (let i = 1; i < q.length; i++) { c.strokeStyle = `rgba(157,201,42,${0.85 - i * 0.17})`; c.lineWidth = Math.max(2, Math.min(1.5 + m.z * 0.6, 6)) * (1.15 - i * 0.18); c.beginPath(); c.moveTo(q[i - 1][0], q[i - 1][1]); c.lineTo(q[i][0], q[i][1]); c.stroke(); } }); c.lineCap = "butt"; }
-  if (!LIVE_ROUTES) routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; drawTruck(c, x, y, p[1], Math.min(0.55 + m.z * 0.09, 1.6), r.over || r.relay ? "#b02f2f" : "#751485", k === FOLLOW); });
+  for (const j of open) {
+    drawDC(c, m, SITES[j], colorOf(j, DAY.open), m.z > 2.5);
+    const arr = I.byDc[j]; if (!arr || !arr.length) continue;
+    const [x, y] = m.P(SITES[j].lat, SITES[j].lon), f = upperIdx(arr, T) / arr.length;
+    c.lineWidth = 4; c.strokeStyle = "rgba(255,255,255,.85)"; c.beginPath(); c.arc(x, y, 16, 0, 7); c.stroke();
+    if (f > 0) { c.strokeStyle = "#9dc92a"; c.beginPath(); c.arc(x, y, 16, -Math.PI / 2, -Math.PI / 2 + f * 2 * Math.PI); c.stroke(); }
+  }
+  if (!LIVE_ROUTES) {
+    const pos = [];
+    routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; pos.push([x, y, p[1], r, k]); });
+    if (night > 0.05) { c.fillStyle = `rgba(157,201,42,${Math.min(0.45, night)})`; c.beginPath(); for (const [x, y] of pos) { c.moveTo(x + 9, y); c.arc(x, y, 9, 0, 7); } c.fill(); }
+    const sc = Math.min(0.55 + m.z * 0.09, 1.6);
+    for (const [x, y, dir, r, k] of pos) { const col = r.over || r.relay ? "#b02f2f" : "#751485"; if (k === FOLLOW) drawTruck(c, x, y, dir, sc, col, true); else { const sp = truckSprite(col, dir < 0, sc); c.drawImage(sp, x - sp.w / 2, y - sp.h / 2, sp.w, sp.h); } }
+  }
   $("#clock").textContent = hhmm(Math.max(T, P.depart)); $("#scrub").value = T;
+  const cn = $("#clock-now"); if (cn && !LIVE_ROUTES) { const x = $("#clockchart")._X(Math.min(Math.max(T, 3.5), 14)); cn.setAttribute("x1", x); cn.setAttribute("x2", x); }
 }
 function kpisDay() {
   const s = DAY.summary; let done = 0, late = 0, total = 0, road = 0;
@@ -971,7 +1098,7 @@ async function solveLive() {
 }
 
 // ---------- 3 · How it works (lecture-aligned) ----------
-// Why this answer: every evaluated network, challengers head to head, the tests passed, the network DC by DC
+// Why this answer: every evaluated network, the tests passed, the network DC by DC
 let HILITE = -1;
 const ORIG = [["G2-best", "clock-aware G2 seed", "#751485"], ["G1-best", "load-only G1 seed", "#8e7dbe"], ["G0", "centre of gravity (Data Team)", "#e8950f"], ["today", "today's sites adjusted", "#2e86ab"], ["swap", "local moves of these", "#cfc4d4"], ["gen", "learned generator (Lecture 6)", "#9dc92a"]];
 const origKey = o => o.startsWith("swap") ? "swap" : o.startsWith("G0") ? "G0" : o.includes("current") || o.includes("today") ? "today" : o;
@@ -1003,36 +1130,8 @@ function whyStrip() {
   $("#why-sub").textContent = `${pts.length} networks for k = ${ks[0]} to ${ks[ks.length - 1]}, from four generators, their local moves and a learned generator, each priced by the full evaluation E on the same ${M.days[0]} demand days as today's network. None lies left of the recommendation; the runner-up costs ${fM(sorted[1] - sorted[0])} M a month more. ${off} more cost over ${f0(cap / 1e6)} M and are counted at the right edge.`;
   $("#why-legend").innerHTML = ORIG.map(([k, l, c]) => `<span><i class="sw" style="background:${k === "gen" ? "#fff" : c};${k === "gen" ? "border:2px solid #4f6b0c" : ""}"></i>${l}</span>`).join("") + `<span>hover a dot for its k and cost</span>`;
 }
-let CH = 0;
-function challenger() {
-  const F = R.finals, rec = F.recommended, parts = [["fixed", "DC rent"], ["fleet", "owned vehicles"], ["fuel", "fuel"], ["spot", "spot trucks"], ["relay", "relay drivers"], ["penalty", "late and stock-outs"]];
-  const g0 = R.pool.filter(p => p.origin.startsWith("G0")).sort((a, b) => a.E - b.E)[0];
-  const tk = k => R.top5.find(t => t.k === k);
-  const L = [
-    ["Today's network", F.baseline, "28 final days"], ["Strategy: eight DCs", F.best_k8, "28 final days"], ["The quick estimate's pick", F.proxy_only, "28 final days"],
-    ["Today's sites, redrawn", F.reassigned12, "28 final days"], ["The best twelve sites", F.best12, "28 final days"],
-    tk(9) && ["Best nine DCs", { total: tk(9).final_E, k: 9 }, "28 final days"], tk(11) && ["Best eleven DCs", { total: tk(11).final_E, k: 11 }, "28 final days"],
-    g0 && ["Data Team: centre of gravity", { total: g0.E, k: g0.k, search: true }, `${M.days[0]} search days`],
-  ].filter(Boolean);
-  $("#ch-seg").innerHTML = L.map((x, i) => `<button data-i="${i}" class="${i === CH ? "on" : ""}">${x[0]}</button>`).join("");
-  document.querySelectorAll("#ch-seg button").forEach(b => b.onclick = () => { CH = +b.dataset.i; challenger(); });
-  const [name, c, days] = L[CH], ref = c.search ? R.pool_best : rec.total;
-  const rows = (c.fixed != null ? parts.map(([k, l]) => [l, c[k] - rec[k]]) : []).concat([["total", c.total - ref]]);
-  const svg = $("#chchart"); svg.innerHTML = "";
-  const mx = Math.max(...rows.map(r => Math.abs(r[1]))) * 1.35, cx = 270, half = 150, h = Math.min(30, 220 / rows.length);
-  el("line", { x1: cx, x2: cx, y1: 6, y2: 10 + rows.length * h, stroke: "#c9c3cd" }, svg);
-  rows.forEach(([l, v], i) => {
-    const y = 10 + i * h, w = Math.abs(v) / mx * half, tot = l === "total";
-    el("rect", { x: v >= 0 ? cx : cx - w, y: y + 3, width: Math.max(w, 1), height: h - 8, rx: 4, fill: v >= 0 ? (tot ? "#d23f3f" : "#e8a3a3") : (tot ? "#4f6b0c" : "#9dc92a") }, svg);
-    el("text", { x: 8, y: y + h / 2 + 4, "font-size": 12, fill: "#1f1f24", "font-weight": tot ? 800 : 400 }, svg, l === "total" ? "total" : l);
-    el("text", { x: v >= 0 ? cx + w + 5 : cx - w - 5, y: y + h / 2 + 4, "text-anchor": v >= 0 ? "start" : "end", "font-size": 11.5, fill: "#4a4a52", "font-weight": tot ? 800 : 400 }, svg, (v >= 0 ? "+" : "−") + fM(Math.abs(v)));
-  });
-  el("text", { x: cx - 8, y: 10 + rows.length * h + 16, "text-anchor": "end", "font-size": 11, fill: "#4f6b0c" }, svg, "cheaper than the recommendation");
-  el("text", { x: cx + 8, y: 10 + rows.length * h + 16, "font-size": 11, fill: "#d23f3f" }, svg, "dearer");
-  const d = c.total - ref;
-  $("#ch-note").innerHTML = `<b>${name}</b> (${c.k} DCs) costs <b>${fM(d)} M a month more</b> than the recommendation on the ${days}.` + (c.fixed != null && c.fixed < rec.fixed ? ` It saves ${fM(rec.fixed - c.fixed)} M of rent, and gives it back on the road.` : "") + (c.search ? " Optimal for its own criterion, straight-line distance, not for cost." : "");
-}
 function ladder() {
+  const F = R.finals, g0 = R.pool.filter(p => p.origin.startsWith("G0")).sort((a, b) => a.E - b.E)[0];
   const at = R.curve_bo.findIndex(v => v <= R.pool_best + 1) + 1, rm = R.random_band.p50[R.random_band.p50.length - 1];
   const rev = R.reversals.slice(1), keep = rev.filter(x => x.saving > 0).length, flip = rev.filter(x => x.saving <= 0);
   const ex = VER && VER.checks.find(x => x.check.startsWith("heuristic vs exact")), rc = R.routing_check;
@@ -1043,6 +1142,7 @@ function ladder() {
     ["Survives a stronger router", rc ? `With PyVRP's routes on every territory the saving is about ${fM(R.saving.final_mean - rc.saving_month_shift)} M a month; the best k moves at most within the 10-11 near-tie.` : "Router check not run.", "checks"],
     ["Survives changed assumptions", `${keep} of ${rev.length} changed assumptions keep the redesign paying; the ${flip.length} that reverse it (${flip.map(x => x.value || x.assumption).join("; ")}) are business facts to confirm, not model choices.`, "answer"],
     ["The router is exact where it can be checked", ex ? `Against an exact set-partitioning solver on small territories: ${ex.detail}.` : "Run python verify.py.", "checks"],
+    ["Cheaper than every proposal made at the meeting", `On the same ${M.days[1]} final days: today's network costs ${fM(F.baseline.total - F.recommended.total)} M a month more, Strategy's eight DCs ${fM(F.best_k8.total - F.recommended.total)} M more and the quick estimate's pick ${fM(F.proxy_only.total - F.recommended.total)} M more; the Data Team's centre of gravity, at its best k, ${fM(g0.E - R.pool_best)} M more on the search days.`, "answer"],
   ];
   $("#ladder").innerHTML = T.map(([t, d, tab], i) => `<div class="rung"><span class="tick">✓</span><div><b>${i + 1} · ${t}</b><div class="note">${d}</div></div><button class="btn ghost small" onclick="show('${tab}')">see</button></div>`).join("") +
     `<div class="keypoint"><b>What "best" means here.</b> The best of ${n} networks, each fully evaluated, out of ${nChoose(R.sites.length, k).toExponential(1).replace("e+", " × 10^")} possible sets of ${k} sites: a search, not a proof. A better network would need site sets that neither the four generators, their local moves nor a learned generator reached; the learned generator, sampling exactly such sets, found none.</div>`;
@@ -1152,7 +1252,7 @@ function figHierarchy() {
   box(20, 10, "D1 network", "once, years", true); box(20, 72, "D2 territories", "months"); box(20, 134, "D3 fleet", "contracts"); box(20, 196, "D4 routing", "every evening");
   el("defs", {}, s).innerHTML = '<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#751485"/></marker><marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#4f6b0c"/></marker>';
   for (const y of [54, 116, 178]) el("line", { x1: 110, y1: y, x2: 110, y2: y + 16, stroke: "#751485", "stroke-width": 2, "marker-end": "url(#ah)" }, s);
-  el("path", { d: "M200 218 C 320 218, 320 32, 202 32", fill: "none", stroke: "#4f6b0c", "stroke-width": 2.2, "stroke-dasharray": "6 4", "marker-end": "url(#ag)" }, s);
+  el("path", { d: "M200 218 C 320 218, 320 32, 202 32", fill: "none", stroke: "#4f6b0c", "stroke-width": 2.2, "stroke-dasharray": "6 4", "marker-end": "url(#ag)", class: "flowedge" }, s);
   el("text", { x: 300, y: 120, "font-size": 12, "font-weight": 800, fill: "#4f6b0c" }, s, "evaluated_by");
   el("text", { x: 300, y: 136, "font-size": 11, fill: "#4a4a52" }, s, "operating cost");
   el("text", { x: 214, y: 66, "font-size": 10.5, fill: "#751485" }, s, "feasible region");
