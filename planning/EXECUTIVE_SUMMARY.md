@@ -34,7 +34,7 @@ First data to obtain: the real outcome tables (they measure today's network), on
 | `problem-definition.md` | Seven template sections: four statements placed, D1-D4 with dependencies and `evaluated_by`, standard forms of the three levels, I/O schema, data reading table (orders are not shelf demand; outcome tables are outcomes of today's network), demand model, approaches, balance table, cases, evidence, reversals, extensions, client proposal, three LLM discussions |
 | `code/` | Generator, OSRM road cache, Poisson-Gamma demand, savings + 2-opt + relay router, transportation-LP assignment, newsvendor fleet, E over sampled days, G0/G1/G2, pool, discrepancy GP + EI, reversals, checks, extensions, `verify.py`, local app; three commands |
 | `demo.html` | Six tabs in CU style: answer map and sweep, animated delivery day on real road shapes with a live solve, lecture-by-lecture method, data and baseline with a 1990-2026 growth animation, cases and checks, extensions; offline, every precomputed number tagged with its command |
-| `proposal.html` | 16 slides in project-management order, built from the same registry; visible controls; each evidence slide links to its demo tab; each claim tagged "shown in the fictional instance" or "needs real data" |
+| `proposal.html` | 17 slides in project-management order, built from the same registry; visible controls; each evidence slide links to its demo tab; each claim tagged "shown in the fictional instance" or "needs real data" |
 
 ## 3. How the answer changed, run by run
 
