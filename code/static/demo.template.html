@@ -150,6 +150,7 @@ details.log { margin-top: 10px; } details.log summary { cursor: pointer; font-we
 }
 @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes flowdash { to { stroke-dashoffset: -20; } }
+.use { background: var(--purple); color: #fff; border-radius: 14px; padding: 11px 15px; margin: 6px 0 12px; font-size: 14.5px; line-height: 1.5; } .use b { color: var(--lime); }
 .rung { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px dashed var(--line); }
 .rung .tick { width: 24px; height: 24px; border-radius: 50%; background: var(--lime); color: var(--purple-ink); display: grid; place-items: center; font-weight: 900; font-size: 13px; }
 .seg.wrap { flex-wrap: wrap; border-radius: 16px; margin-bottom: 6px; }
@@ -234,7 +235,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
       <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
         <input type="range" id="scrub" min="3.5" max="14" step="0.01" value="3.5" style="flex:1;min-width:160px" aria-label="time of day"><select id="speed" aria-label="speed"><option value="0.5">slow</option><option value="1" selected>normal</option><option value="2.5">fast</option></select></div>
       <div class="mapbox" id="daymap"></div>
-      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span>dark: before sunrise</span><span id="geom-note"></span></div>
+      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span id="geom-note"></span></div>
       <div class="clockcard"><div class="row spread"><b>The day against the clock</b><span class="note">trucks on the road by DC (areas) and stores served (lime line); deliveries end by 12:00, trucks are back by 13:00</span></div><svg class="chart" id="clockchart" viewBox="0 0 760 170"></svg></div>
     </div>
     <div class="grid" style="align-content:start">
@@ -319,7 +320,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   <div id="ext-none" class="card" hidden>Run <code>python run_full.py</code> to compute the extensions.</div>
   <div class="stitle"><span class="deco">⇢</span><h2>A sequence of closures, one lease at a time</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2">
-    <div class="card"><h3>What happens at each lease expiry</h3><p class="sub" id="seq-sub"></p>
+    <div class="card"><h3>What happens at each lease expiry</h3><div class="use">Use <b>a sequence of decisions with a state</b> s<sub>t</sub> = (open sites, lease end dates), one decision at each lease expiry, to plan the move to the recommendation, because a site can only be given up when its lease ends; compare a policy committed to the target with a myopic one that takes the cheapest action each time.</div><p class="sub" id="seq-sub"></p>
       <div class="seg" id="seq-seg"><button data-n="committed" class="on">Committed to the recommendation</button><button data-n="myopic">Myopic (may renew)</button></div>
       <svg class="chart" id="seq-time" viewBox="0 0 780 460" style="margin-top:10px"></svg><div class="legend" id="seq-legend"></div></div>
     <div class="grid" style="align-content:start">
@@ -329,19 +330,19 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   </div>
   <div class="stitle"><span class="deco">≋</span><h2>Robustness: demand shifts and a different distance source</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2">
-    <div class="card"><h3>Best number of DCs and the saving, scenario by scenario</h3><p class="sub" id="rob-sub"></p><svg class="chart" id="rob-chart" viewBox="0 0 780 320"></svg><div class="legend" id="rob-legend"></div></div>
+    <div class="card"><h3>Best number of DCs and the saving, scenario by scenario</h3><div class="use">Use <b>scenario re-scoring under the same E</b> (demand scaled, or a different distance source) to measure the regret of choosing 10 DCs now, because a decision that is best in one world can be costly in another.</div><p class="sub" id="rob-sub"></p><svg class="chart" id="rob-chart" viewBox="0 0 780 320"></svg><div class="legend" id="rob-legend"></div></div>
     <div class="card"><h3>What it implies</h3><div class="tw"><table id="rob-table"></table></div><div id="rob-text"></div></div>
   </div>
   <div class="stitle"><span class="deco">?</span><h2>Value of information: measure first, or decide now?</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2">
-    <div class="card"><h3>Stop time × road speed: the best k and the regret of deciding now</h3><p class="sub" id="voi-sub"></p><div class="tw"><table class="heat" id="voi-grid"></table></div><div class="formula" id="voi-formula"></div></div>
+    <div class="card"><h3>Stop time × road speed: the best k and the regret of deciding now</h3><div class="use">Use <b>the expected value of perfect information</b> from a decision network (Lecture 3: d* maximises expected utility over the posterior) to rank what to measure first, because a measurement is worth only what it can change in the decision.</div><p class="sub" id="voi-sub"></p><div class="tw"><table class="heat" id="voi-grid"></table></div><div class="formula" id="voi-formula"></div></div>
     <div class="grid" style="align-content:start"><div class="card"><div class="grid g2e" id="voi-kpis"></div></div><div class="card" id="voi-text"></div></div>
   </div>
   <div id="drift-wrap"><div class="stitle"><span class="deco">⟳</span><h2>How far must today's network have drifted?</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2"><div class="card"><h3>The saving against the year of the last redesign</h3><p class="sub" id="drift-sub"></p><svg class="chart" id="drift-chart" viewBox="0 0 780 300"></svg></div>
     <div class="card" id="drift-text"></div></div></div>
   <div id="gen-wrap"><div class="stitle"><span class="deco">G</span><h2>Candidate generation: a learned distribution over networks</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
-  <div class="grid g2"><div class="card"><h3>CbAS on site sets (Lecture 6)</h3><p class="sub" id="gen-sub"></p><div class="tw"><table id="gen-table"></table></div></div>
+  <div class="grid g2"><div class="card"><h3>A generative model of site sets (Lecture 6)</h3><div class="use">Use <b>a generative model conditioned on a target</b> (Lecture 6: sample x ∼ p(x | y ≥ y<sub>max</sub>); implemented as CbAS, conditioning by adaptive sampling) to propose new site sets, because local moves only reach networks near the seeds.</div><div class="formula" id="gen-formula"></div><p class="sub" id="gen-sub"></p><div class="tw"><table id="gen-table"></table></div></div>
     <div class="card" id="gen-text"></div></div></div>
 </section>
 
@@ -454,9 +455,15 @@ class MapView {
   inv(x, y) { const s = this.s(); return [-((y - this.H / 2) / s + this.cy), ((x - this.W / 2) / s + this.cx) / KX]; }
   zoomAt(f, x = this.W / 2, y = this.H / 2) { const [la, lo] = this.inv(x, y); this.z = Math.min(Math.max(this.z * f, 0.7), 60); const [nx, ny] = this.P(la, lo); this.cx += (nx - x) / this.s(); this.cy += (ny - y) / this.s(); this.draw(); }
   centerOn(lat, lon, z) { if (z) this.z = z; this.cx = lon * KX; this.cy = -lat; }
-  draw() { if (!this.W) return; const c = this.ctx; c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, this.W, this.H); this.land(); this.layers(this); }
+  draw() { if (!this.W) return; this._pend = []; this._marks = []; const c = this.ctx; c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, this.W, this.H); this.land(); this.layers(this); flushLabels(this); }
   land() {
     const c = this.ctx;
+    if (this.shadowLand) {
+      // One shadowed silhouette under the provinces gives the land some depth
+      c.save(); c.shadowColor = "rgba(92,15,105,.18)"; c.shadowBlur = 22; c.shadowOffsetY = 6; c.fillStyle = "#ffffff"; c.beginPath();
+      for (const pr of R.geo.provinces) for (const ring of pr.rings) ring.forEach(([lo, la], i) => { const [x, y] = this.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); });
+      c.fill(); c.restore();
+    }
     for (const pr of R.geo.provinces) for (const ring of pr.rings) {
       c.beginPath(); ring.forEach(([lo, la], i) => { const [x, y] = this.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); });
       c.closePath(); c.fillStyle = "#ffffff"; c.fill(); c.strokeStyle = "#dccfe2"; c.lineWidth = 1; c.stroke();
@@ -500,11 +507,22 @@ function drawDC(c, m, s, col, label, mark) {
   c.save(); c.shadowColor = "rgba(0,0,0,.25)"; c.shadowBlur = 5; rr(c, x - 9, y - 9, 18, 18, 5); c.fillStyle = mark === "closed" ? "#9a9aa2" : "#5c0f69"; c.fill(); c.restore();
   rr(c, x - 5, y - 5, 10, 10, 2.5); c.fillStyle = mark === "closed" ? "#e6e6ea" : col; c.fill();
   if (mark === "new") { c.fillStyle = "#9dc92a"; c.beginPath(); c.arc(x + 8, y - 8, 5, 0, 7); c.fill(); c.strokeStyle = "#fff"; c.lineWidth = 1.5; c.stroke(); }
-  if (label && m.z >= 1.3) {
-    c.font = "700 11.5px Noto Sans, sans-serif"; const w = c.measureText(s.name).width;
-    rr(c, x + 12, y - 9, w + 12, 19, 9); c.fillStyle = "rgba(255,255,255,.95)"; c.fill(); c.strokeStyle = "#ecdcf0"; c.stroke();
-    c.fillStyle = mark === "closed" ? "#63636b" : "#5c0f69"; c.fillText(s.name, x + 18, y + 4.5);
+  (m._marks || (m._marks = [])).push([x - 10, y - 10, 20, 20]);
+  if (label && m.z >= (m.labelZ || 1.3)) (m._pend || (m._pend = [])).push([s.name, mark, x, y]);
+}
+function flushLabels(m) {
+  // After every marker is down: each label right of its marker, else left, else none, so labels cover neither each other nor a marker
+  const c = m.ctx, L = (m._marks || []).slice(), hit = ([bx, by, bw, bh]) => L.some(([ax, ay, aw, ah]) => bx < ax + aw && ax < bx + bw && by < ay + ah && ay < by + bh);
+  c.font = "700 11.5px Noto Sans, sans-serif";
+  for (const [name, mark, x, y] of m._pend || []) {
+    const w = c.measureText(name).width, own = L.findIndex(b => b[0] === x - 10 && b[1] === y - 10), mine = own >= 0 ? L.splice(own, 1)[0] : null;
+    const box = [[x + 12, y - 9], [x - 24 - w, y - 9]].map(([bx, by]) => [bx, by, w + 12, 19]).find(b => !hit(b));
+    if (mine) L.push(mine);
+    if (!box) continue;
+    L.push(box); rr(c, box[0], box[1], box[2], box[3], 9); c.fillStyle = "rgba(255,255,255,.95)"; c.fill(); c.strokeStyle = "#ecdcf0"; c.lineWidth = 1; c.stroke();
+    c.fillStyle = mark === "closed" ? "#63636b" : "#5c0f69"; c.fillText(name, box[0] + 6, y + 4.5);
   }
+  m._pend = []; m._marks = [];
 }
 const colorOf = (j, open) => PAL[open.indexOf(j) % PAL.length];
 const TYPES = ["residential", "office", "mixed", "roadside"];
@@ -516,6 +534,32 @@ function nearestStore(m, x, y, filter) {
 
 // ---------- 1 · The answer ----------
 let ANS = null, ANSMODE = "change", MT = 0, MTH = null;
+const HULLS = {};
+function hullsOf(mode) {
+  // Each DC's territory as the convex hull of its stores, leaving out the farthest 3% so a few far stores do not balloon it
+  if (HULLS[mode]) return HULLS[mode];
+  const asg = mode === "baseline" ? S.base_dc : S.rec_dc, out = {};
+  for (const j of R.networks[mode]) {
+    const s = SITES[j], pts = [];
+    for (let i = 0; i < S.lat.length; i++) if (asg[i] === j) pts.push([S.lon[i] * KX, S.lat[i], Math.hypot((S.lon[i] - s.lon) * KX, S.lat[i] - s.lat)]);
+    pts.sort((a, b) => a[2] - b[2]); const keep = pts.slice(0, Math.max(3, Math.ceil(pts.length * 0.97))).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], hi = [];
+    for (const p of keep) { while (lo.length > 1 && cross(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+    for (const p of keep.slice().reverse()) { while (hi.length > 1 && cross(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop(); hi.push(p); }
+    out[j] = lo.slice(0, -1).concat(hi.slice(0, -1)).map(p => [p[1], p[0] / KX]);
+  }
+  return (HULLS[mode] = out);
+}
+function drawHulls(c, m, mode, col, fill) {
+  c.save(); c.lineJoin = "round";
+  for (const [j, h] of Object.entries(hullsOf(mode))) {
+    c.beginPath(); h.forEach(([la, lo], i) => { const [x, y] = m.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.closePath();
+    if (fill) { c.fillStyle = col(+j) + "1f"; c.fill(); c.setLineDash([]); c.strokeStyle = col(+j) + "aa"; c.lineWidth = 1.6; }
+    else { c.setLineDash([5, 4]); c.strokeStyle = col(+j); c.lineWidth = 1.2; }
+    c.stroke();
+  }
+  c.restore();
+}
 function ansMode(n) { ANSMODE = n; document.querySelectorAll("#ans-seg button").forEach(z => z.classList.toggle("on", z.dataset.n === n)); $("#ans-legend").dataset.mode = n; legendAnsGlobal(); ANS.draw(); }
 function legendAnsGlobal() {
   $("#ans-legend").innerHTML = ANSMODE === "change"
@@ -565,17 +609,29 @@ RENDER.answer = () => {
   }
   if (!ANS) {
     ANS = new MapView($("#ansmap"));
+    ANS.shadowLand = true; ANS.labelZ = 1;
     ANS.layers = m => {
       const c = m.ctx, open = ANSMODE === "baseline" ? R.networks.baseline : R.networks.recommended, asg = ANSMODE === "baseline" ? S.base_dc : S.rec_dc;
-      const sz = Math.min(1.4 + m.z * 0.5, 5);
+      const sz = Math.min(1.6 + m.z * 0.5, 5);
+      // Territories: today's as dashed outlines in the change view, the shown network's as tinted regions with faint spokes to each store
+      if (ANSMODE === "change") { drawHulls(c, m, "baseline", () => "#8f8698", false); drawHulls(c, m, "recommended", j => colorOf(j, R.networks.recommended), true); }
+      if (ANSMODE === "baseline" || ANSMODE === "recommended") {
+        drawHulls(c, m, ANSMODE, j => colorOf(j, open), true);
+        c.lineWidth = 0.5;
+        for (const j of open) {
+          const [dx, dy] = m.P(SITES[j].lat, SITES[j].lon); c.strokeStyle = colorOf(j, open) + "26"; c.beginPath();
+          for (let i = 0; i < S.lat.length; i++) if (asg[i] === j) { const [x, y] = m.P(S.lat[i], S.lon[i]); c.moveTo(dx, dy); c.lineTo(x, y); }
+          c.stroke();
+        }
+      }
       for (let i = 0; i < S.lat.length; i++) {
         const [x, y] = m.P(S.lat[i], S.lon[i]); if (x < -10 || y < -10 || x > m.W + 10 || y > m.H + 10) continue;
         let col = colorOf(asg[i], open);
         if (ANSMODE === "change") col = S.base_dc[i] === S.rec_dc[i] ? "#cfc4d4" : "#751485";
         if (ANSMODE === "morph") col = MT > MTH[i] ? colorOf(S.rec_dc[i], R.networks.recommended) : colorOf(S.base_dc[i], R.networks.baseline);
-        if (m.z > 5) drawStore(c, x, y, sz * 0.9, col); else { c.fillStyle = col; c.fillRect(x - sz / 2, y - sz / 2, sz, sz); }
+        if (m.z > 5) drawStore(c, x, y, sz * 0.9, col); else { c.fillStyle = col; c.beginPath(); c.arc(x, y, sz / 2, 0, 7); c.fill(); }
       }
-      if (ANSMODE === "change") { for (const j of closed) drawDC(c, m, SITES[j], "#ccc", true, "closed"); for (const j of kept) drawDC(c, m, SITES[j], "#751485", true); for (const j of opened) drawDC(c, m, SITES[j], "#751485", true, "new"); }
+      if (ANSMODE === "change") { for (const j of kept) drawDC(c, m, SITES[j], "#751485", true); for (const j of opened) drawDC(c, m, SITES[j], "#751485", true, "new"); for (const j of closed) drawDC(c, m, SITES[j], "#ccc", m.z >= 1.6, "closed"); }
       else if (ANSMODE === "morph") { c.globalAlpha = Math.max(0, 1 - MT * 1.6); for (const j of closed) drawDC(c, m, SITES[j], colorOf(j, R.networks.baseline), true); c.globalAlpha = Math.min(1, MT * 1.6); for (const j of opened) drawDC(c, m, SITES[j], colorOf(j, R.networks.recommended), true, "new"); c.globalAlpha = 1; for (const j of kept) drawDC(c, m, SITES[j], colorOf(j, R.networks.recommended), true); }
       else for (const j of open) drawDC(c, m, SITES[j], colorOf(j, open), true);
       if (HILITE >= 0) { const [x, y] = m.P(SITES[HILITE].lat, SITES[HILITE].lon); c.beginPath(); c.arc(x, y, 20, 0, 7); c.strokeStyle = "#9dc92a"; c.lineWidth = 5; c.stroke(); }
@@ -768,7 +824,7 @@ function routeIndex(routes) {
   routes.forEach(r => { let a = 90, b = -90, c = 360, d = -360; for (const [la, lo] of (r.path || r.pts)) { if (la < a) a = la; if (la > b) b = la; if (lo < c) c = lo; if (lo > d) d = lo; } r.bb = [a, b, c, d]; });
   return (routes._idx = { t: Float64Array.from(ev, e => e[0]), s: Int32Array.from(ev, e => e[1]), k: Int32Array.from(ev, e => e[2]), byDc });
 }
-const nightAlpha = t => Math.max(0, Math.min(1, (7.2 - t) / 3)) * 0.5, PAD = 320;
+const PAD = 320;
 function layerView(m) {
   // The map's projection on a canvas PAD pixels larger on every side, fixed at the centre it was drawn for
   const S0 = m.s(), v = { W: m.W + 2 * PAD, H: m.H + 2 * PAD, z: m.z, cx: m.cx, cy: m.cy, land: MapView.prototype.land };
@@ -813,18 +869,12 @@ function dayStores(m, routes, full) {
   return I;
 }
 function drawDay(m) {
+  m._pend = []; m._marks = [];
   const c = m.ctx, routes = LIVE_ROUTES || DAY.routes; routeIndex(routes);
-  const full = dayStatic(m, routes), I = dayStores(m, routes, full), night = LIVE_ROUTES ? 0 : nightAlpha(T);
+  const full = dayStatic(m, routes), I = dayStores(m, routes, full);
   const v = m._lv, S0 = m.s(), ox = -PAD + (v.cx - m.cx) * S0, oy = -PAD + (v.cy - m.cy) * S0;
   c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, m.W, m.H); c.drawImage(m._sc, ox, oy, v.W, v.H);
-  if (night > 0) { c.fillStyle = `rgba(42,8,50,${night})`; c.fillRect(0, 0, m.W, m.H); }
   c.drawImage(m._st, ox, oy, v.W, v.H);
-  // A ring that fades out where a store has just been served
-  c.lineWidth = 2;
-  for (let e = upperIdx(I.t, T - 0.08); e < I.t.length && I.t[e] <= T; e++) {
-    const f = (T - I.t[e]) / 0.08, [x, y] = m.P(S.lat[I.s[e]], S.lon[I.s[e]]); if (x < 0 || y < 0 || x > m.W || y > m.H) continue;
-    c.strokeStyle = `rgba(157,201,42,${0.9 * (1 - f)})`; c.beginPath(); c.arc(x, y, 3 + f * 12, 0, 7); c.stroke();
-  }
   // Each DC with a ring that fills as its stores are served
   const open = LIVE_ROUTES ? [LIVE.dc] : DAY.open;
   for (const j of open) {
@@ -834,10 +884,10 @@ function drawDay(m) {
     c.lineWidth = 4; c.strokeStyle = "rgba(255,255,255,.85)"; c.beginPath(); c.arc(x, y, 16, 0, 7); c.stroke();
     if (f > 0) { c.strokeStyle = "#9dc92a"; c.beginPath(); c.arc(x, y, 16, -Math.PI / 2, -Math.PI / 2 + f * 2 * Math.PI); c.stroke(); }
   }
+  flushLabels(m);
   if (!LIVE_ROUTES) {
     const pos = [];
     routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; pos.push([x, y, p[1], r, k]); });
-    if (night > 0.05) { c.fillStyle = `rgba(157,201,42,${Math.min(0.45, night)})`; c.beginPath(); for (const [x, y] of pos) { c.moveTo(x + 9, y); c.arc(x, y, 9, 0, 7); } c.fill(); }
     const sc = Math.min(0.55 + m.z * 0.09, 1.6);
     for (const [x, y, dir, r, k] of pos) { const col = r.over || r.relay ? "#b02f2f" : "#751485"; if (k === FOLLOW) drawTruck(c, x, y, dir, sc, col, true); else { const sp = truckSprite(col, dir < 0, sc); c.drawImage(sp, x - sp.w / 2, y - sp.h / 2, sp.w, sp.h); } }
   }
@@ -1009,19 +1059,19 @@ RENDER.how = () => {
   if (HOW) return; HOW = true;
   const r = R.finals.recommended, ex = R.r2.example;
   const L = [
-    { q: "Q1 · What is decided, and what judges it?", lec: "Lecture 1 · standard form, hierarchy", title: "Four decisions, one judge",
+    { q: "Q1 · What is decided, and what judges it?", lec: "Lecture 1 · standard form, hierarchy", title: "Four decisions, one judge", use: `Use <b>the standard form</b> min<sub>x∈D</sub> f(x) s.t. g<sub>i</sub>(x) ≤ 0, h<sub>j</sub>(x) = 0 and the classification reference (Lecture 1) to write each decision with its variables, objective and constraints, because only then can the four meeting statements be placed on one scale and the hierarchy be read off: D1 changes the feasible region and parameters of the levels below and is <i>evaluated by</i> them.`,
       left: `<p>The network is chosen once; territories and fleet for months; routes every evening after the orders arrive. The upper decisions change the lower problem's feasible region and parameters; the lower level <b>evaluates</b> the upper one.</p>
       <div class="flow"><div class="hot"><b>D1 network</b>how many DCs, where</div><div><b>D2 territories</b>store → DC</div><div><b>D3 fleet</b>owned vehicles</div><div><b>D4 routing</b>each day</div></div>
       <div class="keypoint"><b>Hierarchical, stateless, open-loop</b> within one redesign. Re-running the routing every day does not make it feedback, and receiving a cost from it is not feedback for D1.</div>
       <div class="flow"><div><b>Takes in</b>stores (place, type, opening and closing dates), a year of daily orders, 60 candidate sites with rents and store bounds, today's 12 DCs and their leases, cost parameters, the cached road distances</div><div class="hot"><b>The system</b>demand model → territories → routing on sampled days → fleet → E → budgeted search</div><div><b>Gives out</b>the network and each store's DC, owned vehicles per DC, monthly cost by component with its 90% band, service before noon, the log of every full evaluation (registry.json)</div></div>`,
       right: `<svg class="chart" viewBox="0 0 440 250" id="fig-h"></svg>` },
-    { q: "Q2 · How much will each store order?", lec: "Lecture 2 · Poisson-Gamma with exposure", title: "Demand as a belief, not a number",
+    { q: "Q2 · How much will each store order?", lec: "Lecture 2 · Poisson-Gamma with exposure", title: "Demand as a belief, not a number", use: `Use <b>a Poisson-Gamma conjugate model with exposure</b> (Lecture 2) to estimate each store's order rate λ<sub>s</sub>, because counts with a calendar effect and short histories need a prior that new stores can borrow from, and the update is closed-form. Use its <b>posterior predictive, a negative binomial</b>, to sample planning days, because fleet and spot hire are not linear in demand, so one average day would understate the cost.`,
       left: `<div class="formula">${MATH.lik}</div><div class="formula">${MATH.post}</div><div class="formula">${MATH.pred}</div>
       <div class="keypoint"><b>Add cages to the shape; add exposure to the rate.</b> The exposure of a day is the store type's calendar multiplier (weekday × season × holiday), estimated over the whole chain per type: office stores order 0.70 of their weekday level at weekends, residential stores 1.12, so one chain profile would mislead. Prior strength by empirical Bayes: ${R.r2.prior_strength.map(x => x.toFixed(1)).join(", ")} store-days by type.</div>
       <p>Store ${ex.store} has ${ex.days} days of history: prior mean ${ex.prior_mean.toFixed(2)}, its own data ${ex.data_mean.toFixed(2)}, posterior ${ex.post_mean.toFixed(2)} cages per unit exposure (true ${ex.true_rate.toFixed(2)}).</p>
       <div class="keypoint"><b>Why sampled days, not one average day.</b> Fleet and spot hire are not linear in demand: each DC owns the ${P.fleet_q.toFixed(3)} quantile of its daily need and pays ${f0(P.spot_day)} KRW for every vehicle above it, so a busy day costs more than a quiet day saves. Priced on one average day the ${ALT} network costs ${fM(R.r2.average_day)} M a month, on ${M.days[0]} sampled days ${fM(R.r2.sampled)} M: one average day understates E by ${fM(R.r2.sampled - R.r2.average_day)} M (${(100 * (R.r2.sampled / R.r2.average_day - 1)).toFixed(1)}%). The gap is small because store-level noise cancels at the DC; what moves every DC at once is the chain-wide shock (AR(1), φ = ${R.r2.phi.toFixed(2)}, σ = ${R.r2.sigma.toFixed(3)}) and holidays: on the peak day (${R.r2.peak_date}) the network needs ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned.</div>`,
       right: `<svg class="chart" viewBox="0 0 440 210" id="fig-gamma"></svg><svg class="chart" viewBox="0 0 440 190" id="fig-ppc"></svg><p class="note">Posterior predictive check: replicated chain totals (lime) against the history (purple).</p><svg class="chart" viewBox="0 0 440 150" id="fig-r2"></svg><p class="note">The same network priced three ways, M KRW a month.</p>` },
-    { q: "Q3 · How does one DC run its morning?", lec: "Lecture 1 · formulation is a balance", title: "The lower level: one DC, one day",
+    { q: "Q3 · How does one DC run its morning?", lec: "Lecture 1 · formulation is a balance", title: "The lower level: one DC, one day", use: `Use <b>the Clarke-Wright savings heuristic followed by 2-opt</b> to build each DC's routes, with the delivery window as a hard constraint, because a territory of up to 1,400 stores is far beyond an exact vehicle-routing solver and the search needs thousands of solves; its accuracy is measured against <b>exact set partitioning</b> on small territories and <b>PyVRP</b> (hybrid genetic search) on every territory.`,
       left: `<div class="formula">${MATH.lower_obj}</div><div class="formula">${MATH.lower_st}</div><div class="formula">${MATH.time}</div>
       <p><b>The window is a hard constraint:</b> no route may reach a store after 12:00, so a long territory needs more vehicles; the 98% target is met with room to spare and its 2% slack is not used.</p>
       <p>Built by Clarke-Wright savings, improved by 2-opt; every merge is checked against all five limits.</p><div class="formula">${MATH.savings}</div><div class="formula">${MATH.twoopt}</div>
@@ -1029,20 +1079,20 @@ RENDER.how = () => {
       <p><b>One solve</b> (one DC, one day) takes about ${(M.timing.per_eval_s * M.timing.workers / M.timing.territory_days_per_eval).toFixed(2)} core-seconds and returns to the upper level: vehicles needed, kilometres, late deliveries (after 14:00), stock-outs, relay routes and the routes themselves; spot trucks follow from vehicles needed against the owned fleet.</p>
       <div class="chips"><span class="inm" title="48 roll cages per vehicle">in: load</span><span class="inm" title="25 stops per vehicle">in: stops</span><span class="inm" title="250 km per vehicle and day">in: km</span><span class="inm" title="every stop by 12:00">in: noon clock</span><span class="inm" title="back by 13:00 including a 30-minute break">in: shift and break</span><span class="inm" title="a second driver where no one-driver route reaches">in: relay routes</span><span class="outm" title="one trip per vehicle and day">out: multiple trips</span><span class="outm" title="one average speed; the speed reversal rows cover it">out: time-of-day traffic</span><span class="outm" title="all vehicles leave at 04:00; the departure-wave check covers it">out: dock congestion</span><span class="outm" title="empty cages ride back on the same vehicle">out: returns</span></div><p class="note">Left out because the brief does not detail them; listed for the business to confirm (proposal: scope).</p>`,
       right: `<svg class="chart" viewBox="0 0 440 270" id="fig-savings"></svg><svg class="chart" viewBox="0 0 440 80" id="fig-census"></svg>` },
-    { q: "Q4 · How does a day's routing price a network?", lec: "Lectures 1-2 · bilevel evaluation, sample average", title: "The connection: E(x)",
+    { q: "Q4 · How does a day's routing price a network?", lec: "Lectures 1-2 · bilevel evaluation, sample average", title: "The connection: E(x)", use: `Use <b>a transportation linear programme</b> to assign stores to the open DCs, because for fixed sites the assignment is linear and is solved exactly; use <b>the newsvendor critical fractile</b> to size each DC's owned fleet, because owning against hiring is a newsvendor trade-off; and average the routed cost over <b>sampled demand days</b> (a sample average over the posterior predictive) with common random numbers, so every network is compared on the same days.`,
       left: `<div class="formula">${MATH.E}</div><div class="formula">${MATH.lp}</div><div class="formula">${MATH.newsvendor}</div>
       <div class="keypoint"><b>Evaluate a layout through its best operation.</b> Every candidate and today's network are routed on the same sampled days (common random numbers), so differences are paired.</div>
       <div class="flow"><div><b>Down ↓</b>the site set; territories from the LP; the fleet rule (${P.fleet_q.toFixed(3)} quantile)</div><div><b>Up ↑</b>per DC and day: vehicles, km, late and missed deliveries, relay routes; then spot trucks and E</div><div class="hot"><b>Cost</b>k DCs × ${M.days[0]} days: ${r.k * M.days[0]} routing solves for one evaluation at k = ${r.k}</div></div>
       <p><b>The assignment is re-solved inside E, not proposed by the search.</b> For a fixed set of sites, assigning stores within ${M.bounds[0]}-${f0(M.bounds[1])} per DC is a transportation LP: linear, so solved exactly in one call (here it comes out integral). A candidate is therefore a site set only, and every network is judged with its best territories rather than with an assignment a proposer guessed. Demand enters as ${M.days[0]} sampled days because cost is not linear in demand (Q2).</p>`,
       right: `<div class="flow"><div><b>sites y</b>candidate</div><div><b>LP</b>territories</div><div><b>${M.days[0]} days ξ</b>posterior predictive</div><div class="hot"><b>routing</b>per DC-day</div><div><b>0.671 quantile</b>owned fleet</div><div><b>E(x)</b>KRW/month</div></div><svg class="chart" viewBox="0 0 440 200" id="fig-news"></svg>` },
-    { q: "Q5 · Which networks are worth an expensive evaluation?", lec: "Lectures 4-5 · Bayesian optimisation, surrogate discrepancy", title: "The upper level: a budget of 40",
-      left: `<div class="formula">${MATH.upper}</div><div class="formula">${MATH.ko}</div><div class="formula">${MATH.ei}</div><div class="formula">${MATH.ml}</div>
+    { q: "Q5 · Which networks are worth an expensive evaluation?", lec: "Lectures 4-5 · Bayesian optimisation, surrogate discrepancy", title: "The upper level: a budget of 40", use: `Use <b>Bayesian optimisation</b> (Lecture 4): a <b>Gaussian process</b> on the discrepancy E − G<sub>2</sub> (Kennedy and O'Hagan) with the <b>expected-improvement</b> acquisition, to choose which 40 of the pool's candidates get a full evaluation, because each evaluation is expensive, the site choice is combinatorial, and raw DC coordinates cannot be learned from 40 points; seven summary features φ(x) make the GP learnable.`,
+      left: `<div class="formula">${MATH.upper}</div><div class="formula">${MATH.ko}</div><div class="formula">${MATH.gppost}</div><div class="formula">${MATH.ei}</div><div class="formula">${MATH.ml}</div>
       <div class="flow"><div><b>Seed</b>the G2 optimum of every k</div><div><b>Learn</b>GP on the gap E − G2</div><div><b>Optimise</b>EI over the pool</div><div class="hot"><b>Observe</b>one full evaluation</div></div>
       <div class="keypoint"><b>Raw coordinates cannot be learned from 40 evaluations;</b> the GP works on ${R.feature_names.length} summary features: ${R.feature_names.join(", ")}.</div>
       <p><b>What is linear, what is combinatorial.</b> With the sites fixed, the territories are an LP and are solved exactly inside every evaluation; what remains is the choice of sites, ${nChoose(R.sites.length, r.k).toExponential(1).replace("e+", " × 10^")} possible sets for k = ${r.k} alone, combinatorial and priced only by routing. So the upper level is searched under a budget, and only it.</p>
       <p><b>Budget B = ${M.budget}:</b> ${R.log_bo.filter(x => x.rule.includes("seed")).length} seeds (the G2 optimum of every k from ${M.k_range[0]} to ${M.k_range[1]}) and ${R.log_bo.filter(x => !x.rule.includes("seed")).length} chosen by EI. Forty is the brief's default; at hours per evaluation with the real routing system it is about a week of computing. The reported search is one fresh run from seed ${M.seed}; random selection spends the same ${M.budget} on the same pool.</p>`,
       right: `<svg class="chart" viewBox="0 0 440 260" id="fig-search"></svg><div class="row"><input type="range" id="step" min="1" value="1" style="flex:1"><span class="note" id="step-label"></span></div><div class="mapbox" id="searchmap" style="height:300px;margin-top:8px"></div><details class="log"><summary>Evaluation log: every full evaluation of the reported search</summary><div class="seg" id="log-seg" style="margin:8px 0"><button data-n="bo" class="on">GP + EI</button><button data-n="rand">random selection</button></div><div class="scroll"><table id="logtab"></table></div></details>` },
-    { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E",
+    { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E", use: `Use <b>Lecture 5's proxy diagnosis</b>: treat the cheap criterion G as a proxy for the full evaluation E and measure <b>prediction quality</b> (Spearman rank correlation) separately from <b>decision quality</b> (what G's own pick loses under E), because a proxy that ranks well on average can still be exploited by the search. Remedy: put <b>system knowledge</b> into G (the noon clock), giving G<sub>2</sub>, and judge every candidate by E.`,
       left: `<div class="formula">${MATH.bound}</div>
       <p><b>G1</b> (fixed cost, vehicles by load, continuous-approximation km) ignores the clock. Prediction quality: Spearman ${R.r3_g1.spearman.toFixed(2)}; decision quality: among the evaluated candidates it picks k = ${R.r3_g1.g_pick_k} and loses ${fM(R.r3_g1.loss)} M a month; searched over the whole pool it picks ${R.finals.proxy_only.k} DCs and loses ${fM(R.finals.proxy_only.total - R.finals.recommended.total)} M on the final days.</p>
       <div class="formula">${MATH.g2 || ""}</div>
@@ -1051,7 +1101,7 @@ RENDER.how = () => {
       right: `<div class="seg" id="g-seg"><button data-n="G2" class="on">G2 (with the clock)</button><button data-n="G1">G1 (load only)</button></div><svg class="chart" viewBox="0 0 440 300" id="fig-scatter"></svg><svg class="chart" viewBox="0 0 440 90" id="fig-bound"></svg>` },
   ];
   L.push(balanceLec());
-  $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.left}</div><div>${x.right}</div></div>`).join("");
+  $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.use ? `<div class="use">${x.use}</div>` : ""}${x.left}</div><div>${x.right}</div></div>`).join("");
   figHierarchy(); figGamma(); figPPC(); figSavings(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
   document.querySelectorAll("#log-seg button").forEach(b => b.onclick = () => { document.querySelectorAll("#log-seg button").forEach(z => z.classList.toggle("on", z === b)); logTable(b.dataset.n); });
 };
@@ -1085,7 +1135,7 @@ function balanceLec() {
     ["Search and budget", `Pool + GP on E − G2 + EI, B = ${M.budget}`, `${M.budget} evaluations`, "Misses the pool's best", `The whole pool of ${R.pool.length} evaluated once: the search found its best at evaluation ${at}`, "checked", "g"],
   ];
   const tab = `<div class="tw"><table class="bal"><tr><th>Modelling choice</th><th>What we model</th><th>Cost to compute</th><th>What it could get wrong</th><th>How we checked it</th><th>Decision</th></tr>${rows.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><span class="dchip ${r[6]}">${r[5]}</span></td></tr>`).join("")}</table></div>`;
-  return { wide: true, q: "Q7 · What did we simplify, and does it matter?", lec: "Brief §3.4 · fidelity against computation", title: "The balance, row by row",
+  return { wide: true, q: "Q7 · What did we simplify, and does it matter?", lec: "Brief §3.4 · fidelity against computation", title: "The balance, row by row", use: "Use <b>one row per modelling choice</b> with what the real operation does, what we model, its computing cost, what it could get wrong and the check that shows whether it changes the decision, because a simplification that could reverse the answer and was not checked is the main risk of the whole method.",
     left: `${tab}<div class="grid g2e" style="margin-top:10px"><div class="keypoint"><b>Where the computing went.</b> Into road distances and full routing at full store density, because the trade-off in k comes from the clock: a route that leaves at 04:00 must reach its last stop by noon, and that only shows with real stop density and real road distances. The upper level gets the cheapest adequate tool, a pool and a surrogate.</div><div class="keypoint"><b>First simplification to remove:</b> time-of-day speeds. Departures before 07:00 miss the morning peak, but the returns to capital-region DCs do not; the speed rows of the reversal table bound the effect.</div></div>`, right: "" };
 }
 function axesXY(svg, box, xr, yr, fx, fy, nx = 5, ny = 4) {
@@ -1422,7 +1472,7 @@ RENDER.ext = () => {
   if (!X_) { $("#ext-none").hidden = false; return; }
   const Q = X_.sequence, n = Q.months, mo = iso => { const [y, m] = iso.split("-").map(Number); return (y - 2027) * 12 + m; };
   $("#seq-sub").textContent = `${Q.leases.length} leases end between ${Q.leases[0].date.slice(0, 7)} and ${Q.leases[Q.leases.length - 1].date.slice(0, 7)}; each month is priced by E on the ${M.days[0]} search days, territories redrawn by the LP for every network in between`;
-  $("#seq-formula").innerHTML = MATH.seq || "";
+  $("#seq-formula").innerHTML = MATH.seq || ""; if ($("#gen-formula")) $("#gen-formula").innerHTML = MATH.gen || "";
   const draw = () => {
     const s = $("#seq-time"); s.innerHTML = ""; const path = Q[SEQMODE], other = Q[SEQMODE === "committed" ? "myopic" : "committed"];
     const lines = [["today, leases renewed", Array(n).fill(Q.base_total), "#d23f3f", "6 5"], ["territories redrawn, no lease change", Array(n).fill(Q.redrawn_total), "#c9a6d1", "3 3"],
