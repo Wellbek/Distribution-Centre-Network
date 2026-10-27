@@ -63,6 +63,11 @@ for net in ("baseline_weekday", "recommended_weekday"):
                 bad += not ok
     check(f"{net.split('_')[0]}: every store served once", (seen == 1).all(), f"{(seen == 1).sum()}/{ctx['n']} stores")
     check(f"{net.split('_')[0]}: route limits", bad == 0 and kmerr < 0.2, f"{bad} unflagged violations, {viol} beyond even the relay limits, max km mismatch {kmerr:.3f}")
+    # Vehicles against the lower bound max(load / 48, stores / 25) of every territory
+    used = sum(len(blk["routes"]) for blk in REG["show"][net]["routes"])
+    lb = sum(max(np.ceil(show_day["q"][np.concatenate([r["stores"] for r in blk["routes"]])].sum() / p.cap - 1e-9),
+                 np.ceil(sum(len(r["stores"]) for r in blk["routes"]) / p.max_stops)) for blk in REG["show"][net]["routes"])
+    check(f"{net.split('_')[0]}: vehicles against the load and stop bound", used >= lb, f"{used} vehicles, bound {lb:.0f} (+{100 * (used / lb - 1):.1f}%)")
 
 # Cost identities
 for name, f in REG["finals"].items():
@@ -181,9 +186,26 @@ html = (ROOT.parent / "demo.html").read_text()
 emb = json.loads(re.search(r'<script id="data" type="application/json">(.*?)</script>', html, re.S).group(1))
 check("demo embeds this registry", emb["meta"]["generated"] == REG["meta"]["generated"], REG["meta"]["generated"])
 ev = [c for c in REG["pool"] if c["E"] is not None and any(r["cand"] == REG["pool"].index(c) for r in REG["log_bo"])]
-G = np.array([c["G1"] for c in ev]); E = np.array([c["E"] for c in ev])
-sp = np.corrcoef(np.argsort(np.argsort(G)), np.argsort(np.argsort(E)))[0, 1]
-check("Spearman recomputes", abs(sp - REG["r3"]["spearman"]) < 1e-9, f"{sp:.3f}")
+E = np.array([c["E"] for c in ev])
+for key, r3 in (("G2", REG["r3"]), ("G1", REG["r3_g1"])):
+    G = np.array([c[key] for c in ev])
+    sp = np.corrcoef(np.argsort(np.argsort(G, kind="stable"), kind="stable"), np.argsort(np.argsort(E, kind="stable"), kind="stable"))[0, 1]
+    check(f"Spearman {key} recomputes", abs(sp - r3["spearman"]) < 1e-9, f"{sp:.3f}")
+
+# Extensions: the sequence's months add up, and the unchanged scenario reproduces the sweep
+x = REG.get("extensions")
+if x:
+    s = x["sequence"]
+    c, m = s["committed"], s["myopic"]
+    check("closure sequence adds up", all(abs(sum(p_["monthly"]) - p_["cum"]) < 1 and len(p_["monthly"]) == s["months"] for p_ in (c, m)) and c["final_is_rec"],
+          f"{s['months']} months; committed path ends at the recommendation, {c['cum'] / 1e9:,.2f} bn KRW")
+    sw = {r["k"]: r["total"] for r in REG["sweep"]}
+    rows = x["robustness"][0]["totals"]
+    check("extensions reuse the sweep", all(abs(v - sw[int(k)]) < 1 for k, v in rows.items()), f"k = {', '.join(rows)} equal to the sweep")
+    if x.get("drift"):
+        d16 = next(d for d in x["drift"] if d["year"] == 2016)
+        check("drift sweep reproduces today's network in 2016", abs(d16["total"] - REG["baseline_search"]["total"]) < 1,
+              f"{d16['total'] / 1e6:,.1f} M = baseline {REG['baseline_search']['total'] / 1e6:,.1f} M")
 
 out = ROOT / "results" / PROFILE["name"] / "verification.json"
 out.write_text(json.dumps(dict(generated=time.strftime("%Y-%m-%dT%H:%M:%S"), registry=REG["meta"]["generated"], checks=checks), indent=1))
