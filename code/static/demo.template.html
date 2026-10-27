@@ -200,12 +200,12 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   </div>
   <div class="stitle"><span class="deco">✓</span><h2>Where the DCs go</h2><span class="rule"></span><span class="chip"><span data-alt="pair">baseline vs recommended</span></span></div>
   <div class="grid g2">
-    <div class="card"><div class="row spread"><div class="seg" id="ans-seg"><button data-n="change" class="on">What changes</button><button data-n="baseline">Current 12</button><button data-n="recommended"><span data-alt="cap">Recommended</span></button></div><button class="btn small" id="ans-morph">▶ Play the change</button><span class="note">scroll to zoom · drag to pan · hover a store</span></div>
+    <div class="card"><div class="row spread"><div class="seg" id="ans-seg"><button data-n="change" class="on">What changes</button><button data-n="baseline">Baseline 12</button><button data-n="recommended"><span data-alt="cap">Recommended</span></button></div><button class="btn small" id="ans-morph">▶ Play the change</button><span class="note">scroll to zoom · drag to pan · hover a store</span></div>
       <div class="mapbox" id="ansmap" style="margin-top:10px;height:min(86vh,800px)"></div>
       <div class="legend" id="ans-legend"></div></div>
     <div class="grid" style="align-content:start">
-      <div class="card"><h3>Where the saving comes from</h3><p class="sub">28 final days, paired; each bar is one step from today's network; click a bar to see it on the map</p><svg class="chart" id="waterfall" viewBox="0 0 460 250"></svg></div>
-      <div class="card"><h3>When would the answer change?</h3><p class="sub">Today's network and the best candidate of every k re-scored under one changed assumption (brief R5), 7 search days; saving = today minus the best candidate, M KRW per month.</p><div class="tw"><table id="reversal"></table></div></div>
+      <div class="card"><h3>Where the saving comes from</h3><p class="sub">28 final days, paired; each bar is one step from the baseline network; click a bar to see it on the map</p><svg class="chart" id="waterfall" viewBox="0 0 460 250"></svg></div>
+      <div class="card"><h3>When would the answer change?</h3><p class="sub">Baseline network and the best candidate of every k re-scored under one changed assumption (brief R5), 7 search days; saving = baseline minus the best candidate, M KRW per month.</p><div class="tw"><table id="reversal"></table></div></div>
     </div>
   </div>
   <div class="stitle" id="why"><span class="deco">?</span><h2>Why this network, and why it is the best we can find</h2><span class="rule"></span><span class="chip">every candidate judged by the same E</span></div>
@@ -229,7 +229,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="card">
       <div class="row spread">
         <div class="row"><div class="clockbig" id="clock">04:00</div><div><div class="note" id="day-label"></div><div class="note">deadline 12:00 · back by 13:00 incl. a 30 min break</div></div></div>
-        <div class="row"><div class="seg" id="day-net"><button data-n="baseline">Current 12</button><button data-n="recommended" class="on"><span data-alt="cap">Recommended</span></button></div>
+        <div class="row"><div class="seg" id="day-net"><button data-n="baseline">Baseline 12</button><button data-n="recommended" class="on"><span data-alt="cap">Recommended</span></button></div>
           <div class="seg" id="day-kind"><button data-n="weekday" class="on">Weekday</button><button data-n="peak">Peak day</button></div></div>
       </div>
       <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
@@ -272,7 +272,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   <div class="card" style="margin-top:16px"><h3>What we assumed, for the business to confirm</h3><p class="sub">Everywhere else the brief's own figures are used; the same register is in the proposal and the problem definition</p><div class="tw"><table id="register"></table></div></div>
   <div class="stitle"><span class="deco">◎</span><h2>Where the numbers come from</h2><span class="rule"></span><span class="chip">fictional chain · public geography</span></div>
   <div class="grid g2">
-    <div class="card"><div class="row spread"><h3 id="data-map-h"></h3><div class="seg" id="data-seg"><button data-n="type" class="on">Store type</button><button data-n="dc">Today's DC</button></div></div>
+    <div class="card"><div class="row spread"><h3 id="data-map-h"></h3><div class="seg" id="data-seg"><button data-n="type" class="on">Store type</button><button data-n="dc">Baseline DC</button></div></div>
       <p class="sub" id="data-map-sub"></p><svg class="chart" id="datamap" viewBox="0 0 460 560"></svg><div class="legend" id="data-legend"></div></div>
     <div class="grid" style="align-content:start">
       <div class="card"><h3>Public inputs</h3><p class="sub">Only geography is real; the chain, its demand and its costs are generated</p><div class="tw" id="data-public"></div></div>
@@ -284,13 +284,13 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="card"><div class="grid g4" id="data-kpis"></div><p class="note" id="data-kpi-note" style="margin-top:12px"></p></div>
     <div class="card"><h3>Chain demand over the history year</h3><p class="sub">Roll cages ordered per day by all stores; weekends, the summer peak and holidays move the whole chain</p><svg class="chart" id="data-chain" viewBox="0 0 460 190"></svg></div>
   </div>
-  <div class="stitle"><span class="deco">12</span><h2>How today's network is built</h2><span class="rule"></span><span class="chip">the baseline · exempt from the bounds (brief §2.3)</span></div>
+  <div class="stitle"><span class="deco">12</span><h2>How the baseline network is built</h2><span class="rule"></span><span class="chip">the baseline · exempt from the bounds (brief §2.3)</span></div>
   <div class="grid g2">
     <div class="card"><div class="flow" id="data-flow"></div><div id="data-base-text"></div></div>
-    <div class="card"><h3>Stores per DC today</h3><p class="sub">Bars outside the band break a bound that every redesign must meet</p><svg class="chart" id="data-loads" viewBox="0 0 460 340"></svg><div class="legend" id="data-loads-legend"></div></div>
+    <div class="card"><h3>Stores per DC, baseline</h3><p class="sub">Bars outside the band break a bound that every redesign must meet</p><svg class="chart" id="data-loads" viewBox="0 0 460 340"></svg><div class="legend" id="data-loads-legend"></div></div>
   </div>
   <div class="grid g2" id="grow-wrap" style="margin-top:16px">
-    <div class="card"><div class="row spread"><h3>How today's network grew</h3><div class="row"><button class="btn small" id="grow-play">▶ Play 1990-2026</button><span class="clockbig" id="grow-year" style="font-size:30px">1990</span></div></div>
+    <div class="card"><div class="row spread"><h3>How the baseline network grew</h3><div class="row"><button class="btn small" id="grow-play">▶ Play 1990-2026</button><span class="clockbig" id="grow-year" style="font-size:30px">1990</span></div></div>
       <p class="sub">Each dot is a store open in that year; the 12 DCs were placed in 2016 for the stores of 2016; lime stores opened later and joined the nearest DC with room</p>
       <div class="mapbox small" id="growmap"></div><input type="range" id="grow-slider" min="1990" max="2026" step="1" value="1990" aria-label="year"></div>
     <div class="card"><div class="grid g2e" id="grow-kpis"></div><p class="note" id="grow-note" style="margin-top:10px"></p></div>
@@ -307,7 +307,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="card"><h3>One store in five instead of all stores</h3><p class="sub" id="thin-sub"></p><svg class="chart" id="thinchart" viewBox="0 0 760 300"></svg><div class="legend" id="thin-legend"></div><p class="note" id="thin-note"></p></div>
     <div class="card" id="routercheck"></div>
   </div>
-  <div class="stitle"><span class="deco">▤</span><h2>Today's operation, last 12 months</h2><span class="rule"></span><span class="chip">outcome tables</span></div>
+  <div class="stitle"><span class="deco">▤</span><h2>Baseline operation, last 12 months</h2><span class="rule"></span><span class="chip">outcome tables</span></div>
   <div class="grid g2e"><div class="card" id="histops"></div><div class="card" id="histcheck"></div></div>
   <div class="stitle"><span class="deco">S</span><h2>Stores like mine</h2><span class="rule"></span><span class="chip">franchise view</span></div>
   <div class="grid g2"><div class="card"><h3>On-time share per store, 28 final days</h3><p class="sub">Each store's day-weighted share of deliveries before 12:00</p><svg class="chart" id="storehist" viewBox="0 0 760 260"></svg></div><div class="card" id="storeview"></div></div>
@@ -338,7 +338,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="card"><h3>Stop time × road speed: the best k and the regret of deciding now</h3><div class="use">Use <b>the expected value of perfect information</b> from a decision network (Lecture 3: d* maximises expected utility over the posterior) to rank what to measure first, because a measurement is worth only what it can change in the decision.</div><p class="sub" id="voi-sub"></p><div class="tw"><table class="heat" id="voi-grid"></table></div><div class="formula" id="voi-formula"></div></div>
     <div class="grid" style="align-content:start"><div class="card"><div class="grid g2e" id="voi-kpis"></div></div><div class="card" id="voi-text"></div></div>
   </div>
-  <div id="drift-wrap"><div class="stitle"><span class="deco">⟳</span><h2>How far must today's network have drifted?</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
+  <div id="drift-wrap"><div class="stitle"><span class="deco">⟳</span><h2>How far must the baseline network have drifted?</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
   <div class="grid g2"><div class="card"><h3>The saving against the year of the last redesign</h3><p class="sub" id="drift-sub"></p><svg class="chart" id="drift-chart" viewBox="0 0 780 300"></svg></div>
     <div class="card" id="drift-text"></div></div></div>
   <div id="gen-wrap"><div class="stitle"><span class="deco">G</span><h2>Candidate generation: a learned distribution over networks</h2><span class="rule"></span><span class="chip pre-chip"></span></div>
@@ -367,9 +367,9 @@ const pct = v => (100 * v).toFixed(1) + "%";
 const hhmm = t => { let h = Math.floor(t), m = Math.round((t - h) * 60); if (m === 60) { h++; m = 0; } return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0"); };
 const PAL = ["#751485", "#2e86ab", "#e07a5f", "#3d9970", "#8e7dbe", "#c9822b", "#577590", "#b5838d", "#43aa8b", "#9c6644", "#6d597a", "#277da1", "#bc4b51", "#5b8e7d", "#7a5195", "#ef8a62", "#4d908e", "#a05195", "#355070", "#b56576"];
 const SCALE = Math.round(1 / M.fraction);
-// When no design beats today's network, the searched network is the best alternative, not a recommendation
+// When no design beats the baseline network, the searched network is the best alternative, not a recommendation
 const ALT = R.saving.final_ci[0] > 0 && R.saving.held_ci[0] > 0 ? "recommended" : "best alternative", ALTC = ALT[0].toUpperCase() + ALT.slice(1);
-document.querySelectorAll("[data-alt=pair]").forEach(e => e.textContent = `today vs ${ALT}`);
+document.querySelectorAll("[data-alt=pair]").forEach(e => e.textContent = `baseline vs ${ALT}`);
 document.querySelectorAll("[data-alt=cap]").forEach(e => e.textContent = ALTC);
 const SCALED = M.fraction < 1 ? ` · reduced instance, 1 store in ${SCALE}` : "";
 
@@ -393,10 +393,10 @@ function show(id) {
 // Find an answer: business and analyst questions, each jumping to the card that answers it
 const FIND = [
   ["The decision", [["How many DCs, and where?", "answer", "hero-stats"], ["What does it save, and how sure are we?", "answer", "hero-stats", "saving uncertainty interval held-out"], ["Why is this the best network?", "answer", "why"], ["What does each DC look like: stores, vehicles, rent?", "answer", "net-card", "fleet owned trucks per dc lease"], ["What would change the answer?", "answer", "reversal"], ["How does cost change with the number of DCs?", "answer", "sweep"], ["Were Strategy, Operations, the Data Team and the Field Manager right?", "answer", "stmts"]]],
-  ["Getting there", [["How do we get there, lease by lease?", "ext", "seq-time"], ["What should we measure first?", "ext", "voi-grid"], ["Does the answer hold if demand shifts?", "ext", "rob-chart"], ["How far has today's network drifted?", "ext", "drift-wrap"], ["Could a learned generator find better networks?", "ext", "gen-table"]]],
+  ["Getting there", [["How do we get there, lease by lease?", "ext", "seq-time"], ["What should we measure first?", "ext", "voi-grid"], ["Does the answer hold if demand shifts?", "ext", "rob-chart"], ["How far has the baseline network drifted?", "ext", "drift-wrap"], ["Could a learned generator find better networks?", "ext", "gen-table"]]],
   ["Operations", [["What does a delivery day look like?", "day", "daymap"], ["Can I re-plan one DC with my own settings?", "day", "live-card"], ["Which stores change DC, and are they still on time?", "checks", "storehist"], ["What happens on a day the fleet cannot cover?", "checks", "cases"]]],
   ["The method", [["What is decided, and what judges it?", "how", "q1"], ["How is demand forecast, and why sampled days?", "how", "q2"], ["How is one DC's morning planned?", "how", "q3"], ["How is a network priced?", "how", "q4", "fleet newsvendor quantile assignment lp evaluation"], ["How were networks searched under a budget, and the log?", "how", "q5", "gp ei bayesian random selection evaluation log"], ["Can the quick estimate be trusted?", "how", "q6"], ["What was simplified, and does it matter?", "how", "q7"]]],
-  ["Data and checks", [["How was the data made, and why?", "data", "made"], ["What did we assume, for the business to confirm?", "data", "register", "assumption relay driver rent scope fresh food"], ["How was today's network built?", "data", "data-flow"], ["Is the routing accurate?", "checks", "routercheck", "pyvrp exact heuristic router"], ["Can I reproduce every number?", "checks", "about"]]],
+  ["Data and checks", [["How was the data made, and why?", "data", "made"], ["What did we assume, for the business to confirm?", "data", "register", "assumption relay driver rent scope fresh food"], ["How was the baseline network built?", "data", "data-flow"], ["Is the routing accurate?", "checks", "routercheck", "pyvrp exact heuristic router"], ["Can I reproduce every number?", "checks", "about"]]],
 ];
 const TABNAME = { answer: "The answer", day: "Delivery day", how: "How it works", data: "Data", checks: "Checks", ext: "Extensions" };
 function finderList(q) {
@@ -521,7 +521,7 @@ function ansMode(n) { ANSMODE = n; document.querySelectorAll("#ans-seg button").
 function legendAnsGlobal() {
   $("#ans-legend").innerHTML = ANSMODE === "change"
     ? `<span><i class="sq" style="background:#5c0f69"></i>kept or new DC (lime dot = new)</span><span><i class="sq" style="background:#9a9aa2"></i>closed DC</span><span><i class="sw" style="background:#751485"></i>store that changes DC (${R.stores_view.moved})</span><span><i class="sw" style="background:#cfc4d4"></i>store that stays</span>`
-    : ANSMODE === "morph" ? `<span>Today's territories give way to the recommended ones, growing out from each DC; closed DCs fade, new ones appear</span>`
+    : ANSMODE === "morph" ? `<span>Baseline territories give way to the recommended ones, growing out from each DC; closed DCs fade, new ones appear</span>`
     : `<span><i class="sq" style="background:#5c0f69"></i>open DC</span><span>stores coloured by territory; zoom in to see each shop</span>`;
 }
 function morphAns() {
@@ -542,11 +542,11 @@ RENDER.answer = () => {
   if (pays) {
     $("#hero-h1").innerHTML = `Run <em>${r.k} DCs</em>: keep ${kept.length}, close ${closed.length}, open ${opened.length}`;
     const re = sv.waterfall[0].total - sv.waterfall[1].total;
-    $("#hero-p").textContent = `Kept: ${kept.map(j => SITES[j].name).join(", ") || "none"}. New: ${opened.map(j => SITES[j].name).join(", ")}. ${fM(re)} M of the monthly saving needs no lease at all: today's territories have not been redrawn since 2016. The saving is a result of this fictional chain; for the real one it depends on how far today's network has drifted, which the real outcome tables measure. Road distances from OpenStreetMap via OSRM.`;
+    $("#hero-p").textContent = `Kept: ${kept.map(j => SITES[j].name).join(", ") || "none"}. New: ${opened.map(j => SITES[j].name).join(", ")}. ${fM(re)} M of the monthly saving needs no lease at all: the baseline territories have not been redrawn since 2016. The saving is a result of this fictional chain; for the real one it depends on how far the baseline network has drifted, which the real outcome tables measure. Road distances from OpenStreetMap via OSRM.`;
   } else {
-    const flips = R.reversals.slice(1).filter(x => x.saving > 0).map(x => `${x.assumption} is ${x.value} (saving ${fM(x.saving)} M at k = ${x.k_star})`);
-    $("#hero-h1").innerHTML = `Keep <em>today's ${b.k} DCs</em>: no redesign pays here`;
-    $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% band over demand days ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Today's network may keep small regional DCs and grow past 1,400 stores; a new design must stay within 500-1,400 per DC, and that costs more than it saves. ${flips.length ? `The answer changes only if ${flips.join("; ")}.` : "No tested assumption changes the answer."} Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
+    const flips = R.reversals.slice(1).filter(x => x.saving > 0).map(x => `${x.assumption === "today's network" ? "the baseline network" : x.assumption} is ${x.value} (saving ${fM(x.saving)} M at k = ${x.k_star})`);
+    $("#hero-h1").innerHTML = `Keep <em>the baseline ${b.k} DCs</em>: no redesign pays here`;
+    $("#hero-p").textContent = `The best alternative found (${r.k} DCs: keep ${kept.length}, close ${closed.length}, open ${opened.length}) ${sv.final_mean >= 0 ? `saves ${fM(sv.final_mean)}` : `costs ${fM(-sv.final_mean)} more`} M a month (90% band over demand days ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])}), and ${fM(sv.held_mean)} M on days the search never saw. Baseline network may keep small regional DCs and grow past 1,400 stores; a new design must stay within 500-1,400 per DC, and that costs more than it saves. ${flips.length ? `The answer changes only if ${flips.join("; ")}.` : "No tested assumption changes the answer."} Fictional stores and demand; road distances from OpenStreetMap via OSRM.`;
   }
   // The next two lease expiries: renew the first site every top-5 network keeps, defer the first the recommendation gives up
   const L_ = R.extensions ? R.extensions.sequence.leases : [], top = R.top5.map(t => new Set(R.pool[t.cand].sites));
@@ -554,10 +554,10 @@ RENDER.answer = () => {
   $("#hero-ask").innerHTML = pays ? `<b>Decision requested:</b> approve three data requests by February 2027 (12 months of real deliveries, vehicle-days and spot hires; one month of GPS traces at one DC; real rents); confirm one rule: a second driver on far routes, or a small coastal DC below 500 stores (without either no redesign pays)${keepAll ? `; renew ${keepAll.site} (lease ends ${keepAll.date.slice(0, 7)}; in all five best networks)` : ""}${drop ? `; defer the ${drop.site} renewal (${drop.date.slice(0, 7)}) until the real-data check` : ""}. No new site is leased before that check.`
     : `<b>Decision requested:</b> renew leases as they expire and redraw nothing yet; confirm the DC rents and dock counts the answer depends on, and decide whether the capital-region DCs may keep running above 1,400 stores.`;
   $("#hero-stats").innerHTML = [
-    [pays ? "Monthly cost" : "Best alternative costs", fM(r.total), "M KRW", `today ${fM(b.total)} M a month`],
+    [pays ? "Monthly cost" : "Best alternative costs", fM(r.total), "M KRW", `baseline ${fM(b.total)} M a month`],
     ["Saving per month", fM(sv.final_mean), "M KRW", `28 final days, 90% band ${fM(sv.final_ci[0])} to ${fM(sv.final_ci[1])} (demand days only)${R.routing_check ? `; ${fM(sv.final_mean - R.routing_check.saving_month_shift)} with PyVRP-quality routes and ${fM(R.reversals.find(x => x.assumption === "distance model").saving)} with the calibrated distance model (model checks: Checks and reversal table)` : ""}`],
     ["Saving, unseen days", fM(sv.held_mean), "M KRW", `${M.days[2]} held-out days, 90% band ${fM(sv.held_ci[0])} to ${fM(sv.held_ci[1])}`],
-    ["On time before noon", pct(r.service_mean), "", `worst day ${pct(r.service_min)}; today ${pct(b.service_mean)}`],
+    ["On time before noon", pct(r.service_mean), "", `worst day ${pct(r.service_min)}; baseline ${pct(b.service_mean)}`],
   ].map(([l, v, u, n]) => `<div class="hstat"><div class="l">${l}</div><div class="v"><span class="cnt" data-v="${v}">${v}</span><small>${u}</small></div><div class="l">${n}</div></div>`).join("");
   if (!window.COUNTED && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     window.COUNTED = true; const t0 = performance.now();
@@ -590,14 +590,14 @@ RENDER.answer = () => {
 };
 function storeTip(i) {
   const b = SITES[S.base_dc[i]].name, r = SITES[S.rec_dc[i]].name;
-  return `<b>${S.id[i]}</b> · ${TYPES[S.type[i]]}<br>about ${S.rate[i].toFixed(1)} cages a day<br>DC today: ${b}<br>DC ${ALT}: ${r}${b === r ? "" : " <b>(moves)</b>"}<br>on time before noon: ${pct(S.ontime_base[i])} today, ${pct(S.ontime_rec[i])} ${ALT}`;
+  return `<b>${S.id[i]}</b> · ${TYPES[S.type[i]]}<br>about ${S.rate[i].toFixed(1)} cages a day<br>DC baseline: ${b}<br>DC ${ALT}: ${r}${b === r ? "" : " <b>(moves)</b>"}<br>on time before noon: ${pct(S.ontime_base[i])} baseline, ${pct(S.ontime_rec[i])} ${ALT}`;
 }
 const NS = "http://www.w3.org/2000/svg";
 function el(t, a, p, txt) { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; }
 function niceTicks(lo, hi, n = 5) { const raw = (hi - lo) / n, mag = 10 ** Math.floor(Math.log10(raw)), step = [1, 2, 2.5, 5, 10].map(x => x * mag).find(x => x >= raw); const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v); return out; }
 function waterfall() {
   const svg = $("#waterfall"); svg.innerHTML = "";
-  const short = t => t.startsWith("today's sites") ? "today's sites, territories redrawn" : t.replace("recommended", ALT);
+  const short = t => t.startsWith("today's sites") ? "baseline sites, territories redrawn" : t === "current network" ? "baseline network" : t.replace("recommended", ALT);
   const st = R.saving.waterfall.filter(Boolean).map(s => ({ ...s, step: short(s.step) })), vals = st.map(s => s.total);
   // Axis from just below the cheapest step, so the steps are visible; the cut is marked
   const lo = Math.floor(Math.min(...vals) * 0.9 / 250e6) * 250e6, hi = Math.max(...vals) * 1.03, Y = v => 210 - (v - lo) / (hi - lo) * 190, bw = 300 / st.length;
@@ -607,7 +607,7 @@ function waterfall() {
     const y0 = prev == null ? Y(s.total) : Math.min(Y(prev), Y(s.total)), h = prev == null ? 210 - Y(s.total) : Math.abs(Y(prev) - Y(s.total));
     const col = i === 0 ? "#9a9aa2" : s.total < prev ? "#9dc92a" : "#d23f3f";
     const bar = el("rect", { x, y: y0, width: 380 / st.length - 18, height: Math.max(h, 2), rx: 5, fill: i === st.length - 1 ? "#751485" : col, class: "wfbar" }, svg);
-    bar.onclick = () => (i === 0 ? ansMode("baseline") : i === st.length - 1 ? morphAns() : ansMode("change")); el("title", {}, bar, i === 0 ? "show today's network on the map" : i === st.length - 1 ? "play the change on the map" : "show the stores that change DC");
+    bar.onclick = () => (i === 0 ? ansMode("baseline") : i === st.length - 1 ? morphAns() : ansMode("change")); el("title", {}, bar, i === 0 ? "show the baseline network on the map" : i === st.length - 1 ? "play the change on the map" : "show the stores that change DC");
     el("text", { x: x + (380 / st.length - 18) / 2, y: y0 - 6, "text-anchor": "middle", "font-size": 11.5, "font-weight": 800, fill: "#1f1f24" }, svg, i === 0 || i === st.length - 1 ? fM(s.total) : (s.total < prev ? "−" : "+") + fM(Math.abs(s.total - prev)));
     if (i === 0) el("text", { x: 58, y: 222, "text-anchor": "end", "font-size": 10, fill: "#63636b" }, svg, "axis cut");
     el("foreignObject", { x: x - 6, y: 214, width: 380 / st.length - 4, height: 36 }, svg).innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:10.5px;line-height:1.2;color:#4a4a52;text-align:center">${s.step}</div>`;
@@ -615,12 +615,12 @@ function waterfall() {
 }
 function reversal() {
   // R5 reversals plus the relay-price sweep; red when the saving changes sign, amber when only the best k moves
-  const base = R.reversals[0], rows = [...R.reversals.map(x => [x.assumption, x.value || "base case", x.k_star, x.saving]),
+  const base = R.reversals[0], rows = [...R.reversals.map(x => [x.assumption === "today's network" ? "baseline network" : x.assumption, x.value || "base case", x.k_star, x.saving]),
     ...R.reversal.filter(x => Math.abs(x.relay - P.relay_day) > 1).map(x => ["relay driver per route-day", x.relay === 0 ? "free" : `${f0(x.relay)} KRW`, x.k_star, x.baseline - x.recommended]),
     ...(R.routing_check ? [["routing method", "PyVRP routes instead of savings (day 0, measured; k not re-searched)", base.k_star, R.saving.final_mean - R.routing_check.saving_month_shift]] : [])];
   $("#reversal").innerHTML = `<tr><th>Assumption</th><th>Value</th><th>Best k</th><th>Saving</th></tr>` +
     rows.map(([a, v, k, sv], i) => `<tr class="${i === 0 ? "hl" : (sv > 0) !== (base.saving > 0) ? "flip" : k !== base.k_star ? "kmove" : ""}"><td>${a}</td><td>${v}</td><td>${k ?? "none"}</td><td>${sv == null ? "n/a" : (sv < 0 ? "−" : "") + fM(Math.abs(sv))}</td></tr>`).join("") +
-    `<tr><td colspan="4" class="note">Red: the redesign no longer pays. Amber: it pays, with a different best k. Relay routes a day: today ${R.finals.baseline.over_limit_day.toFixed(0)}, recommended ${R.finals.recommended.over_limit_day.toFixed(0)}. Sweep candidates come from the whole-pool validation, not only the 40 searched.</td></tr>`;
+    `<tr><td colspan="4" class="note">Red: the redesign no longer pays. Amber: it pays, with a different best k. Relay routes a day: baseline ${R.finals.baseline.over_limit_day.toFixed(0)}, recommended ${R.finals.recommended.over_limit_day.toFixed(0)}. Sweep candidates come from the whole-pool validation, not only the 40 searched.</td></tr>`;
 }
 function sweep() {
   const svg = $("#sweep"); svg.innerHTML = "";
@@ -640,7 +640,7 @@ function sweep() {
   const yb = Y(R.baseline_search.total);
   el("line", { x1: L, x2: Rr, y1: yb, y2: yb, stroke: "#d23f3f", "stroke-dasharray": "6 5", "stroke-width": 1.5 }, svg);
   el("rect", { x: Rr - 176, y: yb - 22, width: 172, height: 18, rx: 9, fill: "#fff" }, svg);
-  el("text", { x: Rr - 8, y: yb - 9, "text-anchor": "end", "font-size": 11.5, "font-weight": 700, fill: "#b02f2f" }, svg, "today's 12 DCs, same days");
+  el("text", { x: Rr - 8, y: yb - 9, "text-anchor": "end", "font-size": 11.5, "font-weight": 700, fill: "#b02f2f" }, svg, "baseline 12 DCs, same days");
   el("text", { x: (L + Rr) / 2, y: 395, "text-anchor": "middle", "font-size": 12, fill: "#63636b" }, svg, "number of DCs, k  ·  million KRW per month");
   $("#sweep-legend").innerHTML = comps.map(([, n, c]) => `<span><i class="sq" style="background:${c}"></i>${n}</span>`).join("") + `<span class="note">faded = some day below 98% on time</span>`;
 }
@@ -714,7 +714,7 @@ RENDER.day = () => {
     DM.hover = (x, y) => {
       const k = truckAt(x, y); if (k >= 0) { const r = DAY.routes[k]; return `<b>Truck ${k + 1}</b> from ${SITES[r.dc].name}<br>${r.stores.length} stores, ${r.load.toFixed(0)} cages, ${r.km.toFixed(0)} km<br>back at ${hhmm(r.ret)} · limit: ${r.binding}<br><span class="note">click to follow</span>`; }
       const i = nearestStore(DM, x, y, i => !isNaN(DAY.arrOf[i])); if (i < 0) return null;
-      const a = DAY.arrOf[i]; return storeTip(i) + `<br><b>today:</b> ${a > P.deadline ? "arrives" : "arrived"} ${hhmm(a)} by truck ${DAY.routeOf[i] + 1}`;
+      const a = DAY.arrOf[i]; return storeTip(i) + `<br><b>baseline:</b> ${a > P.deadline ? "arrives" : "arrived"} ${hhmm(a)} by truck ${DAY.routeOf[i] + 1}`;
     };
     DM.onClick = (x, y) => { const k = truckAt(x, y); if (k >= 0) followTruck(k); };
     DM.onUser = () => { if (FOLLOW >= 0 && !playing) {} };
@@ -744,7 +744,7 @@ function clockChart() {
   el("line", { id: "clock-now", x1: X(T), x2: X(T), y1: 8, y2: 140, stroke: "#751485", "stroke-width": 2 }, svg);
   svg._X = X;
 }
-function resetDay() { $("#geom-note").textContent = SHAPES ? "Trucks follow the roads from OSRM; a live solve draws straight lines" : "Straight lines between stops; costs use road km"; DAY = buildDay(); clockChart(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "today's 12 DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
+function resetDay() { $("#geom-note").textContent = SHAPES ? "Trucks follow the roads from OSRM; a live solve draws straight lines" : "Straight lines between stops; costs use road km"; DAY = buildDay(); clockChart(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "the 12 baseline DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
 function truckAt(x, y) {
   let best = -1, bd = 400;
   DAY.routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
@@ -941,7 +941,7 @@ async function solveLive() {
 // ---------- 3 · How it works (lecture-aligned) ----------
 // Why this answer: every evaluated network, the tests passed, the network DC by DC
 let HILITE = -1;
-const ORIG = [["G2-best", "clock-aware G2 seed", "#751485"], ["G1-best", "load-only G1 seed", "#8e7dbe"], ["G0", "centre of gravity (Data Team)", "#e8950f"], ["today", "today's sites adjusted", "#2e86ab"], ["swap", "local moves of these", "#cfc4d4"], ["gen", "learned generator (Lecture 6)", "#9dc92a"]];
+const ORIG = [["G2-best", "clock-aware G2 seed", "#751485"], ["G1-best", "load-only G1 seed", "#8e7dbe"], ["G0", "centre of gravity (Data Team)", "#e8950f"], ["today", "baseline sites adjusted", "#2e86ab"], ["swap", "local moves of these", "#cfc4d4"], ["gen", "learned generator (Lecture 6)", "#9dc92a"]];
 const origKey = o => o.startsWith("swap") ? "swap" : o.startsWith("G0") ? "G0" : o.includes("current") || o.includes("today") ? "today" : o;
 function nChoose(n, k) { let c = 1; for (let i = 1; i <= k; i++) c = c * (n - k + i) / i; return c; }
 function whyStrip() {
@@ -954,7 +954,7 @@ function whyStrip() {
   for (const v of niceTicks(best * 0.97, cap, 6)) { if (v < best * 0.97) continue; el("line", { x1: X(v), x2: X(v), y1: box[1], y2: box[3], stroke: "#f0edf2" }, svg); el("text", { x: X(v), y: box[3] + 16, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, svg, f0(v / 1e6)); }
   for (const k of ks) el("text", { x: box[0] - 10, y: Y(k) + 4, "text-anchor": "end", "font-size": 11, fill: k === R.finals.recommended.k ? "#5c0f69" : "#63636b", "font-weight": k === R.finals.recommended.k ? 800 : 400 }, svg, `k = ${k}`);
   el("line", { x1: X(today), x2: X(today), y1: box[1] - 6, y2: box[3], stroke: "#d23f3f", "stroke-dasharray": "5 4", "stroke-width": 1.5 }, svg);
-  el("text", { x: X(today) - 6, y: box[1] + 4, "text-anchor": "end", "font-size": 11, fill: "#d23f3f", "font-weight": 700 }, svg, `today's network ${f0(today / 1e6)}`);
+  el("text", { x: X(today) - 6, y: box[1] + 4, "text-anchor": "end", "font-size": 11, fill: "#d23f3f", "font-weight": 700 }, svg, `the baseline network ${f0(today / 1e6)}`);
   const col = Object.fromEntries(ORIG.map(o => [o[0], o[2]])), lab = Object.fromEntries(ORIG.map(o => [o[0], o[1]]));
   pts.sort((a, b) => (a.o === "swap" ? 0 : 1) - (b.o === "swap" ? 0 : 1));
   for (const k of ks) { const n = pts.filter(p => p.k === k && p.E > cap).length; if (n) el("text", { x: box[2] + 4, y: Y(k) + 4, "font-size": 10.5, fill: "#9a9aa2" }, svg, `+${n}`); }
@@ -968,7 +968,7 @@ function whyStrip() {
   el("text", { x: xr + 16, y: yr - 12, "font-size": 12, "font-weight": 800, fill: "#5c0f69" }, svg, `recommended ${fM(r0.E)}`);
   el("text", { x: (box[0] + box[2]) / 2, y: box[3] + 34, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, svg, `E on the ${M.days[0]} search days, M KRW per month (+n: networks above ${f0(cap / 1e6)})`);
   const sorted = [...new Set(pts.map(p => p.E))].sort((a, b) => a - b), off = pts.filter(p => p.E > cap).length;
-  $("#why-sub").textContent = `${pts.length} networks for k = ${ks[0]} to ${ks[ks.length - 1]}, from four generators, their local moves and a learned generator, each priced by the full evaluation E on the same ${M.days[0]} demand days as today's network. None lies left of the recommendation; the runner-up costs ${fM(sorted[1] - sorted[0])} M a month more. ${off} more cost over ${f0(cap / 1e6)} M and are counted at the right edge.`;
+  $("#why-sub").textContent = `${pts.length} networks for k = ${ks[0]} to ${ks[ks.length - 1]}, from four generators, their local moves and a learned generator, each priced by the full evaluation E on the same ${M.days[0]} demand days as the baseline network. None lies left of the recommendation; the runner-up costs ${fM(sorted[1] - sorted[0])} M a month more. ${off} more cost over ${f0(cap / 1e6)} M and are counted at the right edge.`;
   $("#why-legend").innerHTML = ORIG.map(([k, l, c]) => `<span><i class="sw" style="background:${k === "gen" ? "#fff" : c};${k === "gen" ? "border:2px solid #4f6b0c" : ""}"></i>${l}</span>`).join("") + `<span>hover a dot for its k and cost</span>`;
 }
 function ladder() {
@@ -983,7 +983,7 @@ function ladder() {
     ["Survives a stronger router", rc ? `With PyVRP's routes on every territory the saving is about ${fM(R.saving.final_mean - rc.saving_month_shift)} M a month; the best k moves at most within the 10-11 near-tie.` : "Router check not run.", "checks"],
     ["Survives changed assumptions", `${keep} of ${rev.length} changed assumptions keep the redesign paying; the ${flip.length} that reverse it (${flip.map(x => x.value || x.assumption).join("; ")}) are business facts to confirm, not model choices.`, "answer"],
     ["The router is exact where it can be checked", ex ? `Against an exact set-partitioning solver on small territories: ${ex.detail}.` : "Run python verify.py.", "checks"],
-    ["Cheaper than every proposal made at the meeting", `On the same ${M.days[1]} final days: today's network costs ${fM(F.baseline.total - F.recommended.total)} M a month more, Strategy's eight DCs ${fM(F.best_k8.total - F.recommended.total)} M more and the quick estimate's pick ${fM(F.proxy_only.total - F.recommended.total)} M more; the Data Team's centre of gravity, at its best k, ${fM(g0.E - R.pool_best)} M more on the search days.`, "answer"],
+    ["Cheaper than every proposal made at the meeting", `On the same ${M.days[1]} final days: the baseline network costs ${fM(F.baseline.total - F.recommended.total)} M a month more, Strategy's eight DCs ${fM(F.best_k8.total - F.recommended.total)} M more and the quick estimate's pick ${fM(F.proxy_only.total - F.recommended.total)} M more; the Data Team's centre of gravity, at its best k, ${fM(g0.E - R.pool_best)} M more on the search days.`, "answer"],
   ];
   $("#ladder").innerHTML = T.map(([t, d, tab], i) => `<div class="rung"><span class="tick">✓</span><div><b>${i + 1} · ${t}</b><div class="note">${d}</div></div><button class="btn ghost small" onclick="show('${tab}')">see</button></div>`).join("") +
     `<div class="keypoint"><b>What "best" means here.</b> The best of ${n} networks, each fully evaluated, out of ${nChoose(R.sites.length, k).toExponential(1).replace("e+", " × 10^")} possible sets of ${k} sites: a search, not a proof. A better network would need site sets that neither the four generators, their local moves nor a learned generator reached; the learned generator, sampling exactly such sets, found none.</div>`;
@@ -1006,7 +1006,7 @@ RENDER.how = () => {
       left: `<p>The network is chosen once; territories and fleet for months; routes every evening after the orders arrive. The upper decisions change the lower problem's feasible region and parameters; the lower level <b>evaluates</b> the upper one.</p>
       <div class="flow"><div class="hot"><b>D1 network</b>how many DCs, where</div><div><b>D2 territories</b>store → DC</div><div><b>D3 fleet</b>owned vehicles</div><div><b>D4 routing</b>each day</div></div>
       <div class="keypoint"><b>Hierarchical, stateless, open-loop</b> within one redesign. Re-running the routing every day does not make it feedback, and receiving a cost from it is not feedback for D1.</div>
-      <div class="flow"><div><b>Takes in</b>stores (place, type, opening and closing dates), a year of daily orders, 60 candidate sites with rents and store bounds, today's 12 DCs and their leases, cost parameters, the cached road distances</div><div class="hot"><b>The system</b>demand model → territories → routing on sampled days → fleet → E → budgeted search</div><div><b>Gives out</b>the network and each store's DC, owned vehicles per DC, monthly cost by component with its 90% band, service before noon, the log of every full evaluation (registry.json)</div></div>`,
+      <div class="flow"><div><b>Takes in</b>stores (place, type, opening and closing dates), a year of daily orders, 60 candidate sites with rents and store bounds, the 12 baseline DCs and their leases, cost parameters, the cached road distances</div><div class="hot"><b>The system</b>demand model → territories → routing on sampled days → fleet → E → budgeted search</div><div><b>Gives out</b>the network and each store's DC, owned vehicles per DC, monthly cost by component with its 90% band, service before noon, the log of every full evaluation (registry.json)</div></div>`,
       right: `<svg class="chart" viewBox="0 0 440 250" id="fig-h"></svg>` },
     { q: "Q2 · How much will each store order?", lec: "Lecture 2 · Poisson-Gamma with exposure", title: "Demand as a belief, not a number", use: `Use <b>a Poisson-Gamma conjugate model with exposure</b> (Lecture 2) to estimate each store's order rate λ<sub>s</sub>, because counts with a calendar effect and short histories need a prior that new stores can borrow from, and the update is closed-form. Use its <b>posterior predictive, a negative binomial</b>, to sample planning days, because fleet and spot hire are not linear in demand, so one average day would understate the cost.`,
       left: `<div class="formula">${MATH.lik}</div><div class="formula">${MATH.post}</div><div class="formula">${MATH.pred}</div>
@@ -1024,7 +1024,7 @@ RENDER.how = () => {
       right: `<svg class="chart" viewBox="0 0 440 270" id="fig-savings"></svg><svg class="chart" viewBox="0 0 440 80" id="fig-census"></svg>` },
     { q: "Q4 · How does a day's routing price a network?", lec: "Lectures 1-2 · bilevel evaluation, sample average", title: "The connection: E(x)", use: `Use <b>a transportation linear programme</b> to assign stores to the open DCs, because for fixed sites the assignment is linear and is solved exactly; use <b>the newsvendor critical fractile</b> to size each DC's owned fleet, because owning against hiring is a newsvendor trade-off; and average the routed cost over <b>sampled demand days</b> (a sample average over the posterior predictive) with common random numbers, so every network is compared on the same days.`,
       left: `<div class="formula">${MATH.E}</div><div class="formula">${MATH.lp}</div><div class="formula">${MATH.newsvendor}</div>
-      <div class="keypoint"><b>Evaluate a layout through its best operation.</b> Every candidate and today's network are routed on the same sampled days (common random numbers), so differences are paired.</div>
+      <div class="keypoint"><b>Evaluate a layout through its best operation.</b> Every candidate and the baseline network are routed on the same sampled days (common random numbers), so differences are paired.</div>
       <div class="flow"><div><b>Down ↓</b>the site set; territories from the LP; the fleet rule (${P.fleet_q.toFixed(3)} quantile)</div><div><b>Up ↑</b>per DC and day: vehicles, km, late and missed deliveries, relay routes; then spot trucks and E</div><div class="hot"><b>Cost</b>k DCs × ${M.days[0]} days: ${r.k * M.days[0]} routing solves for one evaluation at k = ${r.k}</div></div>
       <p><b>The assignment is re-solved inside E, not proposed by the search.</b> For a fixed set of sites, assigning stores within ${M.bounds[0]}-${f0(M.bounds[1])} per DC is a transportation LP: linear, so solved exactly in one call (here it comes out integral). A candidate is therefore a site set only, and every network is judged with its best territories rather than with an assignment a proposer guessed. Demand enters as ${M.days[0]} sampled days because cost is not linear in demand (Q2).</p>`,
       right: `<div class="flow"><div><b>sites y</b>candidate</div><div><b>LP</b>territories</div><div><b>${M.days[0]} days ξ</b>posterior predictive</div><div class="hot"><b>routing</b>per DC-day</div><div><b>0.671 quantile</b>owned fleet</div><div><b>E(x)</b>KRW/month</div></div><svg class="chart" viewBox="0 0 440 200" id="fig-news"></svg>` },
@@ -1064,16 +1064,16 @@ function balanceLec() {
   const W = R.waves, T = R.thinning, rc = R.routing_check, dr = R.extensions ? R.extensions.drift : [], at = R.curve_bo.findIndex(v => v <= R.pool_best + 1) + 1;
   const coreS = (M.timing.per_eval_s * M.timing.workers / M.timing.territory_days_per_eval).toFixed(2);
   const rows = [
-    ["Today's network", "The 2016 planner's design with ten years of growth", "free", "If the real network is closer to optimal, the saving shrinks", `Placed at the optimum for today's stores it wins by ${fM(-tn.saving)} M a month; for any year of the last redesign from ${dr.length ? dr[0].year : ""} to ${dr.length ? dr[dr.length - 1].year : ""} the redesign saves ${dr.length ? `${fM(Math.min(...dr.map(d => d.saving)))}-${fM(Math.max(...dr.map(d => d.saving)))}` : ""} M`, "reverses: real tables decide", "r"],
+    ["Baseline network", "The 2016 planner's design with ten years of growth", "free", "If the real network is closer to optimal, the saving shrinks", `Placed at the optimum for today's stores it wins by ${fM(-tn.saving)} M a month; for any year of the last redesign from ${dr.length ? dr[0].year : ""} to ${dr.length ? dr[dr.length - 1].year : ""} the redesign saves ${dr.length ? `${fM(Math.min(...dr.map(d => d.saving)))}-${fM(Math.max(...dr.map(d => d.saving)))}` : ""} M`, "reverses: real tables decide", "r"],
     ["Distance model", "OSRM road km for store-site pairs and 50 nearest stores, a calibrated model beyond; km / 35 km/h + 15 min a stop", "one-off cache, 5 MB", "Peak-hour slowdowns; model error on short pairs", `Calibrated model only: k* = ${dm.k_star}, saving ${fM(dm.saving)} M; 30 km/h: k* = ${sp.k_star}, saving ${fM(sp.saving)} M`, "k moves by one, sign holds", "a"],
     ["Instance size", "All stores, not thinned", `full run on ${M.timing.workers} workers; reduced run 7 min on 2`, "Nothing from thinning", `The 1-in-5 instance picks k = ${T.k_star_reduced} against ${T.k_star_full}; km per store ×${T.km_ratio_baseline.toFixed(2)} against the ×${T.km_ratio_pred.toFixed(2)} predicted`, "full instance reported", "g"],
     ["Demand and days", `Poisson-Gamma with calendar exposure and a chain shock; ${M.days.join(" / ")} days`, "28 days cost 4× 7", "A quantile from 7 days is noisy", `Top five re-scored on 28 days: the search's best stays first; one average day understates E by ${fM(R.r2.sampled - R.r2.average_day)} M`, "ranking holds", "g"],
-    ["Routing method", "Savings + 2-opt + relay pass", `${coreS} core-s per territory-day`, "Weaker on small rural territories, so it over-states today more", rc ? `PyVRP on every territory: saving about ${fM(R.saving.final_mean - rc.saving_month_shift)} M; k within the 10-11 near-tie` : "", "size moves, sign holds", "a"],
+    ["Routing method", "Savings + 2-opt + relay pass", `${coreS} core-s per territory-day`, "Weaker on small rural territories, so it over-states the baseline more", rc ? `PyVRP on every territory: saving about ${fM(R.saving.final_mean - rc.saving_month_shift)} M; k within the 10-11 near-tie` : "", "size moves, sign holds", "a"],
     ["Delivery window", "Every stop by 12:00, hard", "a check on every merge", "Leaves the 2% tolerance unused", `${pct(R.finals.recommended.service_min)} before noon on the worst final day`, "conservative", "g"],
     ["Departure and docks", "Every vehicle leaves at 04:00", "none", "Flatters large DCs, so favours fewer DCs", `Departure waves with ${W.docks} docks: k* ${W.k_star_plain} → ${W.k_star_waves}; with ${W.docks_more} docks: ${W.k_star_more_docks}`, "decision unchanged", "g"],
-    ["Assignment", "Transportation LP inside E", "one LP per evaluation", "Distance-optimal is not route-optimal", `Redrawing today's own territories by the LP saves ${fM(R.saving.waterfall[0].total - R.saving.waterfall[1].total)} M`, "checked", "g"],
+    ["Assignment", "Transportation LP inside E", "one LP per evaluation", "Distance-optimal is not route-optimal", `Redrawing the baseline's own territories by the LP saves ${fM(R.saving.waterfall[0].total - R.saving.waterfall[1].total)} M`, "checked", "g"],
     ["Fleet policy", `${P.fleet_q.toFixed(3)} quantile owned, unlimited spot trucks`, "free", "Spot supply may run short on peak days", `Peak day ${R.r2.peak_date}: ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned`, "to confirm: spot supply", "a"],
-    ["Candidate set", `${R.sites.length} sites, today's 12 included`, "pool size", "The optimum may sit off the list or outside the pool", "A learned generator sampling new site sets found none better; sites off the list are open with the real-estate team", "partly checked", "a"],
+    ["Candidate set", `${R.sites.length} sites, the 12 baseline sites included`, "pool size", "The optimum may sit off the list or outside the pool", "A learned generator sampling new site sets found none better; sites off the list are open with the real-estate team", "partly checked", "a"],
     ["Number of DCs", `k = ${M.k_range[0]} to ${M.k_range[1]}, one G2 seed each`, `${M.k_range[1] - M.k_range[0] + 1} of ${M.budget} evaluations`, "Evaluations spent on hopeless k", "All of them in the sweep", "checked", "g"],
     ["Search and budget", `Pool + GP on E − G2 + EI, B = ${M.budget}`, `${M.budget} evaluations`, "Misses the pool's best", `The whole pool of ${R.pool.length} evaluated once: the search found its best at evaluation ${at}`, "checked", "g"],
   ];
@@ -1215,25 +1215,25 @@ function checkCharts() {
   const over = W.rows.find(r => r.k === W.k_star_plain), bw = W.baseline;
   $("#wave-note").innerHTML = W.k_star_waves === W.k_star_plain
     ? `<b>The decision holds:</b> k* = ${W.k_star_plain} with and without waves.`
-    : `<b>The decision moves:</b> k* = ${W.k_star_plain} with one 04:00 start, ${W.k_star_waves ?? "none"} with waves. At k = ${W.k_star_plain} the DCs at the store cap need ${over.dock_over_day.toFixed(0)} more departures a day than ${W.docks} docks allow in the last wave; the monthly cost ${over.total < over.total_plain ? "falls" : "rises"} by ${fM(Math.abs(over.total - over.total_plain))} M. Today's network overflows by ${(bw.dock_over_day || 0).toFixed(0)} a day. The dock count is an assumption (${W.docks} = store cap × today's vehicles per store ÷ ${W.waves.length} waves), so this is the first number to confirm with the DC managers.`;
+    : `<b>The decision moves:</b> k* = ${W.k_star_plain} with one 04:00 start, ${W.k_star_waves ?? "none"} with waves. At k = ${W.k_star_plain} the DCs at the store cap need ${over.dock_over_day.toFixed(0)} more departures a day than ${W.docks} docks allow in the last wave; the monthly cost ${over.total < over.total_plain ? "falls" : "rises"} by ${fM(Math.abs(over.total - over.total_plain))} M. Baseline network overflows by ${(bw.dock_over_day || 0).toFixed(0)} a day. The dock count is an assumption (${W.docks} = store cap × baseline vehicles per store ÷ ${W.waves.length} waves), so this is the first number to confirm with the DC managers.`;
   if (!T) { $("#thin-sub").textContent = "Shown when the full run follows a reduced run."; $("#thin-note").textContent = ""; $("#thinchart").innerHTML = ""; }
   else {
     kLines($("#thinchart"), T.rows, [{ key: "reduced", color: "#9dc92a", ok: () => true, dash: "6 5" }, { key: "full", color: "#751485", ok: () => true }], v => f0(v / 1e3));
     $("#thin-sub").textContent = `Cost per planning store (thousand KRW per month), best candidate of every k; reduced: ${f0(T.stores_reduced)} stores with DC cost and bounds × ${T.fraction}`;
     $("#thin-legend").innerHTML = `<span><i class="sq" style="background:#9dc92a"></i>1 in ${Math.round(1 / T.fraction)} stores</span><span><i class="sq" style="background:#751485"></i>all stores</span><span class="note">ring = cheapest k</span>`;
-    $("#thin-note").innerHTML = `${T.k_star_reduced === T.k_star_full ? `<b>The decision holds:</b> both pick k = ${T.k_star_full}.` : `<b>The reduced instance is off by ${Math.abs(T.k_star_reduced - T.k_star_full)}:</b> it picks k = ${T.k_star_reduced}, the full one k = ${T.k_star_full}.`} Thinning raises cost per store at every k; km per store rise ${T.km_ratio_baseline.toFixed(2)}× for today's network, well below the ${T.km_ratio_pred.toFixed(2)}× that the square-root argument predicts, because the trip from the DC to the first store does not shrink with density. The full instance is the one reported.`;
+    $("#thin-note").innerHTML = `${T.k_star_reduced === T.k_star_full ? `<b>The decision holds:</b> both pick k = ${T.k_star_full}.` : `<b>The reduced instance is off by ${Math.abs(T.k_star_reduced - T.k_star_full)}:</b> it picks k = ${T.k_star_reduced}, the full one k = ${T.k_star_full}.`} Thinning raises cost per store at every k; km per store rise ${T.km_ratio_baseline.toFixed(2)}× for the baseline network, well below the ${T.km_ratio_pred.toFixed(2)}× that the square-root argument predicts, because the trip from the DC to the first store does not shrink with density. The full instance is the one reported.`;
   }
   const RC = R.routing_check;
   if (RC) {
     const nm = j => SITES[j].name, row = (net, lab) => { const x = RC[net]; return `<tr><td>${lab}</td><td>${f0(x.cw_veh)}</td><td>${f0(x.hgs_veh)}</td><td>${fM(x.cw_cost)} / ${fM(x.hgs_cost)}</td><td>${pct(Math.min(...x.gaps))} to ${pct(Math.max(...x.gaps))}</td></tr>`; };
     const worst = RC.baseline.per_dc.filter(d => d.hgs_veh != null).sort((a, b) => (b.cw_veh / b.hgs_veh) - (a.cw_veh / a.hgs_veh)).slice(0, 3);
     $("#routercheck").innerHTML = `<h3>The routing heuristic against PyVRP</h3><p class="sub">Savings + 2-opt against PyVRP 0.11.3 (hybrid genetic search, 0.1-0.5 s per store) on every territory of both networks, search day 0, same distances and limits; optional check <code>checks/routing_gap.py</code>, cached in <code>results/checks/</code></p>
-      <table><tr><th>Network</th><th>Vehicles, savings</th><th>Vehicles, PyVRP</th><th>Day cost, M KRW (savings / PyVRP)</th><th>Savings above PyVRP, per territory</th></tr>${row("baseline", "Today")}${row("recommended", ALTC)}</table>
-      <p class="note">${RC.baseline.unrouted.length ? `PyVRP left stores unrouted on ${RC.baseline.unrouted.map(nm).join(", ")} (today's network) even at 0.5 s per store; there the savings cost is used.` : ""} Worst territories: ${worst.map(d => `${nm(d.dc)} ${d.cw_veh} vs ${d.hgs_veh} vehicles`).join("; ")}.</p>
-      <div class="keypoint"><b>The heuristic is weaker on today's small rural territories than on the redesign's</b>, so E over-states today's cost more: with PyVRP's routes the day's operating saving falls from ${fM(RC.saving_day_cw)} to ${fM(RC.saving_day_hgs)} M, and the monthly saving by about ${fM(RC.saving_month_shift)} M, to about ${fM(R.saving.final_mean - RC.saving_month_shift)} M. It stays positive; most of what remains is rent.</div>${RC.k_check && RC.k_check.length > 1 ? `<p class="note">Does it move k? Day cost including rent, savings / PyVRP: ${RC.k_check.map(x => `k = ${x.k}: ${fM(x.cw)} / ${fM(x.hgs)} M`).join("; ")}. With PyVRP's routes the best of these is k = ${RC.k_check.reduce((a, x) => (x.hgs < a.hgs ? x : a)).k}; nine to eleven take the same action at every lease expiry.</p>` : ""}`;
+      <table><tr><th>Network</th><th>Vehicles, savings</th><th>Vehicles, PyVRP</th><th>Day cost, M KRW (savings / PyVRP)</th><th>Savings above PyVRP, per territory</th></tr>${row("baseline", "Baseline")}${row("recommended", ALTC)}</table>
+      <p class="note">${RC.baseline.unrouted.length ? `PyVRP left stores unrouted on ${RC.baseline.unrouted.map(nm).join(", ")} (the baseline network) even at 0.5 s per store; there the savings cost is used.` : ""} Worst territories: ${worst.map(d => `${nm(d.dc)} ${d.cw_veh} vs ${d.hgs_veh} vehicles`).join("; ")}.</p>
+      <div class="keypoint"><b>The heuristic is weaker on the baseline's small rural territories than on the redesign's</b>, so E over-states the baseline's cost more: with PyVRP's routes the day's operating saving falls from ${fM(RC.saving_day_cw)} to ${fM(RC.saving_day_hgs)} M, and the monthly saving by about ${fM(RC.saving_month_shift)} M, to about ${fM(R.saving.final_mean - RC.saving_month_shift)} M. It stays positive; most of what remains is rent.</div>${RC.k_check && RC.k_check.length > 1 ? `<p class="note">Does it move k? Day cost including rent, savings / PyVRP: ${RC.k_check.map(x => `k = ${x.k}: ${fM(x.cw)} / ${fM(x.hgs)} M`).join("; ")}. With PyVRP's routes the best of these is k = ${RC.k_check.reduce((a, x) => (x.hgs < a.hgs ? x : a)).k}; nine to eleven take the same action at every lease expiry.</p>` : ""}`;
   }
   const H = R.history_ops, B = R.finals.baseline;
-  $("#histops").innerHTML = `<h3>The lower level on today's network, ${H.days} history days</h3><table>
+  $("#histops").innerHTML = `<h3>The lower level on the baseline network, ${H.days} history days</h3><table>
     <tr><td>Deliveries</td><td><b>${f0(H.deliveries)}</b> (one per open store and day)</td></tr><tr><td>Before noon</td><td>${pct(H.service)}</td></tr>
     <tr><td>Vehicles a day</td><td>${f0(H.vehicles_day)} (${f0(H.owned)} owned at the ${M.fleet_quantile.toFixed(3)} quantile)</td></tr><tr><td>Kilometres a day</td><td>${f0(H.km_day)}</td></tr><tr><td>Spot trucks</td><td>${fM(H.spot_month)} M KRW per month</td></tr></table>
     <p class="note">Files: <code>deliveries.csv.gz</code>, <code>vehicle_days.csv.gz</code>, <code>spot_hires.csv</code> in <code>code/results/${M.profile}/tables/</code>.</p>`;
@@ -1260,21 +1260,21 @@ RENDER.data = () => {
     ["What kind of store", `Office and mixed near big-city centres, roadside along the countryside, residential elsewhere: ${types.map(([t, c]) => `${t} ${f0(c)}`).join(", ")}.`, "Weekends rise at residential stores and fall at office stores (brief §2.3), so a store's type sets its weekly shape."],
     ["When each store opened", `Denser places first, along a growth curve: ${share(2000)} of today's stores open by 2000, ${share(2010)} by 2010, ${share(2016)} by 2016; 6% opened and 3% closed during the history year.`, "A chain grows from the city centres outward. This gives the short histories the brief asks for, and a network drawn in 2016 that has grown since."],
     ["How much each store orders", "A true level per store (lognormal around 2.2 cages, clipped to 0.5-6) × the weekday profile of its type × a summer peak × Korean holidays × a chain-wide AR(1) shock × store-day noise; Poisson counts for 365 days.", "The brief's demand features (§2.3, §2.6). The shared shock and holidays move every DC at once, which is why sampled days cost more than an average day."],
-    ["Where a DC could go", `${R.sites.length} sites at motorway interchanges and logistics zones, today's 12 among them; rent 180 M in the capital region, 157.5 M in metro cities, 132 M elsewhere.`, "The brief's 40-80 candidate sites, dearer near Seoul (§2.5)."],
-    ["Today's network", "The 12 sites a planner would have chosen in 2016 for the stores of 2016, with the stores opened since added to the nearest DC with room; leases expire from 2027-03 to 2029-12.", "The brief penalises a strawman baseline (§2.5, R5): this is a real planning rule, applied when the network was last redrawn (below)."],
-    ["Today's operation", `Our own lower level run on today's network over the 365 history days: ${f0(R.history_ops.deliveries)} deliveries, ${f0(R.history_ops.vehicles_day)} vehicles and ${f0(R.history_ops.km_day)} km a day.`, "The brief asks for the outcome tables to be produced by our own lower level and labelled as such (§2.5)."],
+    ["Where a DC could go", `${R.sites.length} sites at motorway interchanges and logistics zones, the 12 baseline sites among them; rent 180 M in the capital region, 157.5 M in metro cities, 132 M elsewhere.`, "The brief's 40-80 candidate sites, dearer near Seoul (§2.5)."],
+    ["Baseline network", "The 12 sites a planner would have chosen in 2016 for the stores of 2016, with the stores opened since added to the nearest DC with room; leases expire from 2027-03 to 2029-12.", "The brief penalises a strawman baseline (§2.5, R5): this is a real planning rule, applied when the network was last redrawn (below)."],
+    ["Baseline operation", `Our own lower level run on the baseline network over the 365 history days: ${f0(R.history_ops.deliveries)} deliveries, ${f0(R.history_ops.vehicles_day)} vehicles and ${f0(R.history_ops.km_day)} km a day.`, "The brief asks for the outcome tables to be produced by our own lower level and labelled as such (§2.5)."],
   ];
   $("#made-steps").innerHTML = STEPS.map(([t, how, why], i) => `<div class="step"><span class="num">${i + 1}</span><div><b>${t}</b><div>${how}</div><div class="why"><b>Why:</b> ${why}</div></div></div>`).join("");
   const H8 = R.history_ops;
   $("#tables8").innerHTML = `<tr><th>Table</th><th>One row is</th><th>Here</th><th>Used for</th><th>What it cannot tell us</th></tr>` + [
-    ["stores", "one store", `${f0(n)} open`, "locations, types, today's DC", "why a store is assigned where it is"],
-    ["demand_history", "one store's order for the next day", `365 days`, "the demand model (Q2)", "shelf demand: these are orders placed under today's network"],
-    ["dcs", "one of today's DCs", "12, leases 2027-2029", "the baseline and the lease sequence", "the real rents and terms"],
-    ["candidate_sites", "one site that could be leased", `${R.sites.length}, today's 12 included`, "the upper level's choice set", "sites the real-estate team has not listed"],
+    ["stores", "one store", `${f0(n)} open`, "locations, types, baseline DC", "why a store is assigned where it is"],
+    ["demand_history", "one store's order for the next day", `365 days`, "the demand model (Q2)", "shelf demand: these are orders placed under the baseline network"],
+    ["dcs", "one of baseline DCs", "12, leases 2027-2029", "the baseline and the lease sequence", "the real rents and terms"],
+    ["candidate_sites", "one site that could be leased", `${R.sites.length}, the 12 baseline sites included`, "the upper level's choice set", "sites the real-estate team has not listed"],
     ["cost_parameters", "one cost figure", "brief defaults + relay price", "every cost in E", "the real figures (Finance)"],
-    ["deliveries", "one store on one day", f0(H8.deliveries), "today's service level", "what any other network would cost"],
-    ["vehicle_days", "one vehicle on one day", `${f0(H8.vehicles_day)} a day`, "today's fleet and km", "router accuracy: our router produced it"],
-    ["spot_hires", "one DC on one day", `${f0(H8.spot_month / 1e6)} M KRW a month`, "today's spot cost", "the spot market's real supply"],
+    ["deliveries", "one store on one day", f0(H8.deliveries), "baseline service level", "what any other network would cost"],
+    ["vehicle_days", "one vehicle on one day", `${f0(H8.vehicles_day)} a day`, "baseline fleet and km", "router accuracy: our router produced it"],
+    ["spot_hires", "one DC on one day", `${f0(H8.spot_month / 1e6)} M KRW a month`, "baseline spot cost", "the spot market's real supply"],
   ].map(r => `<tr><td><code>${r[0]}</code></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join("");
   const rv = R.reversals, strict = rv.find(x => x.assumption === "vehicle limits"), strictMin = rv.find(x => x.assumption === "vehicle limits and minimum");
   $("#register").innerHTML = `<tr><th>Item</th><th>The brief</th><th>We use</th><th>Why</th></tr>` + [
@@ -1286,7 +1286,7 @@ RENDER.data = () => {
     ["DC rent", "150 M; dearer near Seoul", "180 / 157.5 / 132 M by region", "No regional figures given; tested at 100 and 200 M"],
     ["Spot trucks", "550,000 KRW a day", "As many as needed", "No supply limit given"],
     ["Store orders", "Not addressed", "Independent of the delivery time", "No data; a redesign serves some stores later"],
-    ["Today's network", "Placed as a grown chain would be", "A 2016 design with ten years of growth", "No real network given; if it is near-optimal the saving reverses"],
+    ["Baseline network", "Placed as a grown chain would be", "A 2016 design with ten years of growth", "No real network given; if it is near-optimal the saving reverses"],
     ["Scope", "Fresh food optional", "Fresh food, Jeju, moving costs left out", "Allowed by the brief, or not costable without data"],
   ].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
   $("#data-public").innerHTML = `<table><tr><th>Input</th><th>Source and use</th></tr>
@@ -1299,12 +1299,12 @@ RENDER.data = () => {
     <tr><td>store_type</td><td>Office and mixed near big-city centres, roadside in the countryside</td><td>${types.map(([t, c]) => `${t} ${f0(c)}`).join(", ")}</td></tr>
     <tr><td>demand level</td><td>True level lognormal around 2.2 cages a day, clipped to 0.5-6 (brief §2.6); the planner sees only the Poisson-Gamma posterior (Lecture 2)</td><td>posterior mean per unit of calendar exposure: mean ${(rates.reduce((a, x) => a + x, 0) / rates.length).toFixed(2)}, 10-90% ${q(0.1).toFixed(2)}-${q(0.9).toFixed(2)}</td></tr>
     <tr><td>demand_history</td><td>365 days: store level × weekday × summer × holidays × chain-wide AR(1) shock × store-day noise, Poisson counts</td><td>${f0(Math.min(...ch))}-${f0(Math.max(...ch))} cages a day</td></tr>
-    <tr><td>candidate_sites</td><td>60 sites near motorway interchanges and logistics zones, today's 12 included; rent 150 M × 1.20 capital / 1.05 metro / 0.88 regional</td><td>${Object.entries(tiers).sort((x, y) => y[0] - x[0]).map(([v, c]) => `${c} at ${fM(+v)} M`).join(", ")}</td></tr>
+    <tr><td>candidate_sites</td><td>60 sites near motorway interchanges and logistics zones, the 12 baseline sites included; rent 150 M × 1.20 capital / 1.05 metro / 0.88 regional</td><td>${Object.entries(tiers).sort((x, y) => y[0] - x[0]).map(([v, c]) => `${c} at ${fM(+v)} M`).join(", ")}</td></tr>
     <tr><td>cost_parameters</td><td>Teaching defaults (brief §2.6); a relay driver priced like an owned vehicle-day [assumption]</td><td>vehicle ${fM(P.vehicle_month)} M a month, fuel ${P.fuel_km} KRW/km, spot ${f0(P.spot_day)} a day</td></tr></table>`;
   const k = (l, v, u, note) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}<small>${u}</small></div><div class="n">${note}</div></div>`;
-  $("#data-kpis").innerHTML = k("Vehicles a day, today", f0(b.vehicles_day), "", `${M.days[1]} final days`) + k("Owned vehicles", f0(b.owned), "", `${M.fleet_quantile.toFixed(3)} quantile`) +
+  $("#data-kpis").innerHTML = k("Vehicles a day, baseline", f0(b.vehicles_day), "", `${M.days[1]} final days`) + k("Owned vehicles", f0(b.owned), "", `${M.fleet_quantile.toFixed(3)} quantile`) +
     k("Drivers", `≈ ${f0(b.owned)}`, "", "one per owned vehicle; spot trucks bring their own") + k("History year", f0(H.vehicles_day), "veh/day", `${f0(H.deliveries)} deliveries, ${pct(H.service)} before noon`);
-  $("#data-kpi-note").innerHTML = `The brief gives no fleet or driver numbers. The lower level decides each day how many vehicles each DC needs; each DC owns the ${M.fleet_quantile.toFixed(3)} quantile of its daily need (the newsvendor fractile of ${fM(P.vehicle_month)} M a month against ${f0(P.spot_day)} KRW a day) and hires spot trucks above it. The outcome tables <code>deliveries</code>, <code>vehicle_days</code> and <code>spot_hires</code> are this lower level run on today's network over the ${H.days} history days: ${f0(H.km_day)} km and ${fM(H.spot_month)} M KRW of spot hire a month.`;
+  $("#data-kpi-note").innerHTML = `The brief gives no fleet or driver numbers. The lower level decides each day how many vehicles each DC needs; each DC owns the ${M.fleet_quantile.toFixed(3)} quantile of its daily need (the newsvendor fractile of ${fM(P.vehicle_month)} M a month against ${f0(P.spot_day)} KRW a day) and hires spot trucks above it. The outcome tables <code>deliveries</code>, <code>vehicle_days</code> and <code>spot_hires</code> are this lower level run on the baseline network over the ${H.days} history days: ${f0(H.km_day)} km and ${fM(H.spot_month)} M KRW of spot hire a month.`;
   const cs = $("#data-chain"), xr = [0, ch.length - 1], yr = [Math.floor(Math.min(...ch) / 5000) * 5000, Math.ceil(Math.max(...ch) / 5000) * 5000];
   const A = axesXY(cs, [48, 12, 450, 165], xr, yr, v => (R.r2.hist_dates[Math.round(v)] || "").slice(0, 7), v => f0(v / 1000) + "k", 5, 4);
   el("path", { d: ch.map((v, i) => `${i ? "L" : "M"}${A.X(i).toFixed(1)} ${A.Y(v).toFixed(1)}`).join(""), fill: "none", stroke: "#751485", "stroke-width": 1.4 }, cs);
@@ -1315,7 +1315,7 @@ RENDER.data = () => {
   $("#data-base-text").innerHTML = `<p><b>Step 1</b> (<code>prep/current_network.py</code>): the last redesign, modelled as done in 2016 with the planning rule of the time: a capacitated p-median on straight-line km over the stores open in 2016, solved by greedy add and exchange search. The rule was fixed before any redesign was scored against it, but it was adopted after an earlier baseline (a p-median on today's stores and road km) had beaten every redesign; that earlier baseline stays in the reversal table, and the Extensions tab sweeps the year of the last redesign.</p>
     <p><b>Step 2</b> (<code>dcn/world.py</code>): ${late != null ? `${f0(late)} of today's ${f0(n)} stores (${pct(late / n)}) opened after 2016;` : "stores opened after 2016"} each joined the nearest DC with room, so the capital-region DCs filled up to the cap and newer stores ended up farther away. ${under.length} DCs stay below the 500 minimum that binds redesigns (${names(under)}); the brief exempts the baseline from the bounds.</p>
     <p><b>Step 3</b> (<code>dcn/evaluate.py</code>): E = ${fM(b.total)} M KRW a month on the ${M.days[1]} final days (fixed ${fM(b.fixed)}, owned vehicles ${fM(b.fleet)}, fuel ${fM(b.fuel)}, spot ${fM(b.spot)}), ${pct(b.service_mean)} before noon.</p>
-    <div class="keypoint"><b>A plausible network, not an optimum:</b> its mean road distance to the DC is close to a p-median for today's stores, yet redrawing today's own territories already saves ${fM(R.saving.waterfall[0].total - R.saving.waterfall[1].total)} M a month. The opposite case, today's network optimal for today's stores, is a reversal row in the answer tab.</div>`;
+    <div class="keypoint"><b>A plausible network, not an optimum:</b> its mean road distance to the DC is close to a p-median for today's stores, yet redrawing the baseline's own territories already saves ${fM(R.saving.waterfall[0].total - R.saving.waterfall[1].total)} M a month. The opposite case, the baseline network optimal for today's stores, is a reversal row in the answer tab.</div>`;
   growInit();
   const ls = $("#data-loads"), sorted = [...today].sort((x, y) => load(y) - load(x)), mx = Math.max(hi * 1.15, ...today.map(load));
   const bx = v => 150 + v / mx * 290;
@@ -1372,7 +1372,7 @@ function dataMap() {
   const g = el("g", {}, s);
   for (let i = 0; i < S.id.length; i++) { const [x, y] = P2(S.lon[i], S.lat[i]); el("circle", { cx: x, cy: y, r: 1.15, fill: col(i), "fill-opacity": 0.75 }, g); }
   if (DMODE === "dc") for (const j of today) { const [x, y] = P2(SITES[j].lon, SITES[j].lat); el("rect", { x: x - 5, y: y - 5, width: 10, height: 10, rx: 2, fill: "#fff", stroke: PAL[today.indexOf(j) % PAL.length], "stroke-width": 2.5 }, s); }
-  $("#data-legend").innerHTML = DMODE === "type" ? TYPES.map((t, k) => `<span><i class="sw" style="background:${TCOL[k]}"></i>${t}</span>`).join("") : `<span>colour = today's DC; squares = today's 12 sites</span>`;
+  $("#data-legend").innerHTML = DMODE === "type" ? TYPES.map((t, k) => `<span><i class="sw" style="background:${TCOL[k]}"></i>${t}</span>`).join("") : `<span>colour = baseline DC; squares = the 12 baseline sites</span>`;
 }
 RENDER.checks = () => {
   const c = R.cases, r = R.finals.recommended, sv = R.stores_view;
@@ -1390,10 +1390,10 @@ RENDER.checks = () => {
   const mx = Math.max(...hb, ...hr), { X, Y } = axesXY(svg, [52, 12, 740, 225], [0, 1], [0, mx], v => pct(v), v => f0(v), 10, 4), bw = (X(1 / bins) - X(0)) / 2.4;
   for (let i = 0; i < bins; i++) { el("rect", { x: X(i / bins) + 2, y: Y(hb[i]), width: bw, height: 225 - Y(hb[i]), fill: "#c9c3cd", rx: 2 }, svg); el("rect", { x: X(i / bins) + 3 + bw, y: Y(hr[i]), width: bw, height: 225 - Y(hr[i]), fill: "#751485", rx: 2 }, svg); }
   }
-  svg.previousElementSibling.textContent = `Stores below 100% before 12:00 over the 28 final days (grey: today, purple: ${ALT}); always on time: today ${f0(full(S.ontime_base))}, ${ALT} ${f0(full(S.ontime_rec))}. `;
+  svg.previousElementSibling.textContent = `Stores below 100% before 12:00 over the 28 final days (grey: baseline, purple: ${ALT}); always on time: baseline ${f0(full(S.ontime_base))}, ${ALT} ${f0(full(S.ontime_rec))}. `;
   $("#storeview").innerHTML = `<h3>What changes for stores</h3><table>
     <tr><td>Stores that change DC</td><td><b>${f0(sv.moved)}</b> of ${f0(S.lat.length)}</td></tr><tr><td>Farther from their DC</td><td>${f0(sv.farther)} (${f0(sv.farther30)} by more than 30 km, worst +${sv.worst_farther.toFixed(0)} km)</td></tr>
-    <tr><td>Stores below 98% before noon</td><td>today ${f0(sv.below98_base)} · ${ALT} ${f0(sv.below98_rec)}</td></tr><tr><td>Worst store</td><td>today ${pct(sv.worst_base)} · ${ALT} ${pct(sv.worst_rec)}</td></tr></table>
+    <tr><td>Stores below 98% before noon</td><td>baseline ${f0(sv.below98_base)} · ${ALT} ${f0(sv.below98_rec)}</td></tr><tr><td>Worst store</td><td>baseline ${pct(sv.worst_base)} · ${ALT} ${pct(sv.worst_rec)}</td></tr></table>
     <p class="note">Hover a store on any map for its own numbers. Deliveries on two-driver relay routes count by the clock like every other.</p>`;
   checkCharts();
   $("#verify").innerHTML = `<h3>Independent checks</h3><p class="sub">${VER ? `<code>python verify.py</code> on ${VER.generated.replace("T", " ")}` : "Run <code>python verify.py</code> to fill this table."}</p>` +
@@ -1418,7 +1418,7 @@ RENDER.ext = () => {
   $("#seq-formula").innerHTML = MATH.seq || ""; if ($("#gen-formula")) $("#gen-formula").innerHTML = MATH.gen || "";
   const draw = () => {
     const s = $("#seq-time"); s.innerHTML = ""; const path = Q[SEQMODE], other = Q[SEQMODE === "committed" ? "myopic" : "committed"];
-    const lines = [["today, leases renewed", Array(n).fill(Q.base_total), "#d23f3f", "6 5"], ["territories redrawn, no lease change", Array(n).fill(Q.redrawn_total), "#c9a6d1", "3 3"],
+    const lines = [["baseline, leases renewed", Array(n).fill(Q.base_total), "#d23f3f", "6 5"], ["territories redrawn, no lease change", Array(n).fill(Q.redrawn_total), "#c9a6d1", "3 3"],
       ["one-shot switch now", Q.one_shot, "#9dc92a", ""], [SEQMODE === "committed" ? "committed sequence" : "myopic sequence", path.monthly, "#751485", ""], ["other sequence", other.monthly, "#8d3a9c", "2 4"]];
     const all = lines.flatMap(l => l[1]), lo = Math.min(...all) * 0.985, hi = Math.max(...all) * 1.01;
     const { X, Y } = axesXY(s, [64, 160, 760, 420], [0, n], [lo, hi], v => (v % 12 === 0 ? String(2027 + v / 12) : ""), v => f0(v / 1e6), 12, 5);
@@ -1446,7 +1446,7 @@ RENDER.ext = () => {
   draw();
   const bn = v => (v / 1e9).toFixed(2), k = (l, v, u, note) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}<small>${u}</small></div><div class="n">${note}</div><span class="pre-tag">${PRE}</span></div>`;
   const c = Q.committed, my = Q.myopic;
-  $("#seq-kpis").innerHTML = k("36 months, leases renewed", bn(Q.cum_never), "bn KRW", "today's network as it is") + k("Territories redrawn only", bn(Q.cum_redrawn), "bn", `saves ${bn(Q.cum_never - Q.cum_redrawn)} bn, no lease touched`) +
+  $("#seq-kpis").innerHTML = k("36 months, leases renewed", bn(Q.cum_never), "bn KRW", "the baseline network as it is") + k("Territories redrawn only", bn(Q.cum_redrawn), "bn", `saves ${bn(Q.cum_never - Q.cum_redrawn)} bn, no lease touched`) +
     k("Committed sequence", bn(c.cum), "bn", `saves ${bn(Q.cum_never - c.cum)} bn; ends at the recommendation`) + k("One-shot switch now", bn(Q.cum_one_shot), "bn", `pays ${bn(Q.rent_left)} bn of rent on released sites`);
   const renewed = my.steps.filter(st => st.action === "renew" && !Q.leases.find(L => L.site === st.site).in_rec).map(st => st.site);
   $("#seq-text").innerHTML = `<p>The redesign is a <b>sequence of decisions with a state</b>: which sites are open and when each lease ends. A site can only be given up when its lease expires, so the network passes through ${c.steps.length} intermediate states.</p>
@@ -1466,7 +1466,7 @@ RENDER.ext = () => {
   });
   el("text", { x: 412, y: 310, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, rs, "number of DCs, k · cost above the scenario's best network, M KRW a month (filled dot = best k)");
   $("#rob-legend").innerHTML = RB.map((r, i) => `<span><i class="sq" style="background:${COLS[i % 5]}"></i>${r.name}</span>`).join("");
-  $("#rob-sub").textContent = `The best network of every k from the sweep and today's network, re-scored with demand scaled on the same ${M.days[0]} sampled days, or with the calibrated distance model for every pair`;
+  $("#rob-sub").textContent = `The best network of every k from the sweep and the baseline network, re-scored with demand scaled on the same ${M.days[0]} sampled days, or with the calibrated distance model for every pair`;
   const kr = R.finals.recommended.k;
   $("#rob-table").innerHTML = `<tr><th>Scenario</th><th>Best k</th><th>Saving of k = ${kr}</th><th>Regret of k = ${kr}</th></tr>` + RB.map(r => `<tr class="${r.k_star !== kr ? "flip" : ""}"><td>${r.name}</td><td class="ext-k">${r.k_star}</td><td>${fM(r.saving)} M</td><td>${fM(r.regret)} M</td></tr>`).join("");
   const worst = RB.reduce((a, b) => (b.regret > a.regret ? b : a));
@@ -1474,7 +1474,7 @@ RENDER.ext = () => {
 
   // Value of information
   const V = X_.voi, G = V.travel.grid, sp = [...new Set(G.map(g => g.speed))], stp = [...new Set(G.map(g => g.stop_min))], mx = Math.max(...G.map(g => g.totals[String(V.travel.a_star)] - g.best)) || 1;
-  $("#voi-sub").textContent = `Each cell re-scores today's network and the best network of every k with that stop time and speed; prior ${V.prior.join(" / ")} on low / reported / high for each, independently [assumption]. Cell: best k, and the regret of deciding k = ${V.travel.a_star} now`;
+  $("#voi-sub").textContent = `Each cell re-scores the baseline network and the best network of every k with that stop time and speed; prior ${V.prior.join(" / ")} on low / reported / high for each, independently [assumption]. Cell: best k, and the regret of deciding k = ${V.travel.a_star} now`;
   $("#voi-grid").innerHTML = `<tr><th>stop time ↓ · speed →</th>${sp.map(v => `<th style="text-align:center">${v} km/h</th>`).join("")}</tr>` + stp.map(s0 => `<tr><th>${s0} min</th>${sp.map(v => { const g = G.find(x => x.stop_min === s0 && x.speed === v), rg = g.totals[String(V.travel.a_star)] - g.best, a = 0.12 + 0.75 * rg / mx; return `<td style="background:rgba(117,20,133,${rg > 0 ? a : 0.06});color:${rg / mx > 0.5 ? "#fff" : "#1f1f24"}">k* ${g.k_star}<br><span style="font-size:11px;font-weight:600">regret ${fM(rg)} M · p ${g.p.toFixed(3)}</span></td>`; }).join("")}</tr>`).join("");
   $("#voi-formula").innerHTML = MATH.evpi || "";
   const kv = (l, v, note) => `<div class="kpi"><div class="l">${l}</div><div class="v">${fM(v)}<small>M a month</small></div><div class="n">${note}</div><span class="pre-tag">${PRE}</span></div>`;
@@ -1488,7 +1488,7 @@ RENDER.ext = () => {
 function driftCard() {
   const D = R.extensions && R.extensions.drift;
   if (!D) { $("#drift-wrap").hidden = true; return; }
-  $("#drift-sub").textContent = `Today's network rebuilt as the planner of each year would have drawn it (the same rule as the 2016 design), its later stores added without rebalancing, and scored under E on the ${M.days[0]} search days against the best redesign`;
+  $("#drift-sub").textContent = `Baseline network rebuilt as the planner of each year would have drawn it (the same rule as the 2016 design), its later stores added without rebalancing, and scored under E on the ${M.days[0]} search days against the best redesign`;
   const sv = $("#drift-chart"); sv.innerHTML = "";
   const ys = D.map(d => d.saving), lo = Math.min(0, ...ys) * 1.15 - 20e6, hi = Math.max(...ys) * 1.1;
   const { X, Y } = axesXY(sv, [70, 14, 760, 262], [D[0].year - 1, D[D.length - 1].year + 1], [lo, hi], v => (Number.isInteger(v) ? v : ""), v => f0(v / 1e6), D.length + 2, 5);
@@ -1500,7 +1500,7 @@ function driftCard() {
   el("text", { x: 415, y: 294, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, sv, "year of the last redesign (ring: the assumed 2016) · saving of the best redesign, M KRW a month");
   const flip = D.find((d, i) => i && d.saving < 0 && D[i - 1].saving >= 0), prev = flip ? D[D.indexOf(flip) - 1] : null;
   const at = flip ? prev.year + (flip.year - prev.year) * prev.saving / (prev.saving - flip.saving) : null;
-  $("#drift-text").innerHTML = `<h3>The assumption the saving rests on, swept</h3><p>${flip ? `If the last redesign was after about <b>${Math.round(at)}</b>, the redesign no longer pays; the 2016 assumption leaves a margin of ${Math.round(at) - 2016} years.` : `<b>The redesign pays whatever year the last redesign was made</b> (${fM(Math.min(...ys))} to ${fM(Math.max(...ys))} M a month): even a network drawn in ${D[D.length - 1].year} for all of today's stores, on straight-line km and without the noon clock, leaves ${fM(D[D.length - 1].saving)} M.`} The saving is not monotone in the year, because each year's design is a different set of sites.</p><p>Only a design on road km for today's stores removes it (the reversal row "today's network already optimal", ${fM(R.reversals.find(x => x.assumption === "today's network").saving)} M): the saving rests on how today's network was planned as much as on when.</p><div class="keypoint"><b>The first real-data check measures exactly this:</b> today's real network scored under the same E, against the best redesign.</div>`;
+  $("#drift-text").innerHTML = `<h3>The assumption the saving rests on, swept</h3><p>${flip ? `If the last redesign was after about <b>${Math.round(at)}</b>, the redesign no longer pays; the 2016 assumption leaves a margin of ${Math.round(at) - 2016} years.` : `<b>The redesign pays whatever year the last redesign was made</b> (${fM(Math.min(...ys))} to ${fM(Math.max(...ys))} M a month): even a network drawn in ${D[D.length - 1].year} for all of today's stores, on straight-line km and without the noon clock, leaves ${fM(D[D.length - 1].saving)} M.`} The saving is not monotone in the year, because each year's design is a different set of sites.</p><p>Only a design on road km for today's stores removes it (the reversal row "the baseline network already optimal", ${fM(R.reversals.find(x => x.assumption === "today's network").saving)} M): the saving rests on how the baseline network was planned as much as on when.</p><div class="keypoint"><b>The first real-data check measures exactly this:</b> today's real network scored under the same E, against the best redesign.</div>`;
 }
 function genCard() {
   const Gn = R.extensions && R.extensions.generation;
