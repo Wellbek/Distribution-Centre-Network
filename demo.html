@@ -129,6 +129,7 @@ details.log { margin-top: 10px; } details.log summary { cursor: pointer; font-we
 .step .num { width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: var(--lime); display: grid; place-items: center; font-weight: 900; }
 .step .why { margin-top: 4px; font-size: 13px; color: var(--ink-2); background: var(--lav); border-radius: 10px; padding: 5px 9px; }
 .step .why b { color: var(--purple-ink); }
+.kpi-tag { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
 .rung { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px dashed var(--line); }
 .rung .tick { width: 24px; height: 24px; border-radius: 50%; background: var(--lime); color: var(--purple-ink); display: grid; place-items: center; font-weight: 900; font-size: 13px; }
 .seg.wrap { flex-wrap: wrap; border-radius: 16px; margin-bottom: 6px; }
@@ -836,7 +837,7 @@ function kpisDay() {
   DAY.routes.forEach(r => { if (truckPos(r, T)) road++; });
   $("#day-kpis").innerHTML = [["Delivered", `${f0(done)}<small>/ ${f0(total)}</small>`, `${late} after 12:00`], ["Trucks on the road", road, `${DAY.routes.length} routes, ${DAY.routes.filter(r => r.relay).length} with two drivers`],
     ["Kilometres this day", `${f0(s.km_day)}<small>km</small>`, `${s.vehicles_day.toFixed(0)} vehicles`], ["Monthly cost at this day's volume", `${fM(s.total)}<small>M</small>`, "if every day were like this one; the answer tab uses 28 days"]]
-    .map(([l, v, n]) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n}</div><span class="pre-tag">${PRE}</span></div>`).join("");
+    .map(([l, v, n]) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("") + `<div class="kpi-tag"><span class="pre-tag">${PRE}</span> routes and totals; the clock is live</div>`;
 }
 function tick(ts) {
   if (!playing) return;
@@ -1422,7 +1423,8 @@ RENDER.checks = () => {
     <tr><td>Command</td><td><code>${M.command}</code> · seed ${M.seed} · ${M.runtime_s} s</td></tr><tr><td>Environment</td><td>Python ${M.python}, numpy ${M.numpy}, scipy ${M.scipy}</td></tr>
     <tr><td>Instance</td><td>${f0(M.stores_planning)} planning stores${M.fraction < 1 ? ` (1 in ${SCALE} of 10,000 kept; DC cost and bounds scaled by ${M.fraction})` : " (all stores still open at the end of the history year)"}</td></tr><tr><td>Distances</td><td>${M.distance_model}</td></tr>
     <tr><td>Days</td><td>${M.days[0]} search, ${M.days[1]} final, ${M.days[2]} held-out, stratified by calendar class</td></tr><tr><td>Fleet</td><td>owned at the ${M.fleet_quantile.toFixed(3)} quantile (newsvendor), spot above, relay at ${f0(P.relay_day)} KRW per over-limit route</td></tr>
-    <tr><td>Search</td><td>B = ${M.budget}: one G2 seed per k, then EI on a GP of E − G2; random selection on the same pool${M.timing ? `; ${M.timing.per_eval_s} s per evaluation with ${M.timing.workers} workers` : ""}</td></tr></table>
+    <tr><td>Search</td><td>B = ${M.budget}: one G2 seed per k, then EI on a GP of E − G2; random selection on the same pool${M.timing ? `; ${M.timing.per_eval_s} s per evaluation with ${M.timing.workers} workers` : ""}</td></tr>
+    <tr><td>Reduced run</td><td><code>python run_reduced.py</code>: 1 store in 5${R.thinning ? ` (${f0(R.thinning.stores_reduced)} stores)` : ""}, DC cost and bounds × 0.2, the same pool, search, validation and final comparison without the report-only steps; about 7 minutes on two laptop cores (README). It reproduces the structure: the sweep's shape, the baseline comparison and the G-versus-E gap${R.thinning ? `; its best k is ${R.thinning.k_star_reduced} against ${R.thinning.k_star_full} (thinning check above)` : ""}.</td></tr></table>
     <p class="note">Also reproduced by the same command: the extensions (closure sequence, robustness, value of information) in <code>registry.json</code> under <code>extensions</code>. The PyVRP accuracy check is optional: <code>python checks/routing_gap.py</code> after <code>pip install pyvrp==0.11.3</code>.</p>`;
 };
 
