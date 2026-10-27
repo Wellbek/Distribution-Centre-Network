@@ -23,7 +23,7 @@ def greedy_assign(ctx, open_idx):
             alt = d[members].copy(); alt[:, o] = np.inf
             alt[:, load >= ctx["hi"]] = np.inf
             extra = alt.min(1) - d[members, o]
-            move = members[np.argsort(extra)[: load[o] - ctx["hi"]]]
+            move = members[np.argsort(extra, kind="stable")[: load[o] - ctx["hi"]]]
             for m in move:
                 t = int(np.argmin(np.where(load >= ctx["hi"], np.inf, d[m])))
                 load[a[m]] -= 1; a[m] = t; load[t] += 1
@@ -31,7 +31,7 @@ def greedy_assign(ctx, open_idx):
     for u in np.flatnonzero(load < ctx["lo"]):
         donors = np.flatnonzero(load[a] > ctx["lo"])
         extra = d[donors, u] - d[donors, a[donors]]
-        for m in donors[np.argsort(extra)]:
+        for m in donors[np.argsort(extra, kind="stable")]:
             if load[u] >= ctx["lo"]:
                 break
             if load[a[m]] > ctx["lo"]:
@@ -39,9 +39,11 @@ def greedy_assign(ctx, open_idx):
     return a
 
 
-def g1(ctx, open_idx, a=None):
+def g1(ctx, open_idx, a=None, clock=False):
     """Cheap criterion: fixed cost + load-based fleet + line-haul and continuous-approximation local km.
-    Ignores the clock, except that stores beyond the 125 km reach ride relay routes by load, each with a second driver, as in E."""
+    Stores beyond the 125 km reach ride relay routes by load, each with a second driver, as in E.
+    G1 ignores the clock; G2 (clock=True) also counts the routes the noon deadline and the km limit force:
+    a store at road distance d can share a route with at most s_max(d) stores (system knowledge, brief R3)."""
     open_idx = np.asarray(open_idx)
     k = len(open_idx)
     if a is None:
@@ -54,6 +56,12 @@ def g1(ctx, open_idx, a=None):
     x, y = ctx["lon"] * 111 * np.cos(np.radians(36)), ctx["lat"] * 111
     sx = np.sqrt(np.maximum(np.bincount(a, x * x, k) / np.maximum(n_j, 1) - (np.bincount(a, x, k) / np.maximum(n_j, 1)) ** 2, 1))
     sy = np.sqrt(np.maximum(np.bincount(a, y * y, k) / np.maximum(n_j, 1) - (np.bincount(a, y, k) / np.maximum(n_j, 1)) ** 2, 1))
+    if clock:
+        leg = 0.7124 * np.sqrt(4 * np.pi * sx * sy / np.maximum(n_j, 1)) * distances.local_ratio()
+        dd, lg = np.minimum(d, C.FAR_KM), leg[a]
+        s_max = np.minimum.reduce([np.full_like(d, C.MAX_STOPS), (C.DEADLINE - C.DEPART - dd / C.SPEED) / (C.STOP_H + lg / C.SPEED),
+                                   (C.MAX_KM - 2 * dd) / np.maximum(lg, 1e-6)])
+        routes = np.maximum(routes, np.bincount(a, 1 / np.maximum(s_max, 1), k))
     km = (2 * rbar * routes + 0.7124 * np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()).sum()
     veh = np.ceil(routes * 1.08).sum()
     far = d > C.FAR_KM
@@ -83,14 +91,14 @@ def g0_sites(ctx, k, seed):
     return sorted(col.tolist())
 
 
-def g1_best(ctx, k, start=None, n_near=12):
-    """Greedy add from a warm start, then swaps between nearby candidate sites on G1."""
+def g1_best(ctx, k, start=None, n_near=12, clock=False):
+    """Greedy add from a warm start, then swaps between nearby candidate sites on G1 (G2 with clock=True)."""
     J = len(ctx["fixed"])
     open_ = list(start or [])
     while len(open_) < k:
-        open_.append(min((j for j in range(J) if j not in open_), key=lambda j: g1(ctx, open_ + [j])[0]))
-    near = np.argsort(geo.haversine(ctx["site_lat"][:, None], ctx["site_lon"][:, None], ctx["site_lat"][None], ctx["site_lon"][None]), 1)[:, 1:n_near + 1]
-    val = g1(ctx, open_)[0]
+        open_.append(min((j for j in range(J) if j not in open_), key=lambda j: g1(ctx, open_ + [j], clock=clock)[0]))
+    near = np.argsort(geo.haversine(ctx["site_lat"][:, None], ctx["site_lon"][:, None], ctx["site_lat"][None], ctx["site_lon"][None]), 1, kind="stable")[:, 1:n_near + 1]
+    val = g1(ctx, open_, clock=clock)[0]
     for _ in range(2):
         improved = False
         for i in range(k):
@@ -98,12 +106,23 @@ def g1_best(ctx, k, start=None, n_near=12):
                 if j in open_:
                     continue
                 cand = open_[:i] + [int(j)] + open_[i + 1:]
-                v = g1(ctx, cand)[0]
+                v = g1(ctx, cand, clock=clock)[0]
                 if v < val - 1e3:
                     open_, val, improved = cand, v, True
         if not improved:
             break
     return sorted(open_)
+
+
+def hybrid(ctx, k):
+    """Today's sites with the fewest changes: drop (k < 12) or add (k > 12) sites one at a time by G2, as leases expire."""
+    s = ctx["current"].tolist()
+    J = len(ctx["fixed"])
+    while len(s) > k:
+        s.remove(min(s, key=lambda j: g1(ctx, [x for x in s if x != j], clock=True)[0]))
+    while len(s) < k:
+        s.append(min((j for j in range(J) if j not in s), key=lambda j: g1(ctx, s + [j], clock=True)[0]))
+    return sorted(s)
 
 
 def feasible(ctx, sites):
@@ -112,7 +131,7 @@ def feasible(ctx, sites):
 
 
 def build_pool(ctx, ks, per_k, seed):
-    """Candidate pool: G1-best, G0 and random 1-2 swap neighbours for every k."""
+    """Candidate pool for every k: G2-best (the search's seed), G1-best, G0, today's sites adjusted (hybrid), and random 1-2 swaps of these."""
     rng = np.random.default_rng(seed)
     J = len(ctx["fixed"])
     pool, seen = [], set()
@@ -123,19 +142,19 @@ def build_pool(ctx, ks, per_k, seed):
             seen.add(key)
             pool.append(dict(sites=list(key), k=len(key), origin=origin))
 
-    seeds, prev = {}, None
+    seeds, prev, prev2 = {}, None, None
     for k in ks:
         best = g1_best(ctx, k, start=prev)
-        prev = best
-        seeds[k] = tuple(best)
+        best2 = g1_best(ctx, k, start=prev2, clock=True)
+        prev, prev2 = best, best2
+        seeds[k] = tuple(best2)
         g0 = g0_sites(ctx, k, seed + k)
+        hy = hybrid(ctx, k)
+        add(best2, "G2-best")
         add(best, "G1-best")
         add(g0, "G0 centre of gravity")
-        # Today's sites are a candidate of their own k, and a third base for swaps
-        bases = [(best, "G1-best"), (g0, "G0")]
-        if k == len(ctx["current"]):
-            add(ctx["current"].tolist(), "current sites")
-            bases.append((ctx["current"].tolist(), "current sites"))
+        add(hy, "current sites" if k == len(ctx["current"]) else "today's sites adjusted")
+        bases = [(best2, "G2-best"), (best, "G1-best"), (g0, "G0"), (hy, "today's sites")]
         tries = 0
         while sum(p["k"] == k for p in pool) < per_k and tries < 50 * per_k:
             base, name = bases[tries % len(bases)]
@@ -150,6 +169,7 @@ def build_pool(ctx, ks, per_k, seed):
         lp = assign_lp(ctx, np.array(p["sites"]))
         a = np.searchsorted(np.array(p["sites"]), lp["site"]) if lp else greedy_assign(ctx, np.array(p["sites"]))
         p["G1"], _ = g1(ctx, p["sites"], a)
+        p["G2"], _ = g1(ctx, p["sites"], a, clock=True)
         p["features"] = features(ctx, p["sites"], a)
         p["seed"] = tuple(p["sites"]) == seeds[p["k"]]
     return pool
@@ -169,15 +189,15 @@ FEATURE_NAMES = ["k", "mean km to DC", "p95 km to DC", "max km to DC", "load imb
 
 
 def run_search(pool, evaluate, budget, rule, seed):
-    """One budgeted search: G1 seeds first, then EI on a Kennedy-O'Hagan discrepancy GP (or random picks)."""
+    """One budgeted search: G2 seeds first, then EI on a Kennedy-O'Hagan discrepancy GP of E - G2 (or random picks)."""
     rng = np.random.default_rng(seed)
     order = [i for i, p in enumerate(pool) if p["seed"]]
     log, done = [], set()
     for i in order[:budget]:
         e = evaluate(pool[i])
         done.add(i)
-        log.append(dict(step=len(log) + 1, cand=i, rule="G1 seed", E=e["total"], G1=pool[i]["G1"], k=pool[i]["k"], ei=None, ok98=e["ok98"]))
-    X = np.array([p["features"] for p in pool]); G = np.array([p["G1"] for p in pool])
+        log.append(dict(step=len(log) + 1, cand=i, rule="G2 seed", E=e["total"], G1=pool[i]["G1"], G2=pool[i]["G2"], k=pool[i]["k"], ei=None, ok98=e["ok98"]))
+    X = np.array([p["features"] for p in pool]); G = np.array([p["G2"] for p in pool])
     while len(log) < budget:
         rest = [i for i in range(len(pool)) if i not in done]
         if not rest:
@@ -195,5 +215,5 @@ def run_search(pool, evaluate, budget, rule, seed):
             pick = int(np.argmax(score)); i = rest[pick]; ei = float(score[pick])
         e = evaluate(pool[i])
         done.add(i)
-        log.append(dict(step=len(log) + 1, cand=i, rule="EI on GP gap" if rule != "random" else "random", E=e["total"], G1=pool[i]["G1"], k=pool[i]["k"], ei=ei, ok98=e["ok98"]))
+        log.append(dict(step=len(log) + 1, cand=i, rule="EI on GP gap" if rule != "random" else "random", E=e["total"], G1=pool[i]["G1"], G2=pool[i]["G2"], k=pool[i]["k"], ei=ei, ok98=e["ok98"]))
     return log
