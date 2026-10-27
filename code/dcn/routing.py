@@ -39,19 +39,29 @@ def walk(seq, D, p):
     # Drive 0 -> seq -> 0; return km, arrival times, return time
     t, km, prev, arr = p.depart, 0.0, 0, []
     for i in seq:
-        leg = D[prev, i]
+        leg = D[prev][i]
         km += leg
         t += leg / p.speed
         arr.append(t)
         t += p.stop_h
         prev = i
-    back = D[prev, 0]
+    back = D[prev][0]
     return km + back, arr, t + back / p.speed
 
 
 def ok_time(seq, D, p):
-    km, arr, ret = walk(seq, D, p)
-    return km <= p.max_km and arr[-1] <= p.deadline and ret + p.break_h <= p.shift_end
+    # walk() without the arrival list; arrivals and km only grow along a route, so it may stop at the first breach
+    t, km, prev = p.depart, 0.0, 0
+    for i in seq:
+        leg = D[prev][i]
+        km += leg
+        t += leg / p.speed
+        if t > p.deadline or km > p.max_km:
+            return False
+        t += p.stop_h
+        prev = i
+    back = D[prev][0]
+    return km + back <= p.max_km and t + back / p.speed + p.break_h <= p.shift_end
 
 
 def _pairs(D, n, k_nn=40):
@@ -80,7 +90,7 @@ def two_opt(seq, D, p):
         improved = False
         for i in range(1, len(P) - 2):
             for j in range(i + 1, len(P) - 1):
-                delta = D[P[i - 1], P[j]] + D[P[i], P[j + 1]] - D[P[i - 1], P[i]] - D[P[j], P[j + 1]]
+                delta = D[P[i - 1]][P[j]] + D[P[i]][P[j + 1]] - D[P[i - 1]][P[i]] - D[P[j]][P[j + 1]]
                 if delta < -1e-9:
                     cand = P[:i] + P[i:j + 1][::-1] + P[j + 1:]
                     if ok_time(cand[1:-1], D, p):
@@ -117,12 +127,15 @@ def solve(D, q, p=None, improve=True):
 
 
 def _savings(D, q, p, improve):
-    # Clarke-Wright savings under the limits in p, then 2-opt per route
+    # Clarke-Wright savings under the limits in p, then 2-opt per route; small territories read a list copy of D (same floats, faster lookups)
     n = len(q)
+    pairs = [x.tolist() for x in _pairs(D, n)]
+    if n <= 400:
+        D = D.tolist()
     routes = {k: [k] for k in range(1, n + 1)}
     of = list(range(n + 1))
     load = {k: float(q[k - 1]) for k in range(1, n + 1)}
-    for i, j, s in zip(*_pairs(D, n)):
+    for i, j, s in zip(*pairs):
         if s <= 0:
             break
         ri, rj = of[i], of[j]
