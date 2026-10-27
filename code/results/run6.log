@@ -1,0 +1,61 @@
+[   0.1s] world: 1938 planning stores, 60 sites; prior strength [2.21 2.77 1.87 1.99], kappa 8.0
+[  24.2s] pool: 182 candidates for k = 7..19
+[  24.4s] baseline E = 1,581.0 M KRW/month, 3.0 over-limit routes/day
+[  33.7s] reported search done, best E = 1,459.2 M
+[  67.1s] whole pool evaluated (validation)
+[  69.6s] top 5 re-scored on 28 days; recommended k = 12
+[  73.6s] final and held-out comparisons done
+[  74.0s] demand checks done
+[  74.2s] map routes done
+[  74.4s] registry written: /home/louis/dcn/code/results/reduced/registry.json
+[   0.4s] world: 9718 planning stores, 60 sites; prior strength [2.09 2.17 1.92 1.84], kappa 8.1
+[  60.6s] outcome tables: 365 history days, service 1.0000, 635 vehicles/day
+[ 286.3s] pool: 390 candidates for k = 7..19
+[ 286.8s] baseline E = 6,418.9 M KRW/month, 10.0 over-limit routes/day
+[ 327.2s] reported search done, best E = 5,827.6 M
+[ 770.6s] whole pool evaluated (validation)
+[ 783.0s] top 5 re-scored on 28 days; recommended k = 10
+[ 800.3s] final and held-out comparisons done
+[ 838.3s] departure-wave check: k* 10 -> 10 (23 docks), 10 (29 docks)
+[ 962.8s] reversals: as reported  k*=10, stop time 10 min k*=9, stop time 20 min k*=10, speed 30 km/h k*=11, speed 45 km/h k*=9, distance model calibrated model only k*=9, vehicle limits strict brief: no relay routes, stores beyond one driver-day are stock-outs k*=11, vehicle limits and minimum strict brief and no 500-store minimum for redesigns k*=12, DC fixed cost 100 M k*=11, DC fixed cost 200 M k*=9, today's network already optimal for today's stores (p-median on road km) k*=10, 500-store minimum dropped for redesigns k*=11
+[ 962.8s] thinning check: k* full 10, reduced 11
+[ 965.0s] demand checks done
+[ 966.3s] map routes done
+[ 966.5s] registry written: /home/louis/dcn/code/results/full/registry.json
+[   8.2s] extensions: committed 2027-06-30 Hanam Gamil: close and open ['Namyangju Jingeon'] -> 6,030.3 M, k = 12
+[  13.4s] extensions: committed 2027-09-30 Incheon Namdong: close and open ['Siheung Banwol'] -> 6,028.1 M, k = 12
+[  18.6s] extensions: committed 2027-12-31 Yongin Giheung: close and open ['Wonju Munmak', 'Gyeongju Oedong'] -> 6,032.5 M, k = 13
+[  23.7s] extensions: committed 2028-03-31 Busan Gangseo: close and open ['Gimhae Hallim'] -> 6,017.5 M, k = 13
+[  28.9s] extensions: committed 2028-06-30 Daegu Dalseong: close and open ['Chilgok Waegwan'] -> 5,981.4 M, k = 13
+[  32.5s] extensions: committed 2028-09-30 Daejeon Daedeok: close and open ['Nonsan Yeonmu'] -> 5,905.5 M, k = 13
+[  34.3s] extensions: committed 2029-03-31 Gwangju Pyeongdong: close and open ['Naju Bitgaram'] -> 5,859.2 M, k = 13
+[  35.1s] extensions: committed 2029-06-30 Namwon Ijin: close [] -> 5,850.2 M, k = 12
+[  36.0s] extensions: committed 2029-09-30 Andong Pungsan: close [] -> 5,795.3 M, k = 11
+[  36.8s] extensions: committed 2029-12-31 Gangneung Gujeong: close and open [] -> 5,777.1 M, k = 10
+[  37.1s] extensions: myopic 2027-06-30 Hanam Gamil: close and open ['Namyangju Jingeon'] -> 6,030.3 M, k = 12
+[  37.1s] extensions: myopic 2027-09-30 Incheon Namdong: close and open ['Siheung Banwol'] -> 6,028.1 M, k = 12
+[  37.1s] extensions: myopic 2027-12-31 Yongin Giheung: renew [] -> 6,028.1 M, k = 12
+[  42.8s] extensions: myopic 2028-03-31 Busan Gangseo: close and open ['Gimhae Hallim', 'Gyeongju Oedong'] -> 5,970.6 M, k = 13
+[  48.0s] extensions: myopic 2028-06-30 Daegu Dalseong: close and open ['Chilgok Waegwan'] -> 5,933.9 M, k = 13
+[  53.1s] extensions: myopic 2028-09-30 Daejeon Daedeok: close and open ['Nonsan Yeonmu'] -> 5,848.1 M, k = 13
+[  56.4s] extensions: myopic 2029-03-31 Gwangju Pyeongdong: close and open ['Naju Bitgaram'] -> 5,804.7 M, k = 13
+[  58.1s] extensions: myopic 2029-06-30 Namwon Ijin: close [] -> 5,792.9 M, k = 12
+[  59.7s] extensions: myopic 2029-09-30 Andong Pungsan: renew [] -> 5,792.9 M, k = 12
+[  61.5s] extensions: myopic 2029-12-31 Gangneung Gujeong: renew [] -> 5,792.9 M, k = 12
+[  61.7s] extensions: sequence: myopic ends at k = 12, committed at the recommendation: True
+[  75.1s] extensions: robustness chain volume -15%: k* 10, saving 580.6 M
+[  82.0s] extensions: robustness chain volume +20%: k* 10, saving 579.8 M
+[  89.0s] extensions: robustness capital region +30%: k* 10, saving 602.0 M
+[ 103.0s] extensions: travel grid 10 min, 30 km/h: k* 11, regret of k = 10: 55.1 M
+[ 110.0s] extensions: travel grid 10 min, 35 km/h: k* 9, regret of k = 10: 0.7 M
+[ 116.9s] extensions: travel grid 10 min, 45 km/h: k* 8, regret of k = 10: 58.9 M
+[ 124.2s] extensions: travel grid 15 min, 30 km/h: k* 11, regret of k = 10: 151.9 M
+[ 124.2s] extensions: travel grid 15 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 131.2s] extensions: travel grid 15 min, 45 km/h: k* 9, regret of k = 10: 22.1 M
+[ 138.9s] extensions: travel grid 20 min, 30 km/h: k* 11, regret of k = 10: 183.5 M
+[ 146.1s] extensions: travel grid 20 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 153.2s] extensions: travel grid 20 min, 45 km/h: k* 10, regret of k = 10: 0.0 M
+[ 160.3s] extensions: VOI: travel times 27.2 M/month, chain volume 0.0, store rates 0.0
+[ 160.4s] extensions: 166 evaluations, written to /home/louis/dcn/code/results/full/registry.json
+wrote /home/louis/dcn/demo.html (2.41 MB)
+wrote /home/louis/dcn/proposal.html (0.46 MB)

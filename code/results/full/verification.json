@@ -1,6 +1,6 @@
 {
- "generated": "2026-10-20T15:52:03",
- "registry": "2026-10-20T15:23:30",
+ "generated": "2026-10-27T15:56:07",
+ "registry": "2026-10-27T11:24:50",
  "checks": [
   {
    "check": "world rebuilt",
@@ -18,6 +18,11 @@
    "detail": "0 unflagged violations, 0 beyond even the relay limits, max km mismatch 0.050"
   },
   {
+   "check": "baseline: vehicles against the load and stop bound",
+   "ok": true,
+   "detail": "624 vehicles, bound 430 (+45.1%)"
+  },
+  {
    "check": "recommended: every store served once",
    "ok": true,
    "detail": "9718/9718 stores"
@@ -28,19 +33,24 @@
    "detail": "0 unflagged violations, 0 beyond even the relay limits, max km mismatch 0.050"
   },
   {
+   "check": "recommended: vehicles against the load and stop bound",
+   "ok": true,
+   "detail": "593 vehicles, bound 432 (+37.3%)"
+  },
+  {
    "check": "cost identity baseline",
    "ok": true,
-   "detail": "components 5,874.3 M = total 5,874.3 M"
+   "detail": "components 6,566.9 M = total 6,566.9 M"
   },
   {
    "check": "cost identity reassigned12",
    "ok": true,
-   "detail": "components 9,567.6 M = total 9,567.6 M"
+   "detail": "components 6,191.6 M = total 6,191.6 M"
   },
   {
    "check": "cost identity best12",
    "ok": true,
-   "detail": "components 6,116.1 M = total 6,116.1 M"
+   "detail": "components 6,108.4 M = total 6,108.4 M"
   },
   {
    "check": "cost identity recommended",
@@ -55,12 +65,12 @@
   {
    "check": "cost identity best_k8",
    "ok": true,
-   "detail": "components 6,400.0 M = total 6,400.0 M"
+   "detail": "components 6,367.7 M = total 6,367.7 M"
   },
   {
    "check": "paired saving equals total difference",
    "ok": true,
-   "detail": "-100.2 M vs -100.2 M"
+   "detail": "592.4 M vs 592.4 M"
   },
   {
    "check": "assignment LP within bounds",
@@ -85,12 +95,12 @@
   {
    "check": "outcome tables",
    "ok": true,
-   "detail": "3,502,822 deliveries = open store-days; 209,022 vehicle-days, 64,810 km/day"
+   "detail": "3,502,822 deliveries = open store-days; 231,830 vehicle-days, 81,712 km/day"
   },
   {
    "check": "heuristic vs exact (7 stores, 25 instances)",
    "ok": true,
-   "detail": "extra vehicles mean 0.00 (max 0), km gap mean 0.1% (max 3.7%)"
+   "detail": "extra vehicles mean 0.00 (max 0), km gap mean 0.4% (max 3.7%)"
   },
   {
    "check": "JS engine = Python engine without 2-opt",
@@ -105,17 +115,37 @@
   {
    "check": "app.py live solve = routing.solve",
    "ok": true,
-   "detail": "69 vehicles 4847.0 km in 496 ms"
+   "detail": "69 vehicles 4847.0 km in 359 ms"
   },
   {
    "check": "demo embeds this registry",
    "ok": true,
-   "detail": "2026-10-20T15:23:30"
+   "detail": "2026-10-27T11:24:50"
   },
   {
-   "check": "Spearman recomputes",
+   "check": "Spearman G2 recomputes",
    "ok": true,
-   "detail": "0.658"
+   "detail": "0.834"
+  },
+  {
+   "check": "Spearman G1 recomputes",
+   "ok": true,
+   "detail": "0.583"
+  },
+  {
+   "check": "closure sequence adds up",
+   "ok": true,
+   "detail": "36 months; committed path ends at the recommendation, 214.49 bn KRW"
+  },
+  {
+   "check": "extensions reuse the sweep",
+   "ok": true,
+   "detail": "k = 7, 8, 9, 10, 11, 12, 13 equal to the sweep"
+  },
+  {
+   "check": "drift sweep reproduces today's network in 2016",
+   "ok": true,
+   "detail": "6,418.9 M = baseline 6,418.9 M"
   }
  ]
 }
