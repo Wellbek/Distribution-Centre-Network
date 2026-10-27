@@ -24,9 +24,12 @@ def greedy_assign(ctx, open_idx):
             alt[:, load >= ctx["hi"]] = np.inf
             extra = alt.min(1) - d[members, o]
             move = members[np.argsort(extra, kind="stable")[: load[o] - ctx["hi"]]]
-            for m in move:
-                t = int(np.argmin(np.where(load >= ctx["hi"], np.inf, d[m])))
-                load[a[m]] -= 1; a[m] = t; load[t] += 1
+            # Each store goes to its nearest DC not yet full (plain lists: a numpy call per store is slow)
+            ld = load.tolist()
+            for m, row in zip(move.tolist(), d[move].tolist()):
+                t = min(((v, j) for j, v in enumerate(row) if ld[j] < ctx["hi"]), default=(0, 0))[1]
+                ld[a[m]] -= 1; a[m] = t; ld[t] += 1
+            load = np.array(ld)
     # Fill DCs below the minimum with the stores that cost least to move, as the LP will
     for u in np.flatnonzero(load < ctx["lo"]):
         donors = np.flatnonzero(load[a] > ctx["lo"])
