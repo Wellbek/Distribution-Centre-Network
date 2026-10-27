@@ -4,3 +4,4 @@ __pycache__/
 
 # Local archive of superseded runs (earlier runs are in the git history)
 planning/archive/
+.lavish/
