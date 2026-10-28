@@ -111,7 +111,7 @@ check("outcome tables", n_del == ho["deliveries"] == int((hist["y"] >= 0).sum())
 
 # Heuristic accuracy against exact enumeration on small instances (Lecture 3): every route, then every split of the stores
 rng = np.random.default_rng(7)
-gaps_v, gaps_km = [], []
+gaps_v, gaps_km, gaps_c = [], [], []
 for trial in range(25):
     j = int(rng.choice(rec))
     near = np.argsort(ctx["dsite"][:, j])[:60]
@@ -146,8 +146,11 @@ for trial in range(25):
         continue
     ev, ekm = best
     gaps_v.append(h["vehicles"] - ev); gaps_km.append((h["km"] - ekm) / ekm)
+    cost = lambda v, km: C.VEHICLE_MONTH / C.DAYS_MONTH * v + C.FUEL_KM * km
+    gaps_c.append(cost(h["vehicles"], h["km"]) / cost(ev, ekm) - 1)
 check("heuristic vs exact (7 stores, 25 instances)", np.mean(gaps_v) <= 0.2,
-      f"extra vehicles mean {np.mean(gaps_v):.2f} (max {max(gaps_v)}), km gap mean {100 * np.mean(gaps_km):.1f}% (max {100 * max(gaps_km):.1f}%)")
+      f"extra vehicles mean {np.mean(gaps_v):.2f} (max {max(gaps_v)}), km gap mean {100 * np.mean(gaps_km):.1f}% (max {100 * max(gaps_km):.1f}%), "
+      f"day cost gap mean {100 * np.mean(gaps_c):.1f}% (max {100 * max(gaps_c):.1f}%)")
 
 # JavaScript fallback against Python without the segment reversal on the live DC day
 live = REG["live"]; j = live["dc"]; idx = np.array(live["stores"]); q = np.array(live["days"][0]["q"])
