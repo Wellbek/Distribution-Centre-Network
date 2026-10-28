@@ -11,7 +11,6 @@ import urllib.request
 from pathlib import Path
 
 import numpy as np
-from scipy.optimize import Bounds, LinearConstraint, milp
 
 from dcn import config as C
 from dcn import demand, evaluate, routing
@@ -110,7 +109,7 @@ km_day = sum(float(r["km_driven"]) for r in vd) / ho["days"]
 check("outcome tables", n_del == ho["deliveries"] == int((hist["y"] >= 0).sum()) and abs(km_day - ho["km_day"]) / ho["km_day"] < 1e-3,
       f"{n_del:,} deliveries = open store-days; {len(vd):,} vehicle-days, {km_day:,.0f} km/day")
 
-# Heuristic accuracy against exact set partitioning on small instances
+# Heuristic accuracy against exact enumeration on small instances (Lecture 3): every route, then every split of the stores
 rng = np.random.default_rng(7)
 gaps_v, gaps_km = [], []
 for trial in range(25):
@@ -120,30 +119,37 @@ for trial in range(25):
     q = rng.uniform(4, 12, size=7)  # heavier demand so several vehicles are needed
     D = routing.territory_matrix(ctx, j, idx)
     h = routing.solve(D, q, p)
-    cols, cost = [], []
+    route = {}
     for size in range(1, 8):
         for sub in itertools.combinations(range(1, 8), size):
             if q[[s - 1 for s in sub]].sum() > p.cap:
                 continue
-            best = None
             for perm in itertools.permutations(sub):
                 km, arr, ret = routing.walk(list(perm), D, p)
-                if km <= p.max_km and arr[-1] <= p.deadline and ret + p.break_h <= p.shift_end and (best is None or km < best):
-                    best = km
-            if best is not None:
-                cols.append(sub); cost.append(1e4 + best)
-    A = np.zeros((7, len(cols)))
-    for c, sub in enumerate(cols):
-        A[[s - 1 for s in sub], c] = 1
-    res = milp(np.array(cost), constraints=LinearConstraint(A, 1, 1), integrality=np.ones(len(cols)), bounds=Bounds(0, 1))
-    if res.status != 0:
+                if km <= p.max_km and arr[-1] <= p.deadline and ret + p.break_h <= p.shift_end and km < route.get(sub, np.inf):
+                    route[sub] = km
+
+    def splits(rest):
+        # Every way to split the stores into routes: the first store's route, then the rest
+        if not rest:
+            yield []
+            return
+        for size in range(len(rest)):
+            for others in itertools.combinations(rest[1:], size):
+                sub = (rest[0],) + others
+                if sub in route:
+                    for tail in splits(tuple(x for x in rest[1:] if x not in others)):
+                        yield [sub] + tail
+
+    best = min(((len(sp), sum(route[r] for r in sp)) for sp in splits(tuple(range(1, 8)))), default=None)
+    if best is None:
         continue
-    ev, ekm = int(round(res.x.sum())), float(res.fun - 1e4 * round(res.x.sum()))
+    ev, ekm = best
     gaps_v.append(h["vehicles"] - ev); gaps_km.append((h["km"] - ekm) / ekm)
 check("heuristic vs exact (7 stores, 25 instances)", np.mean(gaps_v) <= 0.2,
       f"extra vehicles mean {np.mean(gaps_v):.2f} (max {max(gaps_v)}), km gap mean {100 * np.mean(gaps_km):.1f}% (max {100 * max(gaps_km):.1f}%)")
 
-# JavaScript fallback against Python without 2-opt on the live DC day
+# JavaScript fallback against Python without the segment reversal on the live DC day
 live = REG["live"]; j = live["dc"]; idx = np.array(live["stores"]); q = np.array(live["days"][0]["q"])
 D = routing.territory_matrix(ctx, j, idx)
 py1 = routing.solve(D, q, p)
@@ -160,8 +166,8 @@ try:
             return [r.vehicles, r.km]; }""")
         external = pg.evaluate("[...document.querySelectorAll('script[src],link[href],img[src]')].length")
         b.close()
-    check("JS engine = Python engine without 2-opt", js[0] == py0["vehicles"] and abs(js[1] - py0["km"]) / py0["km"] < 1e-3,
-          f"JS {js[0]} vehicles {js[1]:.1f} km; Python {py0['vehicles']} vehicles {py0['km']:.1f} km; with 2-opt {py1['km']:.1f} km")
+    check("JS engine = Python engine without the segment reversal", js[0] == py0["vehicles"] and abs(js[1] - py0["km"]) / py0["km"] < 1e-3,
+          f"JS {js[0]} vehicles {js[1]:.1f} km; Python {py0['vehicles']} vehicles {py0['km']:.1f} km; with the segment reversal {py1['km']:.1f} km")
     check("demo has no external resources", external == 0, f"{external} external script/link/img tags")
 except ImportError:
     print("SKIP  demo checks: playwright not installed (pip install playwright && playwright install chromium)")
@@ -189,8 +195,9 @@ ev = [c for c in REG["pool"] if c["E"] is not None and any(r["cand"] == REG["poo
 E = np.array([c["E"] for c in ev])
 for key, r3 in (("G2", REG["r3"]), ("G1", REG["r3_g1"])):
     G = np.array([c[key] for c in ev])
-    sp = np.corrcoef(np.argsort(np.argsort(G, kind="stable"), kind="stable"), np.argsort(np.argsort(E, kind="stable"), kind="stable"))[0, 1]
-    check(f"Spearman {key} recomputes", abs(sp - r3["spearman"]) < 1e-9, f"{sp:.3f}")
+    b = np.polyfit(G, E, 1)
+    r2 = 1 - ((E - np.polyval(b, G)) ** 2).sum() / ((E - E.mean()) ** 2).sum()
+    check(f"least-squares R² of E on {key} recomputes", abs(r2 - r3["r2_line"]) < 1e-9, f"{r2:.3f}")
 
 # Extensions: the sequence's months add up, and the unchanged scenario reproduces the sweep
 x = REG.get("extensions")
