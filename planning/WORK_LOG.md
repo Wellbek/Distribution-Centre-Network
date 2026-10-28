@@ -427,3 +427,14 @@ Fixes:
 - How it works and Extensions: every method stated upfront ("Use X to achieve Y because Z") in the lectures' notation: Gamma(alpha, beta) update as a weighted average, negative-binomial posterior predictive, GP posterior mu(x|D) and sigma(x|D), EI as E[max(0, f_min - f(x))], EVPI via d*, a generator conditioned on a target (Lecture 6), formulas re-rendered with KaTeX.
 - Proposal (17 slides): source line for the four meeting statements (from the brief, not invented), method names with lectures, one colour per scope block, the quick estimate explained first (about 10 ms against about 20 core-seconds), "Further inputs required from the business", an operating-realities slide; the same items added to the definition's register.
 - Checks: demo offline clean, no overflow at 390-1920 px, every slide free of collisions and leftovers, `verify.py` 29/29.
+
+### Course methods only, run 7 (28 Oct)
+
+- User check: Clarke-Wright is not in the slides; only methods from the slides and the course script (ideally Lectures 1-6) may be used. Audit of every method in `code/` against the script's algorithm atlas: savings with 2-opt, the set-partitioning MILP in `verify.py`, Spearman, G1's 0.7124 and G0's Hungarian snap were outside the course (D-083).
+- Router prototypes on 44 territory-days of run 6's two networks (laptop, one core): plain step-by-step insertion +29% vehicles against savings, an LP joining route ends in rounds +15-17%, the LP start plus inter-route moves +7%, step-by-step insertion scored by 2 d0 - detour +2.0% (the chosen one), best of three weights +1.6% for three times the time.
+- Laptop reduced run of the new code (2 workers, 640 s): saving 134.9 M, recommends 9 (9-11 within 1.2 M); extensions on the reduced registry ran clean (486 s).
+- Spark run 7 (user): `run_full.py` 876 s + 296 s extensions, registry 2026-10-28T14:31:55; the Spark skipped the reduced run (the laptop's reduced registry is shipped). `run7.log` and `shapes.json` came back truncated (copied while still being written); to be copied again.
+- Run 7 result: same ten sites as run 6; saving 468.7 M (456.0-482.1), held-out 469.3 M; quick estimate loses 356.7 M (picks 8); route-length constant c = 1.077; G2 R² 0.57 (pool 0.70), G1 0.25.
+- New findings: departure waves with 23 docks move k* to 12 (the 10- and 11-DC networks overflow the docks of their largest DCs by 3.3 vehicles a day), 29 docks keep 10; the myopic lease path ends 6 M a month cheaper than the committed one but keeps Gangneung at 123 stores; Gimpo is in four of the five best networks (the third keeps Yongin, Hanam, Incheon), but the best 9- to 12-DC networks all keep Gimpo and Cheonan.
+- `verify.py` 29/29 on run 7; exact enumeration: 0 extra vehicles, km 8.9% above the optimum on average (savings had 0.4%).
+- The laptop reset once during the session (the scratchpad with the PyVRP environment was lost and rebuilt).
