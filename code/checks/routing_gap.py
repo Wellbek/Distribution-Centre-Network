@@ -1,4 +1,4 @@
-"""Router accuracy: savings + 2-opt against PyVRP (hybrid genetic search) on the same territories and days.
+"""Router accuracy: our lower level against PyVRP (a genetic algorithm with local search) on the same territories and days.
 
 Optional check, needs `pip install pyvrp==0.11.3`; run after run_full.py: python checks/routing_gap.py [baseline|redrawn|recommended|site-list] [days] [sec_per_store] [dcs].
 Results go to results/checks/; the shipped JSON files are the cached results quoted in problem-definition.md Section 2a.
@@ -39,9 +39,9 @@ def far_stores(D, p):
 
 def _pyvrp(D, q, p, fixed, seconds, seed):
     # One capacitated VRP with load and stop dimensions, noon deadline, shift and km limits; D index 0 = DC.
-    # Fleet = savings count + 25% (at least 5): with one vehicle per store HGS stalls on rural territories (all singleton routes)
+    # Fleet = our router's count + 25% (at least 5): with one vehicle per store PyVRP stalls on rural territories (all singleton routes)
     n = len(q)
-    fleet = len(routing._savings(D, q, p, False))
+    fleet = len(routing._construct(D, q, p, False))
     vt = pyvrp.VehicleType(min(n, fleet + max(5, fleet // 4)), capacity=[C.CAP, p.max_stops], fixed_cost=round(fixed * UNIT), start_late=0,
                            max_duration=int((p.shift_end - p.break_h - p.depart) * 3600), max_distance=int(p.max_km * 1000),
                            unit_distance_cost=round(C.FUEL_KM * UNIT / 1000))
@@ -121,27 +121,27 @@ def main():
             D = routing.territory_matrix(ctx, j, idx)
             q = day["q"][idx]
             t1 = time.time()
-            cw = routing.solve(D, q, p)
-            t_cw = time.time() - t1
-            cw_relay = sum(r["binding"] == "relay" for r in cw["routes"])
+            ours = routing.solve(D, q, p)
+            t_ours = time.time() - t1
+            ours_relay = sum(r["binding"] == "relay" for r in ours["routes"])
             secs = max(10.0, per_store * len(idx))
             routes, feas, far = hgs(D, q, p, secs)
             h = audit(routes, D, q, p, far)
             row = dict(net=net, day=d, label=day["label"], dc=int(j), stores=len(idx), cages=float(q.sum()), lb_load=int(np.ceil(q.sum() / C.CAP)),
-                       far=len(far), cw_veh=cw["vehicles"], cw_km=round(cw["km"], 1), cw_relay=cw_relay, cw_s=round(t_cw, 2),
+                       far=len(far), ours_veh=ours["vehicles"], ours_km=round(ours["km"], 1), ours_relay=ours_relay, ours_s=round(t_ours, 2),
                        hgs_veh=h["vehicles"], hgs_km=round(h["km"], 1), hgs_relay=h["relay"], hgs_bad=h["bad"], hgs_feasible=feas, hgs_s=secs,
-                       cw_cost=day_cost(cw["vehicles"], cw["km"], cw_relay), hgs_cost=day_cost(h["vehicles"], h["km"], h["relay"]))
+                       ours_cost=day_cost(ours["vehicles"], ours["km"], ours_relay), hgs_cost=day_cost(h["vehicles"], h["km"], h["relay"]))
             rows.append(row)
-            print(f"[{time.time() - t0:5.0f}s] day {d} DC {j:2d} n={len(idx):4d} LB {row['lb_load']:3d} | CW {cw['vehicles']:3d} veh {cw['km']:8.0f} km "
-                  f"({cw_relay} relay) | HGS {h['vehicles']:3d} veh {h['km']:8.0f} km ({h['relay']} relay, bad {h['bad']}) | "
-                  f"cost gap {(row['cw_cost'] / row['hgs_cost'] - 1) * 100:5.1f}%", flush=True)
+            print(f"[{time.time() - t0:5.0f}s] day {d} DC {j:2d} n={len(idx):4d} LB {row['lb_load']:3d} | ours {ours['vehicles']:3d} veh {ours['km']:8.0f} km "
+                  f"({ours_relay} relay) | PyVRP {h['vehicles']:3d} veh {h['km']:8.0f} km ({h['relay']} relay, bad {h['bad']}) | "
+                  f"cost gap {(row['ours_cost'] / row['hgs_cost'] - 1) * 100:5.1f}%", flush=True)
     tag = "-".join(map(str, day_ids)) + ("" if only is None else "_dc" + "-".join(map(str, only)))
     out = CODE / "results" / "checks" / f"routing_gap_{net}_{tag}.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(rows, indent=1))
-    cw_v, h_v = sum(r["cw_veh"] for r in rows), sum(r["hgs_veh"] for r in rows)
-    cw_c, h_c = sum(r["cw_cost"] for r in rows), sum(r["hgs_cost"] for r in rows)
-    print(f"total: CW {cw_v} vehicles, HGS {h_v}; daily cost CW {cw_c / 1e6:.1f} M, HGS {h_c / 1e6:.1f} M ({(cw_c / h_c - 1) * 100:.1f}%); written {out.name}")
+    o_v, h_v = sum(r["ours_veh"] for r in rows), sum(r["hgs_veh"] for r in rows)
+    o_c, h_c = sum(r["ours_cost"] for r in rows), sum(r["hgs_cost"] for r in rows)
+    print(f"total: ours {o_v} vehicles, PyVRP {h_v}; daily cost ours {o_c / 1e6:.1f} M, PyVRP {h_c / 1e6:.1f} M ({(o_c / h_c - 1) * 100:.1f}%); written {out.name}")
 
 
 if __name__ == "__main__":

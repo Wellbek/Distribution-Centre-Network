@@ -1,4 +1,4 @@
-"""Lower level: one DC's day as a capacitated VRP with a hard noon deadline, Clarke-Wright savings plus 2-opt."""
+"""Lower level: one DC's day as a capacitated VRP with a hard noon deadline; routes built step by step, then segments reversed (Lecture 0)."""
 from dataclasses import dataclass, replace
 
 import numpy as np
@@ -64,26 +64,8 @@ def ok_time(seq, D, p):
     return km + back <= p.max_km and t + back / p.speed + p.break_h <= p.shift_end
 
 
-def _pairs(D, n, k_nn=40):
-    # Savings for all pairs on small territories, k nearest neighbours on large ones
-    d0 = D[0, 1:]
-    if n <= 400:
-        i, j = np.triu_indices(n, 1)
-    else:
-        nn = np.argpartition(D[1:, 1:], k_nn, axis=1)[:, : k_nn + 1]
-        i = np.repeat(np.arange(n), nn.shape[1])
-        j = nn.ravel()
-        keep = i != j
-        i, j = np.minimum(i, j)[keep], np.maximum(i, j)[keep]
-        ij = np.unique(np.stack([i, j], 1), axis=0)
-        i, j = ij[:, 0], ij[:, 1]
-    s = d0[i] + d0[j] - D[i + 1, j + 1]
-    order = np.lexsort((j, i, -s))
-    return i[order] + 1, j[order] + 1, s[order]
-
-
-def two_opt(seq, D, p):
-    # Reverse P[i..j] when the two swapped edges shorten the route and it stays feasible
+def reverse_segments(seq, D, p):
+    # Improvement: reverse P[i..j] when the two swapped edges shorten the route and it stays feasible
     P = [0] + list(seq) + [0]
     improved = True
     while improved:
@@ -101,7 +83,7 @@ def two_opt(seq, D, p):
 def solve(D, q, p=None, improve=True):
     """Route one DC's stores for one day; stores no one-driver route can reach go on two-driver relay routes."""
     p = p or Params()
-    routes = _savings(D, q, p, improve)
+    routes = _construct(D, q, p, improve)
     bad = [r for r in routes if r["binding"] == "violates limit"]
     missed = 0
     if bad and not p.relay:
@@ -112,7 +94,7 @@ def solve(D, q, p=None, improve=True):
         far = np.array(sorted(v for r in bad for v in r["seq"]))
         sub = np.r_[0, far + 1]
         pr = replace(p, max_km=p.relay_km, shift_end=p.relay_shift_end)
-        relay = _savings(D[np.ix_(sub, sub)], q[far], pr, improve)
+        relay = _construct(D[np.ix_(sub, sub)], q[far], pr, improve)
         for r in relay:
             r["seq"] = far[r["seq"]].tolist()
             r["binding"] = "relay" if r["binding"] != "violates limit" else "violates limit"
@@ -126,47 +108,69 @@ def solve(D, q, p=None, improve=True):
     )
 
 
-def _savings(D, q, p, improve):
-    # Clarke-Wright savings under the limits in p, then 2-opt per route; small territories read a list copy of D (same floats, faster lookups)
+def _construct(D, q, p, improve, k_nn=30):
+    """Step by step with infeasible stores masked: open a route at the unrouted store farthest from the DC, then insert the
+    store whose cheapest feasible insertion saves the most km against its own trip (2 d0 - detour), until none fits."""
     n = len(q)
-    pairs = [x.tolist() for x in _pairs(D, n)]
+    D = np.asarray(D)
+    d0 = D[0]
+    nn = np.argsort(D[1:, 1:], axis=1, kind="stable")[:, : k_nn + 1] + 1
+    left = np.ones(n + 1, bool)
+    left[0] = False
+    order = sorted(range(1, n + 1), key=lambda i: (-d0[i], i))
+    eps, oi, routes = 1e-9, 0, []
+    while left.any():
+        while not left[order[oi]]:
+            oi += 1
+        r = [order[oi]]
+        left[r[0]] = False
+        load = float(q[r[0] - 1])
+        near = np.zeros(n + 1, bool)
+        near[nn[r[0] - 1]] = True
+        while ok_time(r, D, p) and len(r) < p.max_stops:
+            C = np.flatnonzero(near & left)
+            C = C[load + q[C - 1] <= p.cap + eps]
+            if not len(C):
+                break
+            # Position k lies between P[k] and N[k]; arrivals only grow along a route, so one slack per route decides the later stops
+            km, arr, ret = walk(r, D, p)
+            P, N = np.r_[0, r], np.r_[r, 0]
+            dep = np.r_[p.depart, np.array(arr) + p.stop_h]
+            DP = D[np.ix_(P, C)]
+            detour = DP + D[np.ix_(C, N)].T - D[P, N][:, None]
+            push = detour / p.speed + p.stop_h
+            ok = (dep[:, None] + DP / p.speed <= p.deadline + eps) & (km + detour <= p.max_km + eps)
+            ok[:-1] &= arr[-1] + push[:-1] <= p.deadline + eps
+            ok &= ret + push + p.break_h <= p.shift_end + eps
+            dm = np.where(ok, detour, np.inf)
+            kb = dm.argmin(0)
+            db = dm[kb, np.arange(len(C))]
+            score = np.where(np.isfinite(db), 2 * d0[C] - db, -np.inf)
+            placed = False
+            while np.isfinite(score.max()):
+                b = int(score.argmax())
+                c, k = int(C[b]), int(kb[b])
+                s = r[:k] + [c] + r[k:]
+                if ok_time(s, D, p):
+                    r, placed = s, True
+                    load += float(q[c - 1])
+                    left[c] = False
+                    near[nn[c - 1]] = True
+                    break
+                score[b] = -np.inf
+            if not placed:
+                break
+        routes.append(r)
+    # Small territories read a list copy of D in the improvement (same floats, faster lookups)
     if n <= 400:
         D = D.tolist()
-    routes = {k: [k] for k in range(1, n + 1)}
-    of = list(range(n + 1))
-    load = {k: float(q[k - 1]) for k in range(1, n + 1)}
-    # A store inside a route never becomes an end again (merges only join ends), so its pairs can be skipped at once
-    inner = [False] * (n + 1)
-    cap, max_stops = p.cap, p.max_stops
-    for i, j, s in zip(*pairs):
-        if s <= 0:
-            break
-        if inner[i] or inner[j]:
-            continue
-        ri, rj = of[i], of[j]
-        if ri == rj:
-            continue
-        A, B = routes[ri], routes[rj]
-        if load[ri] + load[rj] > cap or len(A) + len(B) > max_stops:
-            continue
-        cand = (A if A[-1] == i else A[::-1]) + (B if B[0] == j else B[::-1])
-        if not ok_time(cand, D, p):
-            cand = cand[::-1]
-            if not ok_time(cand, D, p):
-                continue
-        routes[ri] = cand
-        load[ri] += load.pop(rj)
-        del routes[rj]
-        for v in cand:
-            of[v] = ri
-        for v in cand[1:-1]:
-            inner[v] = True
     out = []
-    for k, seq in routes.items():
+    for seq in routes:
         if improve and len(seq) >= 4:
-            seq = two_opt(seq, D, p)
+            seq = reverse_segments(seq, D, p)
         km, arr, ret = walk(seq, D, p)
-        out.append(dict(seq=[v - 1 for v in seq], km=km, load=load[k], arr=arr, ret=ret, binding=_binding(seq, load[k], km, arr, ret, p)))
+        load = float(sum(q[v - 1] for v in seq))
+        out.append(dict(seq=[v - 1 for v in seq], km=km, load=load, arr=arr, ret=ret, binding=_binding(seq, load, km, arr, ret, p)))
     out.sort(key=lambda r: r["arr"][0])
     return out
 
