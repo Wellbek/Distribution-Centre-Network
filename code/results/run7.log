@@ -1,0 +1,70 @@
+[   0.1s] world: 1938 planning stores, 60 sites; prior strength [2.21 2.77 1.87 1.99], kappa 8.0
+[   2.1s] baseline E = 1,601.2 M KRW/month, 7.0 over-limit routes/day
+[   2.1s] route-length constant c = 0.838, fitted on the baseline's routed search days
+[  20.6s] pool: 182 candidates for k = 7..19
+[  27.8s] reported search done, best E = 1,471.8 M
+[  49.5s] whole pool evaluated (validation)
+[  51.5s] top 5 re-scored on 28 days; recommended k = 9
+[  54.1s] final and held-out comparisons done
+[  54.4s] demand checks done
+[  54.6s] map routes done
+[  54.7s] registry written: /home/louis/dcn/code/results/reduced/registry.json
+[   0.5s] world: 9718 planning stores, 60 sites; prior strength [2.09 2.17 1.92 1.84], kappa 8.1
+[  68.3s] outcome tables: 365 history days, service 1.0000, 636 vehicles/day
+[  69.0s] baseline E = 6,454.1 M KRW/month, 15.0 over-limit routes/day
+[  69.0s] route-length constant c = 1.077, fitted on the baseline's routed search days
+[ 270.2s] pool: 390 candidates for k = 7..19
+[ 311.0s] reported search done, best E = 5,982.0 M
+[ 669.8s] whole pool evaluated (validation)
+[ 683.9s] top 5 re-scored on 28 days; recommended k = 10
+[ 703.3s] final and held-out comparisons done
+[ 740.2s] departure-wave check: k* 10 -> 12 (23 docks), 10 (29 docks)
+[ 872.4s] reversals: as reported  k*=10, stop time 10 min k*=10, stop time 20 min k*=10, speed 30 km/h k*=11, speed 45 km/h k*=9, distance model calibrated model only k*=9, vehicle limits strict brief: no relay routes, stores beyond one driver-day are stock-outs k*=11, vehicle limits and minimum strict brief and no 500-store minimum for redesigns k*=12, DC fixed cost 100 M k*=11, DC fixed cost 200 M k*=9, today's network already optimal for today's stores (p-median on road km) k*=10, 500-store minimum dropped for redesigns k*=11
+[ 872.4s] thinning check: k* full 10, reduced 11
+[ 874.8s] demand checks done
+[ 876.1s] map routes done
+[ 876.3s] registry written: /home/louis/dcn/code/results/full/registry.json
+[   9.1s] extensions: committed 2027-06-30 Hanam Gamil: close and open ['Namyangju Jingeon'] -> 6,157.2 M, k = 12
+[  14.8s] extensions: committed 2027-09-30 Incheon Namdong: close and open ['Siheung Banwol'] -> 6,171.3 M, k = 12
+[  20.6s] extensions: committed 2027-12-31 Yongin Giheung: close and open ['Wonju Munmak', 'Gyeongju Oedong'] -> 6,191.5 M, k = 13
+[  26.4s] extensions: committed 2028-03-31 Busan Gangseo: close and open ['Gimhae Hallim'] -> 6,208.4 M, k = 13
+[  32.3s] extensions: committed 2028-06-30 Daegu Dalseong: close and open ['Chilgok Waegwan'] -> 6,177.4 M, k = 13
+[  36.2s] extensions: committed 2028-09-30 Daejeon Daedeok: close and open ['Nonsan Yeonmu'] -> 6,065.3 M, k = 13
+[  38.1s] extensions: committed 2029-03-31 Gwangju Pyeongdong: close and open ['Naju Bitgaram'] -> 6,031.7 M, k = 13
+[  39.1s] extensions: committed 2029-06-30 Namwon Ijin: close [] -> 6,010.3 M, k = 12
+[  40.0s] extensions: committed 2029-09-30 Andong Pungsan: close [] -> 5,927.2 M, k = 11
+[  40.9s] extensions: committed 2029-12-31 Gangneung Gujeong: close and open [] -> 5,924.1 M, k = 10
+[  41.2s] extensions: myopic 2027-06-30 Hanam Gamil: close and open ['Namyangju Jingeon'] -> 6,157.2 M, k = 12
+[  41.2s] extensions: myopic 2027-09-30 Incheon Namdong: renew [] -> 6,157.2 M, k = 12
+[  46.9s] extensions: myopic 2027-12-31 Yongin Giheung: renew [] -> 6,157.2 M, k = 12
+[  52.6s] extensions: myopic 2028-03-31 Busan Gangseo: close and open ['Gimhae Hallim', 'Gyeongju Oedong'] -> 6,130.9 M, k = 13
+[  58.3s] extensions: myopic 2028-06-30 Daegu Dalseong: close and open ['Chilgok Waegwan'] -> 6,105.5 M, k = 13
+[  64.1s] extensions: myopic 2028-09-30 Daejeon Daedeok: close and open ['Nonsan Yeonmu'] -> 5,990.1 M, k = 13
+[  69.8s] extensions: myopic 2029-03-31 Gwangju Pyeongdong: close and open ['Naju Bitgaram'] -> 5,957.8 M, k = 13
+[  73.5s] extensions: myopic 2029-06-30 Namwon Ijin: close [] -> 5,937.3 M, k = 12
+[  77.2s] extensions: myopic 2029-09-30 Andong Pungsan: close [] -> 5,918.1 M, k = 11
+[  80.9s] extensions: myopic 2029-12-31 Gangneung Gujeong: renew [] -> 5,918.1 M, k = 11
+[  81.1s] extensions: sequence: myopic ends at k = 11, committed at the recommendation: True
+[  95.6s] extensions: robustness chain volume -15%: k* 10, saving 429.5 M
+[ 103.0s] extensions: robustness chain volume +20%: k* 10, saving 481.3 M
+[ 110.3s] extensions: robustness capital region +30%: k* 10, saving 488.7 M
+[ 125.4s] extensions: travel grid 10 min, 30 km/h: k* 11, regret of k = 10: 98.9 M
+[ 133.1s] extensions: travel grid 10 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 140.7s] extensions: travel grid 10 min, 45 km/h: k* 9, regret of k = 10: 22.2 M
+[ 148.4s] extensions: travel grid 15 min, 30 km/h: k* 11, regret of k = 10: 131.7 M
+[ 148.4s] extensions: travel grid 15 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 156.1s] extensions: travel grid 15 min, 45 km/h: k* 9, regret of k = 10: 10.7 M
+[ 163.5s] extensions: travel grid 20 min, 30 km/h: k* 11, regret of k = 10: 176.3 M
+[ 171.0s] extensions: travel grid 20 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 178.6s] extensions: travel grid 20 min, 45 km/h: k* 9, regret of k = 10: 38.3 M
+[ 186.3s] extensions: VOI: travel times 25.1 M/month, chain volume 0.0, store rates 0.0
+[ 190.0s] extensions: drift: designed in 2010 (4197 stores open): today's cost 6,625.1 M, saving of the best redesign 643.2 M
+[ 199.0s] extensions: drift: designed in 2013 (5188 stores open): today's cost 6,398.8 M, saving of the best redesign 416.8 M
+[ 210.9s] extensions: drift: designed in 2016 (6178 stores open): today's cost 6,454.1 M, saving of the best redesign 472.2 M
+[ 227.3s] extensions: drift: designed in 2019 (7168 stores open): today's cost 6,227.1 M, saving of the best redesign 245.2 M
+[ 239.7s] extensions: drift: designed in 2022 (8300 stores open): today's cost 6,201.6 M, saving of the best redesign 219.6 M
+[ 274.0s] extensions: drift: designed in 2026 (10000 stores open): today's cost 6,234.6 M, saving of the best redesign 252.6 M
+[ 296.0s] extensions: generation: 12 new networks evaluated, best 6,063.2 M against the pool's best 5,982.0 M
+[ 296.0s] extensions: 192 evaluations, written to /home/louis/dcn/code/results/full/registry.json
+wrote /home/louis/dcn/demo.html (2.53 MB)
+wrote /home/louis/dcn/proposal.html (0.49 MB)
