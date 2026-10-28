@@ -8,7 +8,7 @@ import data from "../data.json";
 const STEPS = [
   ["Real roads", "OpenStreetMap road distances through OSRM, not map distances"],
   ["Uncertain demand", "Each store's orders as a Poisson-Gamma belief; DCs routed on sampled days"],
-  ["Every morning routed", "Savings and 2-opt routes for every DC, every stop before noon"],
+  ["Every morning routed", "Every DC routed store by store, every stop before noon"],
   ["A smart search", ""],
 ];
 

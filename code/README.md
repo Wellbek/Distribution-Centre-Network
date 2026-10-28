@@ -1,6 +1,6 @@
 # Dasol network lab - code
 
-Version v1.0, 2026-10-27.
+Version v1.1.
 Python 3.10 or newer, no network access needed at run time.
 
 ## Three commands
@@ -24,10 +24,10 @@ The profile named by `DEMO_PROFILE` in `dcn/config.py` (`full`) also rebuilds `.
 
 ## Checks and the demo
 
-- `python verify.py` checks the shown run independently (route audit, cost identities, LP bounds, determinism, worker pool, departure waves, outcome tables, heuristic against an exact solve, engine parity, the local app) and writes `results/full/verification.json`; the demo checks need `pip install playwright && playwright install chromium` and are skipped without it.
+- `python verify.py` checks the shown run independently (route audit, cost identities, LP bounds, determinism, worker pool, departure waves, outcome tables, the router against exact enumeration, engine parity, the local app) and writes `results/full/verification.json`; the demo checks need `pip install playwright && playwright install chromium` and are skipped without it.
 - `python build_demo.py` embeds the registry, the verification record and the road shapes into `../demo.html`, and the registry into `../proposal.html`.
 - `python checks/routing_gap.py [baseline|recommended] [days] [sec_per_store] [dcs]` measures the routing heuristic against PyVRP 0.11.3 (optional: `pip install pyvrp==0.11.3`); its cached results are in `results/checks/`, and `python checks/routing_summary.py` (no PyVRP needed) summarises them per network; `build_demo.py` embeds that summary in both pages.
-- `../demo.html` opens offline from disk; its live solve runs a simplified in-browser copy of the routing rules (no 2-opt, calibrated distance model instead of the OSRM cache) and says so on the page.
+- `../demo.html` opens offline from disk; its live solve runs a simplified in-browser copy of the routing rules (no segment reversal, calibrated distance model instead of the OSRM cache) and says so on the page.
 - `python app.py` serves the same page on `http://localhost:8437` and answers the live solve with `dcn/routing.py` on the cached road distances, the same rules and inputs as the reported run.
 
 ## Distances
@@ -45,10 +45,10 @@ If the cache is missing the code warns and falls back to an uncalibrated placeho
 | `dcn/distances.py` | Road km: OSRM cache and the calibrated model for uncached pairs |
 | `dcn/world.py` | Stores, types, rates, churn, the historical assignment |
 | `dcn/demand.py` | Calendar, demand history, Poisson-Gamma with exposure, stratified day sampler |
-| `dcn/routing.py` | Lower level: savings + 2-opt under load, stops, km, shift and noon deadline; two-driver relay routes for stores no one-driver route reaches; departure waves under a dock limit |
-| `dcn/evaluate.py` | Connection: transportation-LP assignment, newsvendor fleet, E over sampled days |
+| `dcn/routing.py` | Lower level: routes built step by step (farthest store first, then the insertion that saves most against a store's own trip) and shortened by segment reversal, under load, stops, km, shift and noon deadline; two-driver relay routes for stores no one-driver route reaches; departure waves under a dock limit |
+| `dcn/evaluate.py` | Connection: transportation-LP assignment, owned fleet at the 0.671 quantile of daily need, E over sampled days |
 | `dcn/gp.py` | GP (Matern-5/2 ARD, marginal likelihood) and expected improvement |
-| `dcn/search.py` | G0 centre of gravity, G1 load-based route approximation, G2 with the clock, pool, budgeted search |
+| `dcn/search.py` | G0 centre of gravity, G1 load-based route approximation (its route-length constant fitted by least squares on the baseline's routed days), G2 with the clock, pool, budgeted search |
 | `dcn/pipeline.py` | Whole run: search, validation, finals, held-out days, reversals, departure-wave and thinning checks, outcome tables, registry |
 | `dcn/extensions.py` | Closure sequence along the lease expiries, robustness, value of information, design-year drift sweep, candidate generation (CbAS) |
 | `checks/routing_gap.py` | Optional accuracy check of the routing heuristic against PyVRP |

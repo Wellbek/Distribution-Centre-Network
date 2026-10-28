@@ -16,7 +16,7 @@ d = dict(
     kept=[sites[j]["name"] for j in rec if j in base], opened=[sites[j]["name"] for j in rec if j not in base],
     saving=M(sv["final_mean"]), ci=[M(x) for x in sv["final_ci"]], held=M(sv["held_mean"]), redraw=M(sv["waterfall"][0]["total"] - sv["waterfall"][1]["total"]),
     today=M(F["baseline"]["total"]), recommended=M(F["recommended"]["total"]), eight=M(F["best_k8"]["total"] - F["recommended"]["total"]),
-    proxy_k=F["proxy_only"]["k"], proxy_loss=M(F["proxy_only"]["total"] - F["recommended"]["total"]), sp_g1=round(r["r3_g1"]["spearman"], 2), sp_g2=round(r["r3"]["spearman"], 2),
+    proxy_k=F["proxy_only"]["k"], proxy_loss=M(F["proxy_only"]["total"] - F["recommended"]["total"]), r2_g1=round(r["r3_g1"]["r2_line"], 2), r2_g2=round(r["r3"]["r2_line"], 2),
     networks=len(r["pool"]) + len(r["extensions"]["generation"]["evaluated"]), budget=r["meta"]["budget"],
     found_at=next(i + 1 for i, v in enumerate(r["curve_bo"]) if v <= r["pool_best"] + 1), random_gap=M(r["random_band"]["p50"][-1] - r["pool_best"]),
     pyvrp=M(sv["final_mean"] - r["routing_check"]["saving_month_shift"]) if r.get("routing_check") else None,

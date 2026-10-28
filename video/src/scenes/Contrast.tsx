@@ -33,7 +33,7 @@ export const Contrast: React.FC = () => {
               <div style={{ fontFamily: SANS, fontSize: 30, color: COLORS.offWhite, marginTop: 14 }}>Vehicles must reach every store by noon.</div>
               <div style={{ ...big, color: COLORS.white, marginTop: 40 }}>Picks <span style={{ color: COLORS.lime }}>{data.k} DCs</span></div>
               <div style={{ ...big, color: COLORS.lime, marginTop: 24 }}>Cheapest found</div>
-              <div style={{ fontFamily: SANS, fontSize: 28, color: COLORS.muted, marginTop: 8 }}>rank agreement with the full cost: {data.sp_g1} → {data.sp_g2} once the clock is in</div>
+              <div style={{ fontFamily: SANS, fontSize: 28, color: COLORS.muted, marginTop: 8 }}>fit to the full cost (R²): {data.r2_g1} → {data.r2_g2} once the clock is in</div>
             </div>
           </FadeUp>
         </div>
