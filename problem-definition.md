@@ -82,7 +82,7 @@ Execution frequency (daily routing, a one-off redesign) and triggers (lease expi
 **Given:** DC j, its stores $I_j$, that day's orders $q_i$ (roll cages), road distances $d_{ab}$, travel time $d_{ab}/v$ with $v$ = 35 km/h, stop time $s$ = 15 min, vehicle capacity $Q$ = 48 cages, at most 25 stops and 250 km per vehicle, departure 04:00, deadline 12:00, shift ending 13:00 (10 h from 03:00 including 1 h loading) plus a 30 min break, the owned fleet $n_j$ from `D3`.
 **Decided:** the set of routes $R$ (each an ordered store sequence) covering every store once.
 
-$$\min_{R}\;\; c_v\,|R| \;+\; c_f \sum_{r\in R} \mathrm{km}(r) \;+\; c_s\,(|R|-n_j)^+ \;+\; p_{late} L + p_{out} M$$
+$$\min_{R}\;\; c_v\,\min(|R|, n_j) \;+\; c_s\,(|R|-n_j)^+ \;+\; c_f \sum_{r\in R} \mathrm{km}(r) \;+\; p_{late} L + p_{out} M$$
 
 subject to, for every route $r$: $\sum_{i\in r} q_i \le Q$; $|r| \le 25$; $\mathrm{km}(r) \le 250$; arrival $a_i \le$ 12:00 at every stop; return plus break $\le$ 13:00; arrivals chained by $a_{next} = a_{prev} + s + d_{prev,next}/v$.
 $c_v$ = 180,822 KRW is an owned vehicle-day (5.5 M KRW a month / 30.42 days), $c_f$ = 350 KRW per km, $c_s$ = 550,000 KRW per spot truck, $p_{late}$ = 120,000 KRW per delivery after 14:00, $p_{out}$ = 500,000 KRW per missed store.
