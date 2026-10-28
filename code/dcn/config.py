@@ -33,7 +33,7 @@ WAVES = (4.0, 5.0, 6.0, 7.0)
 # Parallel territories (results do not depend on it)
 WORKERS = int(os.environ.get("DCN_WORKERS", min(os.cpu_count() or 1, 16)))  # processes; DCN_WORKERS=2 for a gentle laptop run
 
-# Fleet policy: newsvendor fractile = 1 - owned cost per day / spot rate = 0.671
+# Fleet policy: own a vehicle while it is needed on more days than its daily cost / the spot rate: quantile 1 - 180,822 / 550,000 = 0.671
 FLEET_Q = 1 - VEHICLE_MONTH / DAYS_MONTH / SPOT_DAY
 
 # Distances: placeholder until the OSRM cache exists

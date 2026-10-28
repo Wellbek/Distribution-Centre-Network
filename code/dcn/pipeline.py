@@ -38,9 +38,11 @@ def _boot(eb, er, seed, n=1000, fixed_fleet=False):
     return [float(np.percentile(out, 5)), float(np.percentile(out, 95))]
 
 
-def _spearman(a, b):
-    ra, rb = np.argsort(np.argsort(a, kind="stable"), kind="stable"), np.argsort(np.argsort(b, kind="stable"), kind="stable")
-    return float(np.corrcoef(ra, rb)[0, 1])
+def _line(g, e):
+    """Least-squares line e = a + b g (Lecture 2): its R² and RMSE, how well G predicts E once rescaled."""
+    X = np.c_[np.ones(len(g)), g]
+    res = e - X @ np.linalg.lstsq(X, e, rcond=None)[0]
+    return float(1 - (res ** 2).sum() / ((e - e.mean()) ** 2).sum()), float(np.sqrt((res ** 2).mean()))
 
 
 def _summary(e):
@@ -171,6 +173,10 @@ def _run(profile):
 
     kmin = int(np.ceil(ctx["n"] / ctx["hi"])); kmax = min(int(ctx["n"] // ctx["lo"]), 20)
     ks = list(range(kmin, kmax + 1))
+    base = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"])
+    clock(f"baseline E = {base['total'] / 1e6:,.1f} M KRW/month, {base['over_limit_day']:.1f} over-limit routes/day")
+    ctx["tour_c"] = search.fit_tour(ctx, base)
+    clock(f"route-length constant c = {ctx['tour_c']:.3f}, fitted on the baseline's routed search days")
     pool = search.build_pool(ctx, ks, profile["pool_per_k"], seed)
     clock(f"pool: {len(pool)} candidates for k = {kmin}..{kmax}")
 
@@ -182,8 +188,6 @@ def _run(profile):
             cache[key] = evaluate.evaluate(ctx, p["sites"], d_search)
         return cache[key]
 
-    base = evaluate.evaluate(ctx, ctx["current"], d_search, assign=ctx["hist_assign"])
-    clock(f"baseline E = {base['total'] / 1e6:,.1f} M KRW/month, {base['over_limit_day']:.1f} over-limit routes/day")
     t_pool = time.time() - t0
     log_bo = search.run_search(pool, ev, C.BUDGET, "ei", seed)
     t_search = time.time() - t0 - t_pool
@@ -349,9 +353,10 @@ def _run(profile):
     def r3_for(key):
         G = np.array([pool[i][key] for i in evald])
         g_pick = evald[int(np.argmin(G))]; e_pick = evald[int(np.argmin(E))]
-        within = [_spearman(G[[i for i, c in enumerate(evald) if pool[c]["k"] == k]], E[[i for i, c in enumerate(evald) if pool[c]["k"] == k]])
+        within = [_line(G[[i for i, c in enumerate(evald) if pool[c]["k"] == k]], E[[i for i, c in enumerate(evald) if pool[c]["k"] == k]])[0]
                   for k in ks if sum(pool[c]["k"] == k for c in evald) >= 3]
-        return dict(spearman=_spearman(G, E), spearman_pool=_spearman(np.array([p[key] for p in pool]), E_pool), spearman_within_k=float(np.mean(within)) if within else None,
+        (r2_line, rmse_line), (r2_line_pool, _) = _line(G, E), _line(np.array([p[key] for p in pool]), E_pool)
+        return dict(r2_line=r2_line, rmse_line=rmse_line, r2_line_pool=r2_line_pool, r2_line_within_k=float(np.mean(within)) if within else None,
                     r2=float(1 - ((E - G) ** 2).sum() / ((E - E.mean()) ** 2).sum()), rmse=float(np.sqrt(((E - G) ** 2).mean())),
                     loss=float(E_pool[g_pick] - E.min()), g_pick_k=pool[g_pick]["k"], e_best_k=pool[e_pick]["k"],
                     A=float(pool[e_pick][key] - E_pool[e_pick]), B=float(E_pool[g_pick] - pool[g_pick][key]),
@@ -387,7 +392,7 @@ def _run(profile):
                   machine=platform.machine(),
                   distance_model=distances.describe(),
                   bounds=[ctx["lo"], ctx["hi"]], k_range=[kmin, kmax], budget=C.BUDGET, days=[C.SEARCH_DAYS, C.FINAL_DAYS, C.HELDOUT_DAYS],
-                  fleet_quantile=C.FLEET_Q, timing=timing),
+                  fleet_quantile=C.FLEET_Q, tour_c=ctx["tour_c"], timing=timing),
         params=dict(cap=C.CAP, max_stops=C.MAX_STOPS, max_km=C.MAX_KM, stop_h=C.STOP_H, speed=C.SPEED, depart=C.DEPART,
                     deadline=C.DEADLINE, shift_end=C.SHIFT_END, break_h=C.BREAK_H, fail_at=C.FAIL_AT, detour=C.DETOUR,
                     detour_mountain=C.DETOUR_MOUNTAIN, road_coef=distances.cache() and distances.cache()['coef'].tolist(),

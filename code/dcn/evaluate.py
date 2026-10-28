@@ -112,7 +112,7 @@ def territories(jobs):
 
 
 def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=False, keep_stores=False, docks=None):
-    """Full evaluation E over sampled days (common random numbers, calendar-stratum weights); docks = departure waves."""
+    """Full evaluation E over sampled days (the same days for every network, calendar-class weights); docks = departure waves."""
     p = p or routing.Params()
     open_idx = np.asarray(open_idx)
     lp = None
@@ -158,7 +158,7 @@ def evaluate(ctx, open_idx, days, assign=None, owned=None, p=None, keep_routes=F
     service = ontime / np.maximum(total, 1)
     wn = w / w.sum()
     out = dict(feasible=True, open=used, k=len(used), **parts, owned=int(owned.sum()), owned_by_dc=owned.tolist(),
-               V=V.tolist(), fuel_d=fuel_d.tolist(), pen_d=pen_d.tolist(), over_d=over_d.tolist(), w=w.tolist(),
+               V=V.tolist(), KM=KM.tolist(), fuel_d=fuel_d.tolist(), pen_d=pen_d.tolist(), over_d=over_d.tolist(), w=w.tolist(),
                vehicles_day=float(wn @ V.sum(0)), dock_over_day=float(wn @ DOCK.sum(0)), km_day=float(wn @ KM.sum(0)), over_limit_day=float(wn @ over_d), missed_routes_day=float(wn @ MISS.sum(0)), stockouts_day=float(wn @ LOST.sum(0)),
                daily_total=daily.tolist(), service=service.tolist(), service_min=float(service.min()),
                ok98=bool(service.min() >= 0.98), census={k: round(v, 2) for k, v in census.items()},

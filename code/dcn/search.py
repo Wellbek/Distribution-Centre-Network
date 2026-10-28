@@ -1,12 +1,12 @@
-"""Upper level: generation criteria G0 (centre of gravity) and G1 (p-median + route approximation), pool, budgeted search."""
+"""Upper level: generation criteria G0 (centre of gravity) and G1, G2 (route approximation), pool, budgeted search."""
 import numpy as np
-from scipy.optimize import linear_sum_assignment
 
 from . import config as C
 from . import distances
 from . import geo
 from .evaluate import assign_lp
 from .gp import GP, expected_improvement
+from .world import transport_lp
 
 
 def greedy_assign(ctx, open_idx):
@@ -42,8 +42,32 @@ def greedy_assign(ctx, open_idx):
     return a
 
 
+def _spread(ctx, a, k):
+    # Stores per territory and the standard deviations of their east-west and north-south km
+    x, y = ctx["lon"] * 111 * np.cos(np.radians(36)), ctx["lat"] * 111
+    n_j = np.bincount(a, minlength=k)
+    sx = np.sqrt(np.maximum(np.bincount(a, x * x, k) / np.maximum(n_j, 1) - (np.bincount(a, x, k) / np.maximum(n_j, 1)) ** 2, 1))
+    sy = np.sqrt(np.maximum(np.bincount(a, y * y, k) / np.maximum(n_j, 1) - (np.bincount(a, y, k) / np.maximum(n_j, 1)) ** 2, 1))
+    return n_j, sx, sy
+
+
+def fit_tour(ctx, base):
+    """Constant c of the local km c sqrt(n A) by least squares on the baseline's routed days (Lecture 2): routed km minus
+    the out-and-back legs 2 rbar V, against sqrt(n A) times the local road-to-map ratio, day-weighted, through the origin."""
+    open_idx = np.asarray(base["open"])
+    a = np.searchsorted(open_idx, ctx["hist_assign"])
+    k = len(open_idx)
+    d, w = ctx["dsite"][np.arange(ctx["n"]), ctx["hist_assign"]], ctx["w"]
+    n_j, sx, sy = _spread(ctx, a, k)
+    rbar = np.bincount(a, w * d, k) / np.bincount(a, w, k)
+    L = np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()
+    y = np.asarray(base["KM"]) - 2 * rbar[:, None] * np.asarray(base["V"])
+    wd = np.asarray(base["w"])
+    return float((wd * L[:, None] * y).sum() / (wd * L[:, None] ** 2).sum())
+
+
 def g1(ctx, open_idx, a=None, clock=False):
-    """Cheap criterion: fixed cost + load-based fleet + line-haul and continuous-approximation local km.
+    """Cheap criterion: fixed cost + load-based fleet + line-haul and continuous-approximation local km (c from fit_tour).
     Stores beyond the 125 km reach ride relay routes by load, each with a second driver, as in E.
     G1 ignores the clock; G2 (clock=True) also counts the routes the noon deadline and the km limit force:
     a store at road distance d can share a route with at most s_max(d) stores (system knowledge, brief R3)."""
@@ -52,20 +76,18 @@ def g1(ctx, open_idx, a=None, clock=False):
     if a is None:
         a = greedy_assign(ctx, open_idx)
     d = ctx["dsite"][np.arange(ctx["n"]), open_idx[a]]
-    w, n_j = ctx["w"], np.bincount(a, minlength=k)
+    w, c = ctx["w"], ctx["tour_c"]
+    n_j, sx, sy = _spread(ctx, a, k)
     W = np.bincount(a, w, k)
     routes = W / (0.92 * C.CAP)
     rbar = np.bincount(a, w * d, k) / np.maximum(W, 1e-9)
-    x, y = ctx["lon"] * 111 * np.cos(np.radians(36)), ctx["lat"] * 111
-    sx = np.sqrt(np.maximum(np.bincount(a, x * x, k) / np.maximum(n_j, 1) - (np.bincount(a, x, k) / np.maximum(n_j, 1)) ** 2, 1))
-    sy = np.sqrt(np.maximum(np.bincount(a, y * y, k) / np.maximum(n_j, 1) - (np.bincount(a, y, k) / np.maximum(n_j, 1)) ** 2, 1))
     if clock:
-        leg = 0.7124 * np.sqrt(4 * np.pi * sx * sy / np.maximum(n_j, 1)) * distances.local_ratio()
+        leg = c * np.sqrt(4 * np.pi * sx * sy / np.maximum(n_j, 1)) * distances.local_ratio()
         dd, lg = np.minimum(d, C.FAR_KM), leg[a]
         s_max = np.minimum.reduce([np.full_like(d, C.MAX_STOPS), (C.DEADLINE - C.DEPART - dd / C.SPEED) / (C.STOP_H + lg / C.SPEED),
                                    (C.MAX_KM - 2 * dd) / np.maximum(lg, 1e-6)])
         routes = np.maximum(routes, np.bincount(a, 1 / np.maximum(s_max, 1), k))
-    km = (2 * rbar * routes + 0.7124 * np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()).sum()
+    km = (2 * rbar * routes + c * np.sqrt(n_j * 4 * np.pi * sx * sy) * distances.local_ratio()).sum()
     veh = np.ceil(routes * 1.08).sum()
     far = d > C.FAR_KM
     Wf = np.bincount(a[far], w[far], k)
@@ -77,7 +99,8 @@ def g1(ctx, open_idx, a=None, clock=False):
 
 
 def g0_sites(ctx, k, seed):
-    """Data Team's method: demand-weighted centre of gravity (k-means on map coordinates), snapped to distinct sites."""
+    """Data Team's method: each store to its nearest centre, each centre moved to its stores' demand-weighted centre of
+    gravity on the map, repeated until the centres stop; then snapped to k distinct sites by the assignment LP (Lecture 1)."""
     rng = np.random.default_rng(seed)
     X = np.c_[ctx["lon"] * np.cos(np.radians(36)), ctx["lat"]]
     w = ctx["w"]
@@ -90,8 +113,8 @@ def g0_sites(ctx, k, seed):
         cent = new
     S = np.c_[ctx["site_lon"] * np.cos(np.radians(36)), ctx["site_lat"]]
     cost = ((cent[:, None, :] - S[None]) ** 2).sum(-1)
-    _, col = linear_sum_assignment(cost)
-    return sorted(col.tolist())
+    res = transport_lp(cost, 0, 1)
+    return sorted(res.x.reshape(k, -1).argmax(1).tolist())
 
 
 def g1_best(ctx, k, start=None, n_near=12, clock=False):

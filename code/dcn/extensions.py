@@ -99,6 +99,7 @@ def _run(profile):
     hist = demand.make_history(world, np.random.default_rng(C.SEED + 1))
     model = demand.fit(world, hist)
     ctx = evaluate.context(world, model)
+    ctx["tour_c"] = reg["meta"]["tour_c"]
     days = demand.sample_days(model, world, C.SEARCH_DAYS, C.SEED + 11, ctx["mask"])
     pool = reg["pool"]
     nets = {s["k"]: pool[s["cand"]]["sites"] for s in reg["sweep"]}
