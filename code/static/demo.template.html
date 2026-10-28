@@ -386,9 +386,19 @@ function show(id) {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.v === id));
   if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
   (RENDER[id] || (() => {}))();
+  requestAnimationFrame(fitFormulas);
   // Every card of precomputed results names its command; the live solve is computed in the page
   document.querySelectorAll(`#v-${id} .card h3`).forEach(h => { if (!h.querySelector(".pre-tag") && !h.closest("#live-card")) h.insertAdjacentHTML("beforeend", ` <span class="pre-tag">${PRE}</span>`); });
 }
+// Shrink a formula that is wider than its box (narrow screens), down to 65% of its size
+function fitFormulas() {
+  document.querySelectorAll(".view.on .formula .katex-display > .katex").forEach(k => {
+    k.style.fontSize = "";
+    const box = k.closest(".formula").clientWidth - 24;
+    if (k.scrollWidth > box) k.style.fontSize = Math.max(0.65, box / k.scrollWidth).toFixed(3) + "em";
+  });
+}
+addEventListener("resize", () => { clearTimeout(fitFormulas._t); fitFormulas._t = setTimeout(fitFormulas, 150); });
 
 // Find an answer: business and analyst questions, each jumping to the card that answers it
 const FIND = [
@@ -1061,7 +1071,7 @@ RENDER.how = () => {
       right: `<div class="seg" id="g-seg"><button data-n="G2" class="on">G2 (with the clock)</button><button data-n="G1">G1 (load only)</button></div><svg class="chart" viewBox="0 0 440 300" id="fig-scatter"></svg><svg class="chart" viewBox="0 0 440 90" id="fig-bound"></svg>` },
   ];
   L.push(balanceLec());
-  $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.use ? `<div class="use">${x.use}</div>` : ""}${x.left}</div><div>${x.right}</div></div>`).join("");
+  $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title} <span class="pre-tag">${PRE}</span></h3>${x.use ? `<div class="use">${x.use}</div>` : ""}${x.left}</div><div>${x.right}</div></div>`).join("");
   figHierarchy(); figGamma(); figPPC(); figInsert(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
   document.querySelectorAll("#log-seg button").forEach(b => b.onclick = () => { document.querySelectorAll("#log-seg button").forEach(z => z.classList.toggle("on", z === b)); logTable(b.dataset.n); });
 };
