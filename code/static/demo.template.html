@@ -395,7 +395,7 @@ const FIND = [
   ["The decision", [["How many DCs, and where?", "answer", "hero-stats"], ["What does it save, and how sure are we?", "answer", "hero-stats", "saving uncertainty interval held-out"], ["Why is this the best network?", "answer", "why"], ["What does each DC look like: stores, vehicles, rent?", "answer", "net-card", "fleet owned trucks per dc lease"], ["What would change the answer?", "answer", "reversal"], ["How does cost change with the number of DCs?", "answer", "sweep"], ["Were Strategy, Operations, the Data Team and the Field Manager right?", "answer", "stmts"]]],
   ["Getting there", [["How do we get there, lease by lease?", "ext", "seq-time"], ["What should we measure first?", "ext", "voi-grid"], ["Does the answer hold if demand shifts?", "ext", "rob-chart"], ["How far has the baseline network drifted?", "ext", "drift-wrap"], ["Could a learned generator find better networks?", "ext", "gen-table"]]],
   ["Operations", [["What does a delivery day look like?", "day", "daymap"], ["Can I re-plan one DC with my own settings?", "day", "live-card"], ["Which stores change DC, and are they still on time?", "checks", "storehist"], ["What happens on a day the fleet cannot cover?", "checks", "cases"]]],
-  ["The method", [["What is decided, and what judges it?", "how", "q1"], ["How is demand forecast, and why sampled days?", "how", "q2"], ["How is one DC's morning planned?", "how", "q3"], ["How is a network priced?", "how", "q4", "fleet newsvendor quantile assignment lp evaluation"], ["How were networks searched under a budget, and the log?", "how", "q5", "gp ei bayesian random selection evaluation log"], ["Can the quick estimate be trusted?", "how", "q6"], ["What was simplified, and does it matter?", "how", "q7"]]],
+  ["The method", [["What is decided, and what judges it?", "how", "q1"], ["How is demand forecast, and why sampled days?", "how", "q2"], ["How is one DC's morning planned?", "how", "q3"], ["How is a network priced?", "how", "q4", "fleet quantile assignment lp evaluation"], ["How were networks searched under a budget, and the log?", "how", "q5", "gp ei bayesian random selection evaluation log"], ["Can the quick estimate be trusted?", "how", "q6"], ["What was simplified, and does it matter?", "how", "q7"]]],
   ["Data and checks", [["How was the data made, and why?", "data", "made"], ["What did we assume, for the business to confirm?", "data", "register", "assumption relay driver rent scope fresh food"], ["How was the baseline network built?", "data", "data-flow"], ["Is the routing accurate?", "checks", "routercheck", "pyvrp exact heuristic router"], ["Can I reproduce every number?", "checks", "about"]]],
 ];
 const TABNAME = { answer: "The answer", day: "Delivery day", how: "How it works", data: "Data", checks: "Checks", ext: "Extensions" };
@@ -617,7 +617,7 @@ function reversal() {
   // R5 reversals plus the relay-price sweep; red when the saving changes sign, amber when only the best k moves
   const base = R.reversals[0], rows = [...R.reversals.map(x => [x.assumption === "today's network" ? "baseline network" : x.assumption, x.value || "base case", x.k_star, x.saving]),
     ...R.reversal.filter(x => Math.abs(x.relay - P.relay_day) > 1).map(x => ["relay driver per route-day", x.relay === 0 ? "free" : `${f0(x.relay)} KRW`, x.k_star, x.baseline - x.recommended]),
-    ...(R.routing_check ? [["routing method", "PyVRP routes instead of savings (day 0, measured; k not re-searched)", base.k_star, R.saving.final_mean - R.routing_check.saving_month_shift]] : [])];
+    ...(R.routing_check ? [["routing method", "PyVRP routes instead of ours (day 0, measured; k not re-searched)", base.k_star, R.saving.final_mean - R.routing_check.saving_month_shift]] : [])];
   $("#reversal").innerHTML = `<tr><th>Assumption</th><th>Value</th><th>Best k</th><th>Saving</th></tr>` +
     rows.map(([a, v, k, sv], i) => `<tr class="${i === 0 ? "hl" : (sv > 0) !== (base.saving > 0) ? "flip" : k !== base.k_star ? "kmove" : ""}"><td>${a}</td><td>${v}</td><td>${k ?? "none"}</td><td>${sv == null ? "n/a" : (sv < 0 ? "−" : "") + fM(Math.abs(sv))}</td></tr>`).join("") +
     `<tr><td colspan="4" class="note">Red: the redesign no longer pays. Amber: it pays, with a different best k. Relay routes a day: baseline ${R.finals.baseline.over_limit_day.toFixed(0)}, recommended ${R.finals.recommended.over_limit_day.toFixed(0)}. Sweep candidates come from the whole-pool validation, not only the 40 searched.</td></tr>`;
@@ -872,47 +872,62 @@ function liveDefaults() { Object.entries({ "lv-dead": 12, "lv-stop": 15, "lv-spe
 function sync() { $("#o-dead").textContent = hhmm(+$("#lv-dead").value); $("#o-stop").textContent = $("#lv-stop").value; $("#o-speed").textContent = $("#lv-speed").value; $("#o-cap").textContent = $("#lv-cap").value; $("#o-stops").textContent = $("#lv-stops").value; $("#o-fleet").textContent = $("#lv-fleet").value; }
 function roadKm(la1, lo1, la2, lo2, mt) { const r = Math.PI / 180, dp = (la2 - la1) * r, dl = (lo2 - lo1) * r; const a = Math.sin(dp / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin(dl / 2) ** 2; const d = 2 * 6371 * Math.asin(Math.sqrt(Math.min(a, 1))); if (!P.road_coef) return d * (mt ? P.detour_mountain : P.detour); if (d === 0) return 0; const c = P.road_coef[mt ? 1 : 0], x = Math.max(d, 0.5); return x * Math.exp(c[0] + c[1] * Math.log(x)); }
 function solveJS(dc, st, p) {
-  // In-browser copy of routing.solve without the 2-opt pass: savings, then a relay pass for stores no one-driver route reaches
+  // In-browser copy of routing.solve without the segment reversal: step-by-step construction, then a relay pass for stores no one-driver route reaches
   const pts = [[dc[0], dc[1], 0], ...st.map(s => [s[0], s[1], s[2]])];
   const D = pts.map(a => pts.map(b => roadKm(a[0], a[1], b[0], b[1], a[2] || b[2])));
-  let out = savingsJS(D, st.map(s => s[3]), p);
+  let out = constructJS(D, st.map(s => s[3]), p);
   const far = out.filter(r => r.binding === "violates limit").flatMap(r => r.seq).sort((a, b) => a - b);
   if (far.length) {
     const sub = [0, ...far.map(i => i + 1)], Ds = sub.map(i => sub.map(j => D[i][j]));
-    const relay = savingsJS(Ds, far.map(i => st[i][3]), { ...p, max_km: p.relay_km, shift_end: p.relay_shift_end });
+    const relay = constructJS(Ds, far.map(i => st[i][3]), { ...p, max_km: p.relay_km, shift_end: p.relay_shift_end });
     relay.forEach(r => { r.seq = r.seq.map(i => far[i]); r.binding = r.binding === "violates limit" ? r.binding : "relay"; });
     out = out.filter(r => r.binding !== "violates limit").concat(relay).sort((a, b) => a.arr[0] - b.arr[0]);
   }
   return { routes: out, vehicles: out.length, km: out.reduce((a, r) => a + r.km, 0) };
 }
-function savingsJS(D, q, p) {
-  const n = q.length;
-  const walk = seq => { let t = p.depart, km = 0, prev = 0; const arr = []; for (const i of seq) { km += D[prev][i]; t += D[prev][i] / p.speed; arr.push(t); t += p.stop_h; prev = i; } km += D[prev][0]; return [km, arr, t + D[prev][0] / p.speed]; };
-  const ok = seq => { const [km, arr, ret] = walk(seq); return km <= p.max_km && arr[arr.length - 1] <= p.deadline && ret + p.break_h <= p.shift_end; };
-  // All pairs up to 400 stores, else each store with its 40 nearest, as routing._pairs
-  const pairs = [];
-  if (n <= 400) { for (let i = 1; i <= n; i++) for (let j = i + 1; j <= n; j++) pairs.push([D[0][i] + D[0][j] - D[i][j], i, j]); }
-  else {
-    const seen = new Set();
-    for (let i = 1; i <= n; i++) {
-      const near = Array.from({ length: n }, (_, k) => k + 1).sort((a, b) => D[i][a] - D[i][b]).slice(0, 41);
-      for (const j of near) { if (j === i) continue; const a = Math.min(i, j), b = Math.max(i, j), key = a * 100000 + b; if (!seen.has(key)) { seen.add(key); pairs.push([D[0][a] + D[0][b] - D[a][b], a, b]); } }
+function constructJS(D, q, p) {
+  // As routing._construct: open a route at the unrouted store farthest from the DC, then insert the store whose cheapest
+  // feasible insertion saves the most km against its own trip (2 d0 - detour), until none fits
+  const n = q.length, eps = 1e-9, d0 = D[0];
+  const walk = seq => { let t = p.depart, km = 0, prev = 0; const arr = []; for (const i of seq) { km += D[prev][i]; t += D[prev][i] / p.speed; arr.push(t); t += p.stop_h; prev = i; } const back = D[prev][0]; return [km + back, arr, t + back / p.speed]; };
+  const okTime = seq => { let t = p.depart, km = 0, prev = 0; for (const i of seq) { km += D[prev][i]; t += D[prev][i] / p.speed; if (t > p.deadline || km > p.max_km) return false; t += p.stop_h; prev = i; } const back = D[prev][0]; return km + back <= p.max_km && t + back / p.speed + p.break_h <= p.shift_end; };
+  const nn = [null]; for (let i = 1; i <= n; i++) nn.push(Array.from({ length: n }, (_, k) => k + 1).sort((a, b) => D[i][a] - D[i][b] || a - b).slice(0, 31));
+  const left = new Array(n + 1).fill(true); left[0] = false;
+  const order = Array.from({ length: n }, (_, k) => k + 1).sort((a, b) => d0[b] - d0[a] || a - b);
+  const routes = []; let oi = 0, nLeft = n;
+  while (nLeft > 0) {
+    while (!left[order[oi]]) oi++;
+    let r = [order[oi]]; left[r[0]] = false; nLeft--;
+    let load = q[r[0] - 1];
+    const near = new Array(n + 1).fill(false); for (const v of nn[r[0]]) near[v] = true;
+    while (okTime(r) && r.length < p.max_stops) {
+      const C = []; for (let c = 1; c <= n; c++) if (near[c] && left[c] && load + q[c - 1] <= p.cap + eps) C.push(c);
+      if (!C.length) break;
+      const [km, arr, ret] = walk(r), P = [0, ...r], N = [...r, 0], dep = [p.depart, ...arr.map(t => t + p.stop_h)], L = r.length;
+      const kb = [], score = [];
+      for (const c of C) {
+        let best = Infinity, bk = 0;
+        for (let k = 0; k <= L; k++) {
+          const dpc = D[P[k]][c], det = dpc + D[c][N[k]] - D[P[k]][N[k]], push = det / p.speed + p.stop_h;
+          let ok = dep[k] + dpc / p.speed <= p.deadline + eps && km + det <= p.max_km + eps && ret + push + p.break_h <= p.shift_end + eps;
+          if (k < L) ok = ok && arr[L - 1] + push <= p.deadline + eps;
+          if (ok && det < best) { best = det; bk = k; }
+        }
+        kb.push(bk); score.push(isFinite(best) ? 2 * d0[c] - best : -Infinity);
+      }
+      let placed = false;
+      while (true) {
+        let b = -1; for (let i = 0; i < score.length; i++) if (isFinite(score[i]) && (b < 0 || score[i] > score[b])) b = i;
+        if (b < 0) break;
+        const c = C[b], s = [...r.slice(0, kb[b]), c, ...r.slice(kb[b])];
+        if (okTime(s)) { r = s; placed = true; load += q[c - 1]; left[c] = false; nLeft--; for (const v of nn[c]) near[v] = true; break; }
+        score[b] = -Infinity;
+      }
+      if (!placed) break;
     }
+    routes.push(r);
   }
-  pairs.sort((a, b) => b[0] - a[0] || a[1] - b[1] || a[2] - b[2]);
-  const routes = new Map(), of = [0], load = new Map();
-  for (let i = 1; i <= n; i++) { routes.set(i, [i]); of.push(i); load.set(i, q[i - 1]); }
-  for (const [s, i, j] of pairs) {
-    if (s <= 0) break; const ri = of[i], rj = of[j]; if (ri === rj) continue;
-    const A = routes.get(ri), B = routes.get(rj);
-    if ((A[0] !== i && A[A.length - 1] !== i) || (B[0] !== j && B[B.length - 1] !== j)) continue;
-    if (load.get(ri) + load.get(rj) > p.cap || A.length + B.length > p.max_stops) continue;
-    let cand = [...(A[A.length - 1] === i ? A : [...A].reverse()), ...(B[0] === j ? B : [...B].reverse())];
-    if (!ok(cand)) { cand = [...cand].reverse(); if (!ok(cand)) continue; }
-    routes.set(ri, cand); load.set(ri, load.get(ri) + load.get(rj)); load.delete(rj); routes.delete(rj); for (const v of cand) of[v] = ri;
-  }
-  const out = [];
-  for (const [k, seq] of routes) { const [km, arr, ret] = walk(seq); out.push({ seq: seq.map(v => v - 1), km, load: load.get(k), arr, ret, binding: km > p.max_km || arr[arr.length - 1] > p.deadline || ret + p.break_h > p.shift_end ? "violates limit" : "" }); }
+  const out = routes.map(seq => { const [km, arr, ret] = walk(seq); return { seq: seq.map(v => v - 1), km, load: seq.reduce((a, v) => a + q[v - 1], 0), arr, ret, binding: km > p.max_km || arr[arr.length - 1] > p.deadline || ret + p.break_h > p.shift_end ? "violates limit" : "" }; });
   return out.sort((a, b) => a.arr[0] - b.arr[0]);
 }
 async function solveLive() {
@@ -922,8 +937,8 @@ async function solveLive() {
   const st = LIVE.stores.map((i, k) => [S.lat[i], S.lon[i], S.mountain[i], day.q[k]]);
   const idx = LIVE.stores;
   let res, engine; const t0 = performance.now();
-  if (BACKEND) { try { res = await (await fetch("/api/solve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dc: [dc.lat, dc.lon], stores: st, params: p, site: LIVE.dc, ids: idx }) })).json(); engine = "Python engine (savings + 2-opt, cached road distances)"; } catch (e) { BACKEND = false; setEngine(); } }
-  if (!res) { res = solveJS([dc.lat, dc.lon], st, p); engine = "in-browser engine (same savings and relay rules; no 2-opt, calibrated distance model instead of the OSRM cache)"; }
+  if (BACKEND) { try { res = await (await fetch("/api/solve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dc: [dc.lat, dc.lon], stores: st, params: p, site: LIVE.dc, ids: idx }) })).json(); engine = "Python engine (step-by-step construction and segment reversal, cached road distances)"; } catch (e) { BACKEND = false; setEngine(); } }
+  if (!res) { res = solveJS([dc.lat, dc.lon], st, p); engine = "in-browser engine (same construction and relay rules; no segment reversal, calibrated distance model instead of the OSRM cache)"; }
   const ms = performance.now() - t0;
   // Fleet limit: routes beyond the available vehicles are not driven; their stores are uncovered
   const covered = res.routes.slice().sort((a, b) => b.load - a.load).slice(0, fleet), uncovered = res.routes.filter(r => !covered.includes(r));
@@ -1014,17 +1029,17 @@ RENDER.how = () => {
       <p>Store ${ex.store} has ${ex.days} days of history: prior mean ${ex.prior_mean.toFixed(2)}, its own data ${ex.data_mean.toFixed(2)}, posterior ${ex.post_mean.toFixed(2)} cages per unit exposure (true ${ex.true_rate.toFixed(2)}).</p>
       <div class="keypoint"><b>Why sampled days, not one average day.</b> Fleet and spot hire are not linear in demand: each DC owns the ${P.fleet_q.toFixed(3)} quantile of its daily need and pays ${f0(P.spot_day)} KRW for every vehicle above it, so a busy day costs more than a quiet day saves. Priced on one average day the ${ALT} network costs ${fM(R.r2.average_day)} M a month, on ${M.days[0]} sampled days ${fM(R.r2.sampled)} M: one average day understates E by ${fM(R.r2.sampled - R.r2.average_day)} M (${(100 * (R.r2.sampled / R.r2.average_day - 1)).toFixed(1)}%). The gap is small because store-level noise cancels at the DC; what moves every DC at once is the chain-wide shock (AR(1), φ = ${R.r2.phi.toFixed(2)}, σ = ${R.r2.sigma.toFixed(3)}) and holidays: on the peak day (${R.r2.peak_date}) the network needs ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned.</div>`,
       right: `<svg class="chart" viewBox="0 0 440 210" id="fig-gamma"></svg><svg class="chart" viewBox="0 0 440 190" id="fig-ppc"></svg><p class="note">Posterior predictive check: replicated chain totals (lime) against the history (purple).</p><svg class="chart" viewBox="0 0 440 150" id="fig-r2"></svg><p class="note">The same network priced three ways, M KRW a month.</p>` },
-    { q: "Q3 · How does one DC run its morning?", lec: "Lecture 1 · formulation is a balance", title: "The lower level: one DC, one day", use: `Use <b>the Clarke-Wright savings heuristic followed by 2-opt</b> to build each DC's routes, with the delivery window as a hard constraint, because a territory of up to 1,400 stores is far beyond an exact vehicle-routing solver and the search needs thousands of solves; its accuracy is measured against <b>exact set partitioning</b> on small territories and <b>PyVRP</b> (hybrid genetic search) on every territory.`,
+    { q: "Q3 · How does one DC run its morning?", lec: "Lecture 1 · formulation is a balance", title: "The lower level: one DC, one day", use: `Use the two roles of a routing solver from Lecture 0, <b>construct step by step with infeasible stores masked, then improve by reversing route segments</b>, with hand-written rules instead of learned ones and the delivery window as a hard constraint, because a territory of up to 1,400 stores is far beyond an exact solve and the search needs thousands of solves; its accuracy is measured against <b>exact enumeration</b> on small territories (Lecture 3) and <b>PyVRP</b>, a genetic algorithm (Lecture 5's black-box optimisers), on every territory.`,
       left: `<div class="formula">${MATH.lower_obj}</div><div class="formula">${MATH.lower_st}</div><div class="formula">${MATH.time}</div>
       <p><b>The window is a hard constraint:</b> no route may reach a store after 12:00, so a long territory needs more vehicles; the 98% target is met with room to spare and its 2% slack is not used.</p>
-      <p>Built by Clarke-Wright savings, improved by 2-opt; every merge is checked against all five limits.</p><div class="formula">${MATH.savings}</div><div class="formula">${MATH.twoopt}</div>
+      <p>Each route opens at the unrouted store farthest from the DC; then the store whose cheapest insertion saves the most kilometres against driving it alone joins, wherever all five limits still hold, until none fits. Then each route reverses a segment whenever that shortens it.</p><div class="formula">${MATH.insert}</div><div class="formula">${MATH.reverse}</div>
       <div class="keypoint"><b>What limits a vehicle's day?</b> In the ${ALT} network: ${Object.entries(r.census).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v.toFixed(0)}`).join(", ")} route-days (day-weighted).</div>
       <p><b>One solve</b> (one DC, one day) takes about ${(M.timing.per_eval_s * M.timing.workers / M.timing.territory_days_per_eval).toFixed(2)} core-seconds and returns to the upper level: vehicles needed, kilometres, late deliveries (after 14:00), stock-outs, relay routes and the routes themselves; spot trucks follow from vehicles needed against the owned fleet.</p>
       <div class="chips"><span class="inm" title="48 roll cages per vehicle">in: load</span><span class="inm" title="25 stops per vehicle">in: stops</span><span class="inm" title="250 km per vehicle and day">in: km</span><span class="inm" title="every stop by 12:00">in: noon clock</span><span class="inm" title="back by 13:00 including a 30-minute break">in: shift and break</span><span class="inm" title="a second driver where no one-driver route reaches">in: relay routes</span><span class="outm" title="one trip per vehicle and day">out: multiple trips</span><span class="outm" title="one average speed; the speed reversal rows cover it">out: time-of-day traffic</span><span class="outm" title="all vehicles leave at 04:00; the departure-wave check covers it">out: dock congestion</span><span class="outm" title="empty cages ride back on the same vehicle">out: returns</span></div><p class="note">Left out because the brief does not detail them; listed for the business to confirm (proposal: scope).</p>`,
-      right: `<svg class="chart" viewBox="0 0 440 270" id="fig-savings"></svg><svg class="chart" viewBox="0 0 440 80" id="fig-census"></svg>` },
-    { q: "Q4 · How does a day's routing price a network?", lec: "Lectures 1-2 · bilevel evaluation, sample average", title: "The connection: E(x)", use: `Use <b>a transportation linear programme</b> to assign stores to the open DCs, because for fixed sites the assignment is linear and is solved exactly; use <b>the newsvendor critical fractile</b> to size each DC's owned fleet, because owning against hiring is a newsvendor trade-off; and average the routed cost over <b>sampled demand days</b> (a sample average over the posterior predictive) with common random numbers, so every network is compared on the same days.`,
-      left: `<div class="formula">${MATH.E}</div><div class="formula">${MATH.lp}</div><div class="formula">${MATH.newsvendor}</div>
-      <div class="keypoint"><b>Evaluate a layout through its best operation.</b> Every candidate and the baseline network are routed on the same sampled days (common random numbers), so differences are paired.</div>
+      right: `<svg class="chart" viewBox="0 0 440 270" id="fig-insert"></svg><svg class="chart" viewBox="0 0 440 80" id="fig-census"></svg>` },
+    { q: "Q4 · How does a day's routing price a network?", lec: "Lectures 1-2 · bilevel evaluation, posterior predictive", title: "The connection: E(x)", use: `Use <b>a transportation linear programme</b> (Lecture 1) to assign stores to the open DCs, because for fixed sites the assignment is linear and is solved exactly; own each DC's vehicles up to the <b>${P.fleet_q.toFixed(3)} quantile</b> of its daily need, because one more owned vehicle (${f0(P.vehicle_month / P.days_month)} KRW a day) pays only if it is needed on more than ${pct(1 - P.fleet_q)} of days at the spot rate of ${f0(P.spot_day)} KRW; and average the routed cost over <b>sampled demand days</b> from the posterior predictive (Lecture 2), the same days for every network.`,
+      left: `<div class="formula">${MATH.E}</div><div class="formula">${MATH.lp}</div><div class="formula">${MATH.fleet}</div>
+      <div class="keypoint"><b>Evaluate a layout through its best operation.</b> Every candidate and the baseline network are routed on the same sampled days, so differences are paired.</div>
       <div class="flow"><div><b>Down ↓</b>the site set; territories from the LP; the fleet rule (${P.fleet_q.toFixed(3)} quantile)</div><div><b>Up ↑</b>per DC and day: vehicles, km, late and missed deliveries, relay routes; then spot trucks and E</div><div class="hot"><b>Cost</b>k DCs × ${M.days[0]} days: ${r.k * M.days[0]} routing solves for one evaluation at k = ${r.k}</div></div>
       <p><b>The assignment is re-solved inside E, not proposed by the search.</b> For a fixed set of sites, assigning stores within ${M.bounds[0]}-${f0(M.bounds[1])} per DC is a transportation LP: linear, so solved exactly in one call (here it comes out integral). A candidate is therefore a site set only, and every network is judged with its best territories rather than with an assignment a proposer guessed. Demand enters as ${M.days[0]} sampled days because cost is not linear in demand (Q2).</p>`,
       right: `<div class="flow"><div><b>sites y</b>candidate</div><div><b>LP</b>territories</div><div><b>${M.days[0]} days ξ</b>posterior predictive</div><div class="hot"><b>routing</b>per DC-day</div><div><b>0.671 quantile</b>owned fleet</div><div><b>E(x)</b>KRW/month</div></div><svg class="chart" viewBox="0 0 440 200" id="fig-news"></svg>` },
@@ -1035,17 +1050,17 @@ RENDER.how = () => {
       <p><b>What is linear, what is combinatorial.</b> With the sites fixed, the territories are an LP and are solved exactly inside every evaluation; what remains is the choice of sites, ${nChoose(R.sites.length, r.k).toExponential(1).replace("e+", " × 10^")} possible sets for k = ${r.k} alone, combinatorial and priced only by routing. So the upper level is searched under a budget, and only it.</p>
       <p><b>Budget B = ${M.budget}:</b> ${R.log_bo.filter(x => x.rule.includes("seed")).length} seeds (the G2 optimum of every k from ${M.k_range[0]} to ${M.k_range[1]}) and ${R.log_bo.filter(x => !x.rule.includes("seed")).length} chosen by EI. Forty is the brief's default; at hours per evaluation with the real routing system it is about a week of computing. The reported search is one fresh run from seed ${M.seed}; random selection spends the same ${M.budget} on the same pool.</p>`,
       right: `<svg class="chart" viewBox="0 0 440 260" id="fig-search"></svg><div class="row"><input type="range" id="step" min="1" value="1" style="flex:1"><span class="note" id="step-label"></span></div><div class="mapbox" id="searchmap" style="height:300px;margin-top:8px"></div><details class="log"><summary>Evaluation log: every full evaluation of the reported search</summary><div class="seg" id="log-seg" style="margin:8px 0"><button data-n="bo" class="on">GP + EI</button><button data-n="rand">random selection</button></div><div class="scroll"><table id="logtab"></table></div></details>` },
-    { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E", use: `Use <b>Lecture 5's proxy diagnosis</b>: treat the cheap criterion G as a proxy for the full evaluation E and measure <b>prediction quality</b> (Spearman rank correlation) separately from <b>decision quality</b> (what G's own pick loses under E), because a proxy that ranks well on average can still be exploited by the search. Remedy: put <b>system knowledge</b> into G (the noon clock), giving G<sub>2</sub>, and judge every candidate by E.`,
+    { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E", use: `Use <b>Lecture 5's proxy diagnosis</b>: treat the cheap criterion G as a proxy for the full evaluation E and measure <b>prediction quality</b> (the R² of a least-squares line from G to E, Lecture 2) separately from <b>decision quality</b> (what G's own pick loses under E), because a proxy that ranks well on average can still be exploited by the search. Remedy: put <b>system knowledge</b> into G (the noon clock), giving G<sub>2</sub>, and judge every candidate by E.`,
       left: `<div class="formula">${MATH.bound}</div>
-      <p><b>G1</b> (fixed cost, vehicles by load, continuous-approximation km) ignores the clock. Prediction quality: Spearman ${R.r3_g1.spearman.toFixed(2)}; decision quality: among the evaluated candidates it picks k = ${R.r3_g1.g_pick_k} and loses ${fM(R.r3_g1.loss)} M a month; searched over the whole pool it picks ${R.finals.proxy_only.k} DCs and loses ${fM(R.finals.proxy_only.total - R.finals.recommended.total)} M on the final days.</p>
+      <p><b>G1</b> (fixed cost, vehicles by load, continuous-approximation km) ignores the clock. Prediction quality: R² ${R.r3_g1.r2_line.toFixed(2)}; decision quality: among the evaluated candidates it picks k = ${R.r3_g1.g_pick_k} and loses ${fM(R.r3_g1.loss)} M a month; searched over the whole pool it picks ${R.finals.proxy_only.k} DCs and loses ${fM(R.finals.proxy_only.total - R.finals.recommended.total)} M on the final days.</p>
       <div class="formula">${MATH.g2 || ""}</div>
-      <p><b>G2</b> adds the routes the noon deadline and the 250 km limit force (Lecture 5's remedy: system knowledge put into G). Spearman ${R.r3.spearman.toFixed(2)} (${R.r3.spearman_pool.toFixed(2)} over the whole pool${R.r3.spearman_within_k != null ? `, ${R.r3.spearman_within_k.toFixed(2)} within k` : ""}); its pick is k = ${R.r3.g_pick_k}, E's best is k = ${R.r3.e_best_k}, and it loses ${fM(R.r3.loss)} M a month.</p>
-      <div class="keypoint"><b>Prediction and decision quality are different numbers.</b> Neither G gets the level right (R² ${R.r3.r2.toFixed(1)} for G2), so the search models the gap E − G2 with a GP instead of trusting G's value.</div>`,
+      <p><b>G2</b> adds the routes the noon deadline and the 250 km limit force (Lecture 5's remedy: system knowledge put into G). R² ${R.r3.r2_line.toFixed(2)} (${R.r3.r2_line_pool.toFixed(2)} over the whole pool${R.r3.r2_line_within_k != null ? `, ${R.r3.r2_line_within_k.toFixed(2)} within k` : ""}); its pick is k = ${R.r3.g_pick_k}, E's best is k = ${R.r3.e_best_k}, and it loses ${fM(R.r3.loss)} M a month.</p>
+      <div class="keypoint"><b>Prediction and decision quality are different numbers.</b> Neither G gets the level right (R² ${R.r3.r2.toFixed(1)} for G2 taken at face value, before the line), so the search models the gap E − G2 with a GP instead of trusting G's value.</div>`,
       right: `<div class="seg" id="g-seg"><button data-n="G2" class="on">G2 (with the clock)</button><button data-n="G1">G1 (load only)</button></div><svg class="chart" viewBox="0 0 440 300" id="fig-scatter"></svg><svg class="chart" viewBox="0 0 440 90" id="fig-bound"></svg>` },
   ];
   L.push(balanceLec());
   $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title}</h3>${x.use ? `<div class="use">${x.use}</div>` : ""}${x.left}</div><div>${x.right}</div></div>`).join("");
-  figHierarchy(); figGamma(); figPPC(); figSavings(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
+  figHierarchy(); figGamma(); figPPC(); figInsert(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
   document.querySelectorAll("#log-seg button").forEach(b => b.onclick = () => { document.querySelectorAll("#log-seg button").forEach(z => z.classList.toggle("on", z === b)); logTable(b.dataset.n); });
 };
 function figR2() {
@@ -1068,8 +1083,8 @@ function balanceLec() {
     ["Distance model", "OSRM road km for store-site pairs and 50 nearest stores, a calibrated model beyond; km / 35 km/h + 15 min a stop", "one-off cache, 5 MB", "Peak-hour slowdowns; model error on short pairs", `Calibrated model only: k* = ${dm.k_star}, saving ${fM(dm.saving)} M; 30 km/h: k* = ${sp.k_star}, saving ${fM(sp.saving)} M`, "k moves by one, sign holds", "a"],
     ["Instance size", "All stores, not thinned", `full run on ${M.timing.workers} workers; reduced run 7 min on 2`, "Nothing from thinning", `The 1-in-5 instance picks k = ${T.k_star_reduced} against ${T.k_star_full}; km per store ×${T.km_ratio_baseline.toFixed(2)} against the ×${T.km_ratio_pred.toFixed(2)} predicted`, "full instance reported", "g"],
     ["Demand and days", `Poisson-Gamma with calendar exposure and a chain shock; ${M.days.join(" / ")} days`, "28 days cost 4× 7", "A quantile from 7 days is noisy", `Top five re-scored on 28 days: the search's best stays first; one average day understates E by ${fM(R.r2.sampled - R.r2.average_day)} M`, "ranking holds", "g"],
-    ["Routing method", "Savings + 2-opt + relay pass", `${coreS} core-s per territory-day`, "Weaker on small rural territories, so it over-states the baseline more", rc ? `PyVRP on every territory: saving about ${fM(R.saving.final_mean - rc.saving_month_shift)} M; k within the 10-11 near-tie` : "", "size moves, sign holds", "a"],
-    ["Delivery window", "Every stop by 12:00, hard", "a check on every merge", "Leaves the 2% tolerance unused", `${pct(R.finals.recommended.service_min)} before noon on the worst final day`, "conservative", "g"],
+    ["Routing method", "Step-by-step construction, segment reversal, relay pass", `${coreS} core-s per territory-day`, "Weaker on small rural territories, so it over-states the baseline more", rc ? `PyVRP on every territory: saving about ${fM(R.saving.final_mean - rc.saving_month_shift)} M; k within the 10-11 near-tie` : "", "size moves, sign holds", "a"],
+    ["Delivery window", "Every stop by 12:00, hard", "a check on every insertion", "Leaves the 2% tolerance unused", `${pct(R.finals.recommended.service_min)} before noon on the worst final day`, "conservative", "g"],
     ["Departure and docks", "Every vehicle leaves at 04:00", "none", "Flatters large DCs, so favours fewer DCs", `Departure waves with ${W.docks} docks: k* ${W.k_star_plain} → ${W.k_star_waves}; with ${W.docks_more} docks: ${W.k_star_more_docks}`, "decision unchanged", "g"],
     ["Assignment", "Transportation LP inside E", "one LP per evaluation", "Distance-optimal is not route-optimal", `Redrawing the baseline's own territories by the LP saves ${fM(R.saving.waterfall[0].total - R.saving.waterfall[1].total)} M`, "checked", "g"],
     ["Fleet policy", `${P.fleet_q.toFixed(3)} quantile owned, unlimited spot trucks`, "free", "Spot supply may run short on peak days", `Peak day ${R.r2.peak_date}: ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned`, "to confirm: spot supply", "a"],
@@ -1120,17 +1135,19 @@ function figPPC() {
   el("path", { d: yr.map((v, i) => `${i ? "L" : "M"}${X(i)} ${Y(v)}`).join(""), fill: "none", stroke: "#9dc92a", "stroke-width": 1.2 }, s);
   el("path", { d: y.map((v, i) => `${i ? "L" : "M"}${X(i)} ${Y(v)}`).join(""), fill: "none", stroke: "#751485", "stroke-width": 1.2 }, s);
 }
-function figSavings() {
-  const s = $("#fig-savings"), D = [60, 210], I = [200, 60], J = [370, 110];
-  el("line", { x1: D[0], y1: D[1], x2: I[0], y2: I[1], stroke: "#c9a6d1", "stroke-width": 2.5, "stroke-dasharray": "6 4" }, s);
-  el("line", { x1: D[0], y1: D[1], x2: J[0], y2: J[1], stroke: "#c9a6d1", "stroke-width": 2.5, "stroke-dasharray": "6 4" }, s);
-  el("line", { x1: I[0], y1: I[1], x2: J[0], y2: J[1], stroke: "#751485", "stroke-width": 3.5 }, s);
-  el("text", { x: 108, y: 128, "font-size": 13, "font-weight": 700, fill: "#8d3a9c" }, s, "d₀ᵢ");
-  el("text", { x: 220, y: 175, "font-size": 13, "font-weight": 700, fill: "#8d3a9c" }, s, "d₀ⱼ");
-  el("text", { x: 285, y: 70, "font-size": 13, "font-weight": 800, fill: "#751485" }, s, "dᵢⱼ");
+function figInsert() {
+  const s = $("#fig-insert"), D = [60, 215], A = [190, 70], B = [360, 120], c = [290, 40];
+  el("line", { x1: D[0], y1: D[1], x2: A[0], y2: A[1], stroke: "#751485", "stroke-width": 3 }, s);
+  el("line", { x1: A[0], y1: A[1], x2: B[0], y2: B[1], stroke: "#c9a6d1", "stroke-width": 3, "stroke-dasharray": "6 4" }, s);
+  el("line", { x1: B[0], y1: B[1], x2: D[0], y2: D[1], stroke: "#751485", "stroke-width": 3 }, s);
+  el("line", { x1: A[0], y1: A[1], x2: c[0], y2: c[1], stroke: "#9dc92a", "stroke-width": 3.5 }, s);
+  el("line", { x1: c[0], y1: c[1], x2: B[0], y2: B[1], stroke: "#9dc92a", "stroke-width": 3.5 }, s);
+  el("line", { x1: D[0], y1: D[1], x2: c[0], y2: c[1], stroke: "#e8950f", "stroke-width": 1.6, "stroke-dasharray": "3 4" }, s);
+  el("text", { x: 150, y: 120, "font-size": 12.5, "font-weight": 700, fill: "#b8730b" }, s, "d₀c, twice alone");
+  el("text", { x: 300, y: 28, "font-size": 12.5, "font-weight": 800, fill: "#4f6b0c" }, s, "detour");
   el("rect", { x: D[0] - 14, y: D[1] - 14, width: 28, height: 28, rx: 7, fill: "#5c0f69" }, s); el("text", { x: D[0], y: D[1] + 4, "text-anchor": "middle", "font-size": 11, "font-weight": 800, fill: "#fff" }, s, "DC");
-  for (const [p, n] of [[I, "i"], [J, "j"]]) { el("circle", { cx: p[0], cy: p[1], r: 13, fill: "#9dc92a" }, s); el("text", { x: p[0], y: p[1] + 4, "text-anchor": "middle", "font-size": 12, "font-weight": 900, fill: "#24320a" }, s, n); }
-  el("text", { x: 20, y: 246, "font-size": 12, fill: "#4a4a52" }, s, "One vehicle for i and j: two trips home saved,"); el("text", { x: 20, y: 262, "font-size": 12, fill: "#4a4a52" }, s, "one link i-j added.");
+  for (const [p, n, f] of [[A, "p", "#c9a6d1"], [B, "p′", "#c9a6d1"], [c, "c", "#9dc92a"]]) { el("circle", { cx: p[0], cy: p[1], r: 13, fill: f }, s); el("text", { x: p[0], y: p[1] + 4, "text-anchor": "middle", "font-size": 12, "font-weight": 900, fill: "#24320a" }, s, n); }
+  el("text", { x: 20, y: 246, "font-size": 12, fill: "#4a4a52" }, s, "Store c joins between p and p′ if the five limits hold;"); el("text", { x: 20, y: 262, "font-size": 12, fill: "#4a4a52" }, s, "the store saving most against its own trip goes first.");
 }
 function figCensus() {
   const s = $("#fig-census"), c = R.finals.recommended.census, tot = Object.values(c).reduce((a, b) => a + b, 0), COL = { load: "#751485", clock: "#d23f3f", shift: "#e07a5f", stops: "#2e86ab", km: "#e8950f", geometry: "#c9c3cd", "violates limit": "#1f1f24" };
@@ -1225,12 +1242,12 @@ function checkCharts() {
   }
   const RC = R.routing_check;
   if (RC) {
-    const nm = j => SITES[j].name, row = (net, lab) => { const x = RC[net]; return `<tr><td>${lab}</td><td>${f0(x.cw_veh)}</td><td>${f0(x.hgs_veh)}</td><td>${fM(x.cw_cost)} / ${fM(x.hgs_cost)}</td><td>${pct(Math.min(...x.gaps))} to ${pct(Math.max(...x.gaps))}</td></tr>`; };
-    const worst = RC.baseline.per_dc.filter(d => d.hgs_veh != null).sort((a, b) => (b.cw_veh / b.hgs_veh) - (a.cw_veh / a.hgs_veh)).slice(0, 3);
-    $("#routercheck").innerHTML = `<h3>The routing heuristic against PyVRP</h3><p class="sub">Savings + 2-opt against PyVRP 0.11.3 (hybrid genetic search, 0.1-0.5 s per store) on every territory of both networks, search day 0, same distances and limits; optional check <code>checks/routing_gap.py</code>, cached in <code>results/checks/</code></p>
-      <table><tr><th>Network</th><th>Vehicles, savings</th><th>Vehicles, PyVRP</th><th>Day cost, M KRW (savings / PyVRP)</th><th>Savings above PyVRP, per territory</th></tr>${row("baseline", "Baseline")}${row("recommended", ALTC)}</table>
-      <p class="note">${RC.baseline.unrouted.length ? `PyVRP left stores unrouted on ${RC.baseline.unrouted.map(nm).join(", ")} (the baseline network) even at 0.5 s per store; there the savings cost is used.` : ""} Worst territories: ${worst.map(d => `${nm(d.dc)} ${d.cw_veh} vs ${d.hgs_veh} vehicles`).join("; ")}.</p>
-      <div class="keypoint"><b>The heuristic is weaker on the baseline's small rural territories than on the redesign's</b>, so E over-states the baseline's cost more: with PyVRP's routes the day's operating saving falls from ${fM(RC.saving_day_cw)} to ${fM(RC.saving_day_hgs)} M, and the monthly saving by about ${fM(RC.saving_month_shift)} M, to about ${fM(R.saving.final_mean - RC.saving_month_shift)} M. It stays positive; most of what remains is rent.</div>${RC.k_check && RC.k_check.length > 1 ? `<p class="note">Does it move k? Day cost including rent, savings / PyVRP: ${RC.k_check.map(x => `k = ${x.k}: ${fM(x.cw)} / ${fM(x.hgs)} M`).join("; ")}. With PyVRP's routes the best of these is k = ${RC.k_check.reduce((a, x) => (x.hgs < a.hgs ? x : a)).k}; nine to eleven take the same action at every lease expiry.</p>` : ""}`;
+    const nm = j => SITES[j].name, row = (net, lab) => { const x = RC[net]; return `<tr><td>${lab}</td><td>${f0(x.ours_veh)}</td><td>${f0(x.hgs_veh)}</td><td>${fM(x.ours_cost)} / ${fM(x.hgs_cost)}</td><td>${pct(Math.min(...x.gaps))} to ${pct(Math.max(...x.gaps))}</td></tr>`; };
+    const worst = RC.baseline.per_dc.filter(d => d.hgs_veh != null).sort((a, b) => (b.ours_veh / b.hgs_veh) - (a.ours_veh / a.hgs_veh)).slice(0, 3);
+    $("#routercheck").innerHTML = `<h3>The routing heuristic against PyVRP</h3><p class="sub">Our router against PyVRP 0.11.3 (a genetic algorithm with local search, 0.1-0.5 s per store) on every territory of both networks, search day 0, same distances and limits; optional check <code>checks/routing_gap.py</code>, cached in <code>results/checks/</code></p>
+      <table><tr><th>Network</th><th>Vehicles, ours</th><th>Vehicles, PyVRP</th><th>Day cost, M KRW (ours / PyVRP)</th><th>Ours above PyVRP, per territory</th></tr>${row("baseline", "Baseline")}${row("recommended", ALTC)}</table>
+      <p class="note">${RC.baseline.unrouted.length ? `PyVRP left stores unrouted on ${RC.baseline.unrouted.map(nm).join(", ")} (the baseline network) even at 0.5 s per store; there our cost is used.` : ""} Worst territories: ${worst.map(d => `${nm(d.dc)} ${d.ours_veh} vs ${d.hgs_veh} vehicles`).join("; ")}.</p>
+      <div class="keypoint"><b>The heuristic is weaker on the baseline's small rural territories than on the redesign's</b>, so E over-states the baseline's cost more: with PyVRP's routes the day's operating saving falls from ${fM(RC.saving_day_ours)} to ${fM(RC.saving_day_hgs)} M, and the monthly saving by about ${fM(RC.saving_month_shift)} M, to about ${fM(R.saving.final_mean - RC.saving_month_shift)} M. It stays positive; most of what remains is rent.</div>${RC.k_check && RC.k_check.length > 1 ? `<p class="note">Does it move k? Day cost including rent, ours / PyVRP: ${RC.k_check.map(x => `k = ${x.k}: ${fM(x.ours)} / ${fM(x.hgs)} M`).join("; ")}. With PyVRP's routes the best of these is k = ${RC.k_check.reduce((a, x) => (x.hgs < a.hgs ? x : a)).k}; nine to eleven take the same action at every lease expiry.</p>` : ""}`;
   }
   const H = R.history_ops, B = R.finals.baseline;
   $("#histops").innerHTML = `<h3>The lower level on the baseline network, ${H.days} history days</h3><table>
@@ -1304,7 +1321,7 @@ RENDER.data = () => {
   const k = (l, v, u, note) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}<small>${u}</small></div><div class="n">${note}</div></div>`;
   $("#data-kpis").innerHTML = k("Vehicles a day, baseline", f0(b.vehicles_day), "", `${M.days[1]} final days`) + k("Owned vehicles", f0(b.owned), "", `${M.fleet_quantile.toFixed(3)} quantile`) +
     k("Drivers", `≈ ${f0(b.owned)}`, "", "one per owned vehicle; spot trucks bring their own") + k("History year", f0(H.vehicles_day), "veh/day", `${f0(H.deliveries)} deliveries, ${pct(H.service)} before noon`);
-  $("#data-kpi-note").innerHTML = `The brief gives no fleet or driver numbers. The lower level decides each day how many vehicles each DC needs; each DC owns the ${M.fleet_quantile.toFixed(3)} quantile of its daily need (the newsvendor fractile of ${fM(P.vehicle_month)} M a month against ${f0(P.spot_day)} KRW a day) and hires spot trucks above it. The outcome tables <code>deliveries</code>, <code>vehicle_days</code> and <code>spot_hires</code> are this lower level run on the baseline network over the ${H.days} history days: ${f0(H.km_day)} km and ${fM(H.spot_month)} M KRW of spot hire a month.`;
+  $("#data-kpi-note").innerHTML = `The brief gives no fleet or driver numbers. The lower level decides each day how many vehicles each DC needs; each DC owns the ${M.fleet_quantile.toFixed(3)} quantile of its daily need (owning pays on days it is needed: ${fM(P.vehicle_month)} M a month against ${f0(P.spot_day)} KRW a day) and hires spot trucks above it. The outcome tables <code>deliveries</code>, <code>vehicle_days</code> and <code>spot_hires</code> are this lower level run on the baseline network over the ${H.days} history days: ${f0(H.km_day)} km and ${fM(H.spot_month)} M KRW of spot hire a month.`;
   const cs = $("#data-chain"), xr = [0, ch.length - 1], yr = [Math.floor(Math.min(...ch) / 5000) * 5000, Math.ceil(Math.max(...ch) / 5000) * 5000];
   const A = axesXY(cs, [48, 12, 450, 165], xr, yr, v => (R.r2.hist_dates[Math.round(v)] || "").slice(0, 7), v => f0(v / 1000) + "k", 5, 4);
   el("path", { d: ch.map((v, i) => `${i ? "L" : "M"}${A.X(i).toFixed(1)} ${A.Y(v).toFixed(1)}`).join(""), fill: "none", stroke: "#751485", "stroke-width": 1.4 }, cs);
@@ -1401,7 +1418,7 @@ RENDER.checks = () => {
   $("#about").innerHTML = `<h3>How these numbers were produced</h3><table>
     <tr><td>Command</td><td><code>${M.command}</code> · seed ${M.seed} · ${M.runtime_s} s</td></tr><tr><td>Environment</td><td>Python ${M.python}, numpy ${M.numpy}, scipy ${M.scipy}</td></tr>
     <tr><td>Instance</td><td>${f0(M.stores_planning)} planning stores${M.fraction < 1 ? ` (1 in ${SCALE} of 10,000 kept; DC cost and bounds scaled by ${M.fraction})` : " (all stores still open at the end of the history year)"}</td></tr><tr><td>Distances</td><td>${M.distance_model}</td></tr>
-    <tr><td>Days</td><td>${M.days[0]} search, ${M.days[1]} final, ${M.days[2]} held-out, stratified by calendar class</td></tr><tr><td>Fleet</td><td>owned at the ${M.fleet_quantile.toFixed(3)} quantile (newsvendor), spot above, relay at ${f0(P.relay_day)} KRW per over-limit route</td></tr>
+    <tr><td>Days</td><td>${M.days[0]} search, ${M.days[1]} final, ${M.days[2]} held-out, stratified by calendar class</td></tr><tr><td>Fleet</td><td>owned at the ${M.fleet_quantile.toFixed(3)} quantile, spot above, relay at ${f0(P.relay_day)} KRW per over-limit route</td></tr>
     <tr><td>Search</td><td>B = ${M.budget}: one G2 seed per k, then EI on a GP of E − G2; random selection on the same pool${M.timing ? `; ${M.timing.per_eval_s} s per evaluation with ${M.timing.workers} workers` : ""}</td></tr>
     <tr><td>Reduced run</td><td><code>python run_reduced.py</code>: 1 store in 5${R.thinning ? ` (${f0(R.thinning.stores_reduced)} stores)` : ""}, DC cost and bounds × 0.2, the same pool, search, validation and final comparison without the report-only steps; about 7 minutes on two laptop cores (README). It reproduces the structure: the sweep's shape, the baseline comparison and the G-versus-E gap${R.thinning ? `; its best k is ${R.thinning.k_star_reduced} against ${R.thinning.k_star_full} (thinning check above)` : ""}.</td></tr></table>
     <p class="note">Also reproduced by the same command: the extensions (closure sequence, robustness, value of information) in <code>registry.json</code> under <code>extensions</code>. The PyVRP accuracy check is optional: <code>python checks/routing_gap.py</code> after <code>pip install pyvrp==0.11.3</code>.</p>`;
