@@ -107,7 +107,9 @@ const strict = rev.find(x => x.assumption === "vehicle limits"), strictMin = rev
 const near = sw.filter(s => s.ok98 && s !== best && s.total - best.total < 50e6);
 const Q = X && X.sequence, V = X && X.voi, RB = X && X.robustness;
 const best5 = R.top5.map(t => R.pool[t.cand].sites), inAll = rec.filter(j => best5.every(s => s.includes(j)));
-const L_ = Q ? Q.leases : [], keepAll = L_.find(L => L.in_rec && inAll.some(j => SITES[j].name === L.site)), drop = L_.find(L => !L.in_rec);
+// A lease worth renewing now: a kept site in the best network of every k still in play (the near-ties and the departure-wave check's k)
+const kPlay = R.sweep.filter(s => Math.abs(s.k - r.k) <= 1 || (R.waves && s.k === R.waves.k_star_waves)), KR = kPlay.map(s => s.k);
+const L_ = Q ? Q.leases : [], keepAll = L_.find(L => L.in_rec && kPlay.every(s => R.pool[s.cand].sites.includes(SITES.findIndex(x => x.name === L.site)))), drop = L_.find(L => !L.in_rec);
 
 // Small map of Korea: stores as dots, DCs as squares
 function map(w, h, net, asg, mark) {
@@ -305,7 +307,7 @@ const SL = [
   // 16 · decision
   { dark: true, html: `<span class="kick">Decision requested</span><h1>Three approvals <em>today</em></h1>
     <div class="stats big3" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="v" style="font-size:24px">Data and one rule</div><div class="l">Inputs 1-4 by end of February 2027: 12 months of deliveries, vehicle-days and spot hires; one month of GPS traces at one DC; real rents. And the rule: a second driver on far routes, or a small coastal DC below 500 stores.</div></div>
-    <div class="stat"><div class="v" style="font-size:24px">Renew ${keepAll ? keepAll.site : SITES[inAll[0]].name}</div><div class="l">${keepAll ? `Lease ends ${keepAll.date.slice(0, 7)}. ` : ""}It is in every one of the five best networks, so renewing is right whatever the real data show.</div></div>
+    ${keepAll ? `<div class="stat"><div class="v" style="font-size:24px">Renew ${keepAll.site}</div><div class="l">Lease ends ${keepAll.date.slice(0, 7)}. It is in the best network of every number of DCs from ${Math.min(...KR)} to ${Math.max(...KR)}, so renewing is right whichever of them the real data settle on.</div></div>` : ""}
     <div class="stat"><div class="v" style="font-size:24px">Defer ${drop ? drop.site : "the next renewal"}</div><div class="l">${drop ? `Lease ends ${drop.date.slice(0, 7)}; ` : ""}the first site the plan gives up. Decide at gate 1 in April 2027. No new site is leased before then.</div></div></div>
     <div class="flow" style="margin-top:22px;position:relative;z-index:1"><div><b>Feb 2027</b>inputs delivered</div><div><b>Mar 2027</b>renew ${keepAll ? keepAll.site.split(" ")[0] : "the first site"}</div><div><b>Apr 2027</b>gate 1: proceed, revise or stop</div><div class="hot"><b>Jun 2027</b>${drop ? drop.site.split(" ")[0] : "next"} lease: first step of the sequence</div></div>
     <p class="lead" style="margin-top:18px;position:relative;z-index:1">Numbers on these slides come from <code>code/</code> (${M.command}, seed ${M.seed}); stores, demand and costs are fictional, geography and roads are real.</p>${DEMO("answer", "Open the demonstration")}` },
