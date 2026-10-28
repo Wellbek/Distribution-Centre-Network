@@ -114,7 +114,13 @@ def _construct(D, q, p, improve, k_nn=30):
     n = len(q)
     D = np.asarray(D)
     d0 = D[0]
-    nn = np.argsort(D[1:, 1:], axis=1, kind="stable")[:, : k_nn + 1] + 1
+    # Each store's k_nn + 1 nearest (itself included), ties by index as a stable sort would take them, as a boolean row
+    Ds = D[1:, 1:]
+    k = min(k_nn, n - 1)
+    t = np.partition(Ds, k, axis=1)[:, k:k + 1]
+    eq = Ds == t
+    nn = np.zeros((n + 1, n + 1), bool)
+    nn[1:, 1:] = (Ds < t) | (eq & (np.cumsum(eq, 1) <= k + 1 - (Ds < t).sum(1, keepdims=True)))
     left = np.ones(n + 1, bool)
     left[0] = False
     order = sorted(range(1, n + 1), key=lambda i: (-d0[i], i))
@@ -125,8 +131,7 @@ def _construct(D, q, p, improve, k_nn=30):
         r = [order[oi]]
         left[r[0]] = False
         load = float(q[r[0] - 1])
-        near = np.zeros(n + 1, bool)
-        near[nn[r[0] - 1]] = True
+        near = nn[r[0]].copy()
         while ok_time(r, D, p) and len(r) < p.max_stops:
             C = np.flatnonzero(near & left)
             C = C[load + q[C - 1] <= p.cap + eps]
@@ -134,10 +139,10 @@ def _construct(D, q, p, improve, k_nn=30):
                 break
             # Position k lies between P[k] and N[k]; arrivals only grow along a route, so one slack per route decides the later stops
             km, arr, ret = walk(r, D, p)
-            P, N = np.r_[0, r], np.r_[r, 0]
-            dep = np.r_[p.depart, np.array(arr) + p.stop_h]
-            DP = D[np.ix_(P, C)]
-            detour = DP + D[np.ix_(C, N)].T - D[P, N][:, None]
+            P, N = np.array([0] + r), np.array(r + [0])
+            dep = np.array([p.depart] + [a + p.stop_h for a in arr])
+            DP = D[P[:, None], C]
+            detour = DP + D[C[:, None], N].T - D[P, N][:, None]
             push = detour / p.speed + p.stop_h
             ok = (dep[:, None] + DP / p.speed <= p.deadline + eps) & (km + detour <= p.max_km + eps)
             ok[:-1] &= arr[-1] + push[:-1] <= p.deadline + eps
@@ -155,7 +160,7 @@ def _construct(D, q, p, improve, k_nn=30):
                     r, placed = s, True
                     load += float(q[c - 1])
                     left[c] = False
-                    near[nn[c - 1]] = True
+                    near |= nn[c]
                     break
                 score[b] = -np.inf
             if not placed:
