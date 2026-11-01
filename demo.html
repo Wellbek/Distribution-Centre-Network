@@ -1022,7 +1022,7 @@ RENDER.day = () => {
       const i = nearestStore(DM, x, y, i => !isNaN(DAY.arrOf[i])); if (i < 0) return null;
       const a = DAY.arrOf[i]; return storeTip(i) + `<br><b>baseline:</b> ${a > P.deadline ? "arrives" : "arrived"} ${hhmm(a)} by truck ${DAY.routeOf[i] + 1}`;
     };
-    DM.onClick = (x, y) => { const k = truckAt(x, y); if (k >= 0 && !LIVE_ROUTES) followTruck(k); };
+    DM.onClick = (x, y) => { const k = truckAt(x, y); if (k >= 0) followTruck(k); };
     DM.onUser = () => { if (FOLLOW >= 0 && !playing) {} };
     document.querySelectorAll("#day-net button").forEach(b => b.onclick = () => { DNET = b.dataset.n; LIVE_ROUTES = null; $("#live-banner").hidden = true; document.querySelectorAll("#day-net button").forEach(z => z.classList.toggle("on", z === b)); LIVE_ROUTES = null; resetDay(); });
     document.querySelectorAll("#day-kind button").forEach(b => b.onclick = () => { DKIND = b.dataset.n; LIVE_ROUTES = null; $("#live-banner").hidden = true; document.querySelectorAll("#day-kind button").forEach(z => z.classList.toggle("on", z === b)); LIVE_ROUTES = null; resetDay(); });
@@ -1057,15 +1057,16 @@ function truckAt(x, y) {
   (LIVE_ROUTES || DAY.routes).forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
   return best;
 }
-function followTruck(k) { FOLLOW = k; $("#unfollow").hidden = false; const p = truckPos(DAY.routes[k], Math.max(T, P.depart + 0.01)); if (p) DM.centerOn(p[0][0], p[0][1], Math.max(DM.z, 9)); else { const d = SITES[DAY.routes[k].dc]; DM.centerOn(d.lat, d.lon, 9); } DM.draw(); truckCard(); }
-$("#follow").onclick = () => { if (LIVE_ROUTES) $("#live-back").onclick(); if (T < P.depart + 0.2) T = P.depart + 0.2; const cand = DAY.routes.map((r, k) => k).filter(k => truckPos(DAY.routes[k], T)); followTruck(cand[Math.floor(Math.random() * cand.length)] ?? 0); if (!playing) $("#play").click(); };
-$("#live-back").onclick = () => { LIVE_ROUTES = null; $("#live-banner").hidden = true; T = 3.5; playing = false; $("#play").textContent = "▶ Play"; if (DM) { DM.fit(); DM.draw(); } clockChart(); kpisDay(); };
+const shownRoutes = () => LIVE_ROUTES || DAY.routes;
+function followTruck(k) { FOLLOW = k; $("#unfollow").hidden = false; const p = truckPos(shownRoutes()[k], Math.max(T, P.depart + 0.01)); if (p) DM.centerOn(p[0][0], p[0][1], Math.max(DM.z, 9)); else { const d = SITES[shownRoutes()[k].dc]; DM.centerOn(d.lat, d.lon, 9); } DM.draw(); truckCard(); }
+$("#follow").onclick = () => { if (T < P.depart + 0.2 || T >= 14) T = P.depart + 0.2; const rs = shownRoutes(), cand = rs.map((r, k) => k).filter(k => truckPos(rs[k], T)); followTruck(cand[Math.floor(Math.random() * cand.length)] ?? 0); if (!playing) $("#play").click(); };
+$("#live-back").onclick = () => { LIVE_ROUTES = null; FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#live-banner").hidden = true; T = 3.5; playing = false; $("#play").textContent = "▶ Play"; if (DM) { DM.fit(); DM.draw(); } clockChart(); kpisDay(); };
 $("#unfollow").onclick = () => { FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; DM.fit(); };
 function truckCard() {
-  if (FOLLOW < 0) return; const r = DAY.routes[FOLLOW], p = truckPos(r, T), done = r.arr.filter(a => a + P.stop_h <= T).length;
+  if (FOLLOW < 0) return; const r = shownRoutes()[FOLLOW]; if (!r) return; const p = truckPos(r, T), done = r.arr.filter(a => a + (r.stop_h ?? P.stop_h) <= T).length;
   const nxt = r.arr.findIndex(a => a > T);
   $("#truckcard").style.display = "block";
-  $("#truckcard").innerHTML = `<b style="color:var(--purple-ink)">Following truck ${FOLLOW + 1}</b> · ${SITES[r.dc].name}<br>${done}/${r.stores.length} stores served · ${r.load.toFixed(0)} cages · ${r.km.toFixed(0)} km route<br>${nxt >= 0 ? `next stop ${S.id[r.stores[nxt]]} at ${hhmm(r.arr[nxt])}` : p ? "driving back to the DC" : `back at ${hhmm(r.ret)}`}<div class="bar" style="margin-top:6px"><i style="width:${100 * done / r.stores.length}%"></i></div>`;
+  $("#truckcard").innerHTML = `<b style="color:var(--purple-ink)">Following truck ${FOLLOW + 1}</b> · ${SITES[r.dc].name}${LIVE_ROUTES ? ` <span class="badge live">your live solve</span>` : ""}<br>${done}/${r.stores.length} stores served · ${r.load.toFixed(0)} cages · ${r.km.toFixed(0)} km route · last delivery ${r.arr.length && r.arr[r.arr.length - 1] < 99 ? hhmm(r.arr[r.arr.length - 1]) : "none"} (deadline ${hhmm(dayDeadline())})<br>${nxt >= 0 ? `next stop ${S.id[r.stores[nxt]]} at ${hhmm(r.arr[nxt])}` : p ? "driving back to the DC" : `back at ${hhmm(r.ret)}`}<div class="bar" style="margin-top:6px"><i style="width:${100 * done / r.stores.length}%"></i></div>`;
 }
 // The day map in layers: a cached static layer (land, routes) redrawn only when the view or the day changes,
 // a store layer updated only for the stores delivered since the last frame, and light per-frame overlays
@@ -1098,7 +1099,7 @@ function dayStatic(m, routes) {
   const [la1, lo0] = v.inv(-20, -20), [la0, lo1] = v.inv(v.W + 20, v.H + 20);
   routes.forEach((r, k) => {
     if (r.bb[1] < la0 || r.bb[0] > la1 || r.bb[3] < lo0 || r.bb[2] > lo1) return;
-    const hot = k === FOLLOW && !LIVE_ROUTES;
+    const hot = k === FOLLOW;
     c.strokeStyle = r.over || r.relay ? "#d23f3f99" : (hot ? r.col : r.col + "55"); c.lineWidth = hot ? 3 : (m.z > 4 ? 2 : 0.8);
     c.setLineDash(r.relay ? [6, 4] : []);
     c.beginPath(); (r.path || r.pts).forEach(([la, lo], i) => { const [x, y] = v.P(la, lo); i ? c.lineTo(x, y) : c.moveTo(x, y); }); c.stroke();
@@ -1168,7 +1169,7 @@ function tick(ts) {
   if (lastTs != null) T += (ts - lastTs) / 1000 * 0.35 * +$("#speed").value;
   lastTs = ts;
   if (T >= 14) { T = 14; playing = false; $("#play").textContent = "↺ Replay"; }
-  if (FOLLOW >= 0) { const p = truckPos(DAY.routes[FOLLOW], T); if (p) DM.centerOn(p[0][0], p[0][1]); truckCard(); }
+  if (FOLLOW >= 0 && shownRoutes()[FOLLOW]) { const p = truckPos(shownRoutes()[FOLLOW], T); if (p) DM.centerOn(p[0][0], p[0][1]); truckCard(); }
   DM.draw(); if (Math.floor(ts / 250) !== Math.floor((ts - 16) / 250)) kpisDay();
   if (playing) requestAnimationFrame(tick);
 }
@@ -1289,7 +1290,7 @@ async function solveLive() {
     lost += unc.reduce((a, r) => a + r.seq.length, 0); all += res.routes.reduce((a, r) => a + r.seq.length, 0);
     late += covered.reduce((a, r) => a + r.arr.filter(x => x > p.deadline).length, 0); vehicles += res.vehicles; km += res.km;
     res.routes.forEach((r, k) => {
-      const q = { dc: j, col: country ? colorOf(j, R.networks[DNET]) : PAL[k % PAL.length], pts: [[dc.lat, dc.lon], ...r.seq.map(s => [st[s][0], st[s][1]]), [dc.lat, dc.lon]], arr: covered.includes(r) ? r.arr : r.arr.map(() => 99), ret: covered.includes(r) ? r.ret : -1, stores: r.seq.map(s => idx[s]), over: !covered.includes(r) || r.binding === "violates limit", relay: r.binding === "relay", km: r.km, load: r.load, stop_h: p.stop_h };
+      const q = { dc: j, col: country ? colorOf(j, R.networks[DNET]) : PAL[k % PAL.length], pts: [[dc.lat, dc.lon], ...r.seq.map(s => [st[s][0], st[s][1]]), [dc.lat, dc.lon]], arr: covered.includes(r) ? r.arr : r.arr.map(() => 99), ret: covered.includes(r) ? r.ret : -1, stores: r.seq.map(s => idx[s]), over: !covered.includes(r) || r.binding === "violates limit", relay: r.binding === "relay", binding: r.binding, km: r.km, load: r.load, stop_h: p.stop_h };
       const nodes = [`d${j}`, ...q.stores.map(s => `s${s}`), `d${j}`];
       q.legs = nodes.slice(1).map((nd, m) => legPath(nodes[m], nd, q.pts[m], q.pts[m + 1])); q.path = q.legs.flatMap((L, m) => (m ? L.p.slice(1) : L.p));
       lr.push(q);
@@ -1306,9 +1307,11 @@ async function solveLive() {
   clockChart(); kpisDay();
   $("#lv-status").textContent = `${lr.length} routes from ${jobs.length} DC${jobs.length > 1 ? "s" : ""} in ${(ms / 1000).toFixed(1)} s of solving; press ▶ to watch the trucks.`; $("#lv-barbox").hidden = true;
   $("#lv-solve").disabled = false; $("#lv-solve").textContent = "Solve and show on the map";
+  const unreach = lr.filter(r => r.ret > 0 && r.binding === "violates limit").reduce((a, r) => a + r.stores.length, 0);
+  const warn = unreach ? `<div class="err" style="margin-top:8px"><b>${f0(unreach)} store${unreach > 1 ? "s" : ""} cannot be served within these limits.</b> No route reaches them by ${hhmm(p.deadline)} within ${f0(p.max_km)} km and the shift, not even a two-driver relay route; they are drawn in red as single-store trips that break a limit and count as late. Loosen the deadline, the speed or the km limit to bring them back.</div>` : "";
   const fail = lost > 0 ? `<div class="err" style="margin-top:8px"><b>The fleet cannot cover this day.</b> ${vehicles} vehicles are needed, ${fleet} are available: ${lost} stores (${pct(lost / all)}) get no delivery, a stock-out penalty of ${f0(lost * 500000)} KRW. Raise the fleet or hire more spot trucks.</div>` : "";
   $("#live-out").innerHTML = `<div class="grid g2e"><div class="kpi"><div class="l">Vehicles needed</div><div class="v">${f0(vehicles)}</div><span class="badge live">live</span></div><div class="kpi"><div class="l">Kilometres</div><div class="v">${f0(km)}<small>km</small></div><span class="badge live">live</span></div>
-    <div class="kpi"><div class="l">Before the deadline</div><div class="v">${pct((all - lost - late) / Math.max(all, 1))}</div><span class="badge live">live</span></div><div class="kpi"><div class="l">Uncovered stores</div><div class="v" style="color:${lost ? "#d23f3f" : "inherit"}">${lost}</div><span class="badge live">live</span></div></div>${fail}
+    <div class="kpi"><div class="l">Before the deadline</div><div class="v">${pct((all - lost - late) / Math.max(all, 1))}</div><span class="badge live">live</span></div><div class="kpi"><div class="l">Uncovered stores</div><div class="v" style="color:${lost ? "#d23f3f" : "inherit"}">${lost}</div><span class="badge live">live</span></div></div>${warn}${fail}
     ${(() => { const ref = country && (di === 0 || di === 2) && R.show[`${DNET}_${di === 0 ? "weekday" : "peak"}`]; return ref ? `<p class="note"><b>The pipeline's own routes for this day</b> (precomputed, <code>python run_full.py</code>; Python engine with segment reversal on the OSRM road distances, default settings): ${f0(ref.summary.vehicles_day)} vehicles, ${f0(ref.summary.km_day)} km. The browser engine uses the calibrated distance model instead of the road cache, so its kilometres and vehicle count differ by a few per cent.</p>` : ""; })()}
     <p class="note">${engine}, ${(ms / 1000).toFixed(1)} s. ${country ? "Every territory is routed with your settings; the vehicle limit applies per DC only in the one-DC solve. " : ""}Shown on the map: press ▶ to watch the trucks drive the solved routes, or <i>Back to the whole network</i> above the map for the precomputed day.</p>`;
 }
