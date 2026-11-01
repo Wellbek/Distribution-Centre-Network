@@ -1,6 +1,6 @@
 [
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 1,
@@ -22,7 +22,7 @@
   "hgs_cost": 14665775.922845606
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 4,
@@ -44,7 +44,7 @@
   "hgs_cost": 18657334.962314606
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 6,
@@ -66,7 +66,7 @@
   "hgs_cost": 15270696.92171216
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 15,
@@ -88,7 +88,7 @@
   "hgs_cost": 15904537.672560869
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 17,
@@ -110,7 +110,7 @@
   "hgs_cost": 15064993.975562839
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 34,
@@ -132,7 +132,7 @@
   "hgs_cost": 9753649.97866669
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 40,
@@ -154,7 +154,7 @@
   "hgs_cost": 24611310.428088933
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 47,
@@ -176,7 +176,7 @@
   "hgs_cost": 17544306.38780987
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 50,
@@ -198,7 +198,7 @@
   "hgs_cost": 8511434.55532473
  },
  {
-  "net": "recommended",
+  "net": "1-4-6-15-17-34-40-47-50-56",
   "day": 0,
   "label": "weekday",
   "dc": 56,
