@@ -32,7 +32,8 @@ def build(profile="reduced"):
                .replace("/*__MATH__*/null", (ROOT / "static" / "math.json").read_text())
                .replace("/*__VERIFY__*/null", ver)
                .replace("/*__SHAPES__*/null", _shapes(res, reg))
-               .replace("/*__DATA__*/null", reg))
+               .replace("/*__DATA__*/null", reg)
+               .replace("/*__SEARCH_LIVE__*/", (ROOT / "static" / "search_live.js").read_text()))
     out = ROOT.parent / "demo.html"
     out.write_text(html)
     print(f"wrote {out} ({out.stat().st_size / 1e6:.2f} MB)")

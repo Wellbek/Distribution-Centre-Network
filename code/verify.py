@@ -168,10 +168,12 @@ try:
             const r = solveJS([s.lat, s.lon], st, {deadline: 12, stop_h: 0.25, speed: 35, cap: 48, max_stops: 25, depart: 4, max_km: 250, shift_end: 13, break_h: 0.5, relay_km: 500, relay_shift_end: 19});
             return [r.vehicles, r.km]; }""")
         external = pg.evaluate("[...document.querySelectorAll('script[src],link[href],img[src]')].length")
+        live = pg.evaluate("""() => { const P = R.pool, s = P.map((p, i) => (p.origin === "G2-best" ? i : -1)).filter(i => i >= 0); let l = []; for (const x of LIVE_SEARCH.run(P, s, R.log_bo.length, "ei", 1)) l = x; return l.map(x => x.cand); }""")
         b.close()
     check("JS engine = Python engine without the segment reversal", js[0] == py0["vehicles"] and abs(js[1] - py0["km"]) / py0["km"] < 1e-3,
           f"JS {js[0]} vehicles {js[1]:.1f} km; Python {py0['vehicles']} vehicles {py0['km']:.1f} km; with the segment reversal {py1['km']:.1f} km")
     check("demo has no external resources", external == 0, f"{external} external script/link/img tags")
+    check("live search in the page repeats the reported search", live == [r["cand"] for r in REG["log_bo"]], f"{sum(x == r['cand'] for x, r in zip(live, REG['log_bo']))} of {len(REG['log_bo'])} picks equal")
 except ImportError:
     print("SKIP  demo checks: playwright not installed (pip install playwright && playwright install chromium)")
 

@@ -70,6 +70,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 22px 24px 60px; }
 .kpi .n { font-size: 12.5px; color: var(--ink-2); }
 .badge { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: var(--lav); color: var(--purple-ink); }
 .badge.live { background: var(--lime-soft); color: var(--lime-ink); }
+.livebar { height: 8px; background: var(--lav); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; } .livebar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--purple), #9dc92a); transition: width .15s; }
 .seg { display: inline-flex; background: var(--lav); border-radius: 999px; padding: 3px; gap: 2px; }
 .seg button { all: unset; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-weight: 700; font-size: 13px; color: var(--purple-ink); }
 .seg button.on { background: var(--purple); color: #fff; }
@@ -506,6 +507,123 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
  ]
 }</script>
 <script id="shapes" type="application/json">null</script>
+<script>// Live budgeted search in the browser: the GP of dcn/gp.py (Matern-5/2 ARD, marginal likelihood) and the EI rule of dcn/search.run_search, on precomputed E values.
+const LIVE_SEARCH = (() => {
+  const SQ5 = Math.sqrt(5);
+
+  function chol(A, n) {
+    const L = new Float64Array(n * n);
+    for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) {
+      let s = A[i * n + j];
+      for (let k = 0; k < j; k++) s -= L[i * n + k] * L[j * n + k];
+      if (i === j) { if (!(s > 0)) return null; L[i * n + i] = Math.sqrt(s); } else L[i * n + j] = s / L[j * n + j];
+    }
+    return L;
+  }
+  function solveL(L, n, b) { const x = Float64Array.from(b); for (let i = 0; i < n; i++) { let s = x[i]; for (let k = 0; k < i; k++) s -= L[i * n + k] * x[k]; x[i] = s / L[i * n + i]; } return x; }
+  function solveLT(L, n, b) { const x = Float64Array.from(b); for (let i = n - 1; i >= 0; i--) { let s = x[i]; for (let k = i + 1; k < n; k++) s -= L[k * n + i] * x[k]; x[i] = s / L[i * n + i]; } return x; }
+
+  // Negative log marginal likelihood and its gradient in theta = [log ls (d), log sf2, log(sn2 - 1e-6)]
+  function nllGrad(th, X, y, n, d) {
+    const ls = th.slice(0, d).map(Math.exp), sf2 = Math.exp(th[d]), sn2 = Math.exp(th[d + 1]) + 1e-6;
+    const K = new Float64Array(n * n), E5 = new Float64Array(n * n), D2 = [];
+    for (let k = 0; k < d; k++) D2.push(new Float64Array(n * n));
+    for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) {
+      let r2 = 0;
+      for (let k = 0; k < d; k++) { const q = (X[i][k] - X[j][k]) / ls[k], q2 = q * q; r2 += q2; D2[k][i * n + j] = D2[k][j * n + i] = q2; }
+      const s = SQ5 * Math.sqrt(r2), e = Math.exp(-s), v = sf2 * (1 + s + s * s / 3) * e;
+      K[i * n + j] = K[j * n + i] = v; E5[i * n + j] = E5[j * n + i] = (5 / 3) * sf2 * (1 + s) * e;
+    }
+    const Kn = Float64Array.from(K); for (let i = 0; i < n; i++) Kn[i * n + i] += sn2;
+    const L = chol(Kn, n);
+    if (!L) return [1e10, new Array(d + 2).fill(0)];
+    const a = solveLT(L, n, solveL(L, n, y));
+    let f = 0; for (let i = 0; i < n; i++) f += 0.5 * y[i] * a[i] + Math.log(L[i * n + i]);
+    // W = K^-1 - a a^T; grad_t = 0.5 tr(W dK_t)
+    const Ki = new Float64Array(n * n);
+    for (let c = 0; c < n; c++) { const e = new Float64Array(n); e[c] = 1; const col = solveLT(L, n, solveL(L, n, e)); for (let r = 0; r < n; r++) Ki[r * n + c] = col[r]; }
+    const g = new Array(d + 2).fill(0);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const w = Ki[i * n + j] - a[i] * a[j];
+      for (let k = 0; k < d; k++) g[k] += 0.5 * w * E5[i * n + j] * D2[k][i * n + j];
+      g[d] += 0.5 * w * K[i * n + j];
+      if (i === j) g[d + 1] += 0.5 * w * (sn2 - 1e-6);
+    }
+    return [f, g];
+  }
+
+  // Projected quasi-Newton (BFGS) with backtracking inside the bounds of dcn/gp.py
+  function minimise(fg, th0, lo, hi, iters = 150) {
+    const m = th0.length, clip = t => t.map((v, i) => Math.min(hi[i], Math.max(lo[i], v)));
+    let x = clip(th0), [f, g] = fg(x), H = Array.from({ length: m }, (_, i) => Array.from({ length: m }, (_, j) => +(i === j)));
+    for (let it = 0; it < iters; it++) {
+      const free = x.map((v, i) => !((v <= lo[i] && g[i] > 0) || (v >= hi[i] && g[i] < 0)));
+      let p = H.map(row => -row.reduce((s, h, j) => s + (free[j] ? h * g[j] : 0), 0)).map((v, i) => (free[i] ? v : 0));
+      if (p.reduce((s, v, i) => s + v * g[i], 0) >= 0) { p = g.map((v, i) => (free[i] ? -v : 0)); H = H.map((r, i) => r.map((_, j) => +(i === j))); }
+      let step = 1, xn, fn, gn;
+      for (let k = 0; k < 30; k++, step *= 0.5) { xn = clip(x.map((v, i) => v + step * p[i])); [fn, gn] = fg(xn); if (fn <= f + 1e-4 * xn.reduce((s, v, i) => s + (v - x[i]) * g[i], 0)) break; }
+      if (!(fn < f) || Math.abs(f - fn) < 1e-9 * Math.max(1, Math.abs(f))) { if (fn < f) { x = xn; f = fn; g = gn; } break; }
+      const s = xn.map((v, i) => v - x[i]), yv = gn.map((v, i) => v - g[i]), sy = s.reduce((a, v, i) => a + v * yv[i], 0);
+      if (sy > 1e-10) {
+        const Hy = H.map(r => r.reduce((a, h, j) => a + h * yv[j], 0)), yHy = yv.reduce((a, v, i) => a + v * Hy[i], 0);
+        H = H.map((r, i) => r.map((h, j) => h + ((sy + yHy) * s[i] * s[j]) / (sy * sy) - (Hy[i] * s[j] + s[i] * Hy[j]) / sy));
+      }
+      x = xn; f = fn; g = gn;
+    }
+    return [x, f];
+  }
+
+  function fit(Xraw, yraw) {
+    const n = Xraw.length, d = Xraw[0].length;
+    const mx = [], sx = [];
+    for (let k = 0; k < d; k++) { const c = Xraw.map(r => r[k]), m = c.reduce((a, b) => a + b, 0) / n; mx.push(m); sx.push(Math.sqrt(c.reduce((a, b) => a + (b - m) ** 2, 0) / n) + 1e-9); }
+    const my = yraw.reduce((a, b) => a + b, 0) / n, sy = Math.sqrt(yraw.reduce((a, b) => a + (b - my) ** 2, 0) / n) + 1e-9;
+    const X = Xraw.map(r => r.map((v, k) => (v - mx[k]) / sx[k])), y = Float64Array.from(yraw.map(v => (v - my) / sy));
+    const lo = [...new Array(d + 1).fill(-3), -8], hi = [...new Array(d + 1).fill(3), 1];
+    let best = null;
+    for (const st of [0, 1, -1]) { const r = minimise(t => nllGrad(t, X, y, n, d), [...new Array(d).fill(st), 0, -2], lo, hi); if (!best || r[1] < best[1]) best = r; }
+    const th = best[0], ls = th.slice(0, d).map(Math.exp), sf2 = Math.exp(th[d]), sn2 = Math.exp(th[d + 1]) + 1e-6;
+    const kern = (A, B) => { let r2 = 0; for (let k = 0; k < d; k++) r2 += ((A[k] - B[k]) / ls[k]) ** 2; const s = SQ5 * Math.sqrt(r2); return sf2 * (1 + s + s * s / 3) * Math.exp(-s); };
+    const K = new Float64Array(n * n); for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) K[i * n + j] = kern(X[i], X[j]) + (i === j ? sn2 : 0);
+    const L = chol(K, n), alpha = solveLT(L, n, solveL(L, n, y));
+    return Xq => Xq.map(r => {
+      const z = r.map((v, k) => (v - mx[k]) / sx[k]), kv = X.map(x => kern(z, x));
+      const mu = kv.reduce((a, v, i) => a + v * alpha[i], 0), v = solveL(L, n, kv);
+      return [mu * sy + my, Math.sqrt(Math.max(sf2 - v.reduce((a, b) => a + b * b, 0), 1e-12)) * sy];
+    });
+  }
+
+  // Normal cdf via erfc (Numerical Recipes erfcc, relative error below 1.2e-7)
+  function ncdf(z) { const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + 0.5 * x), r = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return z >= 0 ? 1 - r / 2 : r / 2; }
+  const npdf = z => Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+  const ei = (mu, sd, best) => { const z = (best - mu) / sd; return (best - mu) * ncdf(z) + sd * npdf(z); };
+
+  // Seeded generator for random selection (mulberry32)
+  const rng = seed => () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+
+  // One budgeted search as a generator: yields after every evaluation, so a page can draw progress
+  function* run(pool, starts, budget, rule, seed) {
+    const done = [], log = [], draw = rng(seed), G = pool.map(p => p.G2 / 1e6);
+    const evaluate = (i, why, eiv) => { done.push(i); log.push({ step: log.length + 1, cand: i, rule: why, E: pool[i].E, ok98: pool[i].ok98, ei: eiv }); };
+    for (const i of starts.slice(0, budget)) { evaluate(i, "start"); yield log; }
+    while (log.length < budget) {
+      const rest = pool.map((_, i) => i).filter(i => !done.includes(i));
+      if (!rest.length) break;
+      if (rule === "random") { evaluate(rest[Math.floor(draw() * rest.length)], "random"); yield log; continue; }
+      const ev = [...done].sort((a, b) => a - b), gp = fit(ev.map(i => pool[i].features), ev.map(i => pool[i].E / 1e6 - G[i]));
+      const pr = gp(rest.map(i => pool[i].features)), pe = gp(ev.map(i => pool[i].features));
+      const bestEv = Math.min(...ev.map((i, k) => G[i] + pe[k][0]));
+      let bi = 0, bs = -Infinity;
+      pr.forEach(([m, s], k) => { const v = ei(G[rest[k]] + m, s, bestEv); if (v > bs) { bs = v; bi = k; } });
+      evaluate(rest[bi], "EI", bs); yield log;
+    }
+    return log;
+  }
+
+  return { run, fit, rng };
+})();
+if (typeof module !== "undefined") module.exports = LIVE_SEARCH;
+</script>
 <script>
 const R = JSON.parse(document.getElementById("data").textContent);
 const MATH = JSON.parse(document.getElementById("math").textContent);
@@ -1219,7 +1337,7 @@ RENDER.how = () => {
       <p><b>Budget B = ${M.budget}:</b> ${R.log_bo.filter(x => x.rule.includes("seed")).length} seeds (the G2 optimum of every k from ${M.k_range[0]} to ${M.k_range[1]}) and ${R.log_bo.filter(x => !x.rule.includes("seed")).length} chosen by EI. Forty is the brief's default; at hours per evaluation with the real routing system it is about a week of computing. The reported search is one fresh run from seed ${M.seed}; random selection spends the same ${M.budget} on the same pool.</p>
       ${R.search_check && R.search_check.selection_replay ? (() => { const S_ = R.search_check.selection_replay, g = (n, r) => S_.runs.find(x => x.starts === n && x.rule === r); return `<p><b>Without the seeds.</b> The seeds already sit within ${fM(R.curve_bo[R.log_bo.filter(x => x.rule.includes("seed")).length - 1] - R.pool_best)} M of the pool's best, which leaves random selection little to lose. Replayed on the evaluated pool (every candidate already priced, so no routing), with ${S_.reps} different random starts of 5 or 13 networks in place of the seeds: GP + EI finds the pool's best in ${Math.round(100 * g(5, "ei").found)}% and ${Math.round(100 * g(13, "ei").found)}% of replays; ${M.budget} random picks hold it with probability ${M.budget} / ${S_.pool} = ${(100 * M.budget / S_.pool).toFixed(1)}%, and stop a median ${fM(g(5, "random").regret_median)} M and ${fM(g(13, "random").regret_median)} M a month above it. The replay reproduces the reported search exactly first. Most of the search's value is in the seeds; the rule's value is that it does not depend on them (cached, <code>python checks/selection_replay.py</code>).</p>`; })() : ""}
       ${R.refinement && R.refinement.path.length > 1 ? (() => { const P_ = R.refinement.path, nm = s => s.replace(/\d+/g, d => SITES[+d].name); return `<p><b>Refinement after the search, outside the budget.</b> The search can only return a member of its pool, so its pick is then refined by a local search on E: every network one move away (any open site swapped for any closed one, one dropped or one added, within the store bounds) is priced on the same ${M.days[0]} search days, the cheapest is taken if it saves more than 1 M a month, and this repeats until no move does. ${f0(R.refinement.evaluations)} evaluations, kept apart from the ${M.budget} of the reported search: ${P_.map((s, i) => i ? `${nm(s.move)} → ${fM(s.E)} M` : `the search's pick ${fM(s.E)} M`).join("; ")}. The end point is the recommendation; no single change improves it, but larger changes may (precomputed, <code>python run_full.py</code>, <code>registry.json</code> → <code>refinement</code>).</p>`; })() : ""}`,
-      right: `<svg class="chart" viewBox="0 0 440 260" id="fig-search"></svg><div class="row"><input type="range" id="step" min="1" value="1" style="flex:1"><span class="note" id="step-label"></span></div><div class="mapbox" id="searchmap" style="height:300px;margin-top:8px"></div><details class="log"><summary>Evaluation log: every full evaluation of the reported search</summary><div class="seg" id="log-seg" style="margin:8px 0"><button data-n="bo" class="on">GP + EI</button><button data-n="rand">random selection</button></div><div class="scroll"><table id="logtab"></table></div></details>` },
+      right: `<svg class="chart" viewBox="0 0 440 260" id="fig-search"></svg><div class="row"><input type="range" id="step" min="1" value="1" style="flex:1"><span class="note" id="step-label"></span></div><div class="mapbox" id="searchmap" style="height:300px;margin-top:8px"></div><details class="log"><summary>Evaluation log: every full evaluation of the reported search</summary><div class="seg" id="log-seg" style="margin:8px 0"><button data-n="bo" class="on">GP + EI</button><button data-n="rand">random selection</button></div><div class="scroll"><table id="logtab"></table></div></details>${R.pool[0].features ? `<div class="card" id="live-search" style="margin-top:12px"><h3>Run the search yourself, live</h3><p class="note" style="margin:4px 0 8px">Every pool network was priced once by <code>python run_full.py</code>; here the selection rule itself (GP on E − G<sub>2</sub>, expected improvement) runs live, against random selection from the same start. With the reported seeds it repeats the logged search pick for pick.</p><div class="row"><div class="seg" id="ls-start"><button data-n="seeds" class="on">Reported seeds</button><button data-n="5">5 random networks</button><button data-n="13">13 random networks</button></div><button class="btn ghost small" id="ls-draw" title="draw other random start networks">new draw</button></div><div class="row" style="margin-top:8px"><label class="note" for="ls-budget">Budget B</label><input type="range" id="ls-budget" min="1" max="60" value="40" style="flex:1"><b id="ls-bval">40</b><button class="btn" id="ls-run">▶ Run the search</button></div><div class="livebar"><i id="ls-bar"></i></div><div class="note" id="ls-status">Ready.</div><svg class="chart" viewBox="0 0 440 220" id="ls-fig"></svg><p id="ls-out" class="note"></p></div>` : ""}` },
     { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E", use: `Use <b>Lecture 5's proxy diagnosis</b>: treat the cheap criterion G as a proxy for the full evaluation E and measure <b>prediction quality</b> (the R² of a least-squares line from G to E, Lecture 2) separately from <b>decision quality</b> (what G's own pick loses under E), because a proxy that ranks well on average can still be exploited by the search. Remedy: put <b>system knowledge</b> into G (the noon clock), giving G<sub>2</sub>, and judge every candidate by E.`,
       left: `<div class="formula">${MATH.bound}</div>
       <p><b>G1</b> (fixed cost, vehicles by load, continuous-approximation km) ignores the clock. Prediction quality: R² ${R.r3_g1.r2_line.toFixed(2)}; decision quality: among the evaluated candidates it picks k = ${R.r3_g1.g_pick_k} and loses ${fM(R.r3_g1.loss)} M a month; searched over the whole pool it picks ${R.finals.proxy_only.k} DCs and loses ${fM(R.finals.proxy_only.total - R.finals.recommended.total)} M on the final days.</p>
@@ -1230,7 +1348,7 @@ RENDER.how = () => {
   ];
   L.push(balanceLec());
   $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title} <span class="pre-tag">${PRE}</span></h3>${x.use ? `<div class="use">${x.use}</div>` : ""}${x.left}</div><div>${x.right}</div></div>`).join("");
-  figHierarchy(); figGamma(); figPPC(); figInsert(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
+  figHierarchy(); figGamma(); figPPC(); figInsert(); figCensus(); figNews(); figSearch(); liveSearch(); figScatter(); figBound(); figR2(); logTable("bo");
   document.querySelectorAll("#log-seg button").forEach(b => b.onclick = () => { document.querySelectorAll("#log-seg button").forEach(z => z.classList.toggle("on", z === b)); logTable(b.dataset.n); });
 };
 function figR2() {
@@ -1354,6 +1472,47 @@ function figSearch() {
   SM = new MapView($("#searchmap"));
   SM.layers = m => { const r = R.log_bo[+$("#step").value - 1], c = m.ctx; for (const st of SITES) { const [x, y] = m.P(st.lat, st.lon); c.beginPath(); c.arc(x, y, 3.2, 0, 7); c.fillStyle = "#fff"; c.fill(); c.strokeStyle = "#b9a9c0"; c.stroke(); } for (const j of R.pool[r.cand].sites) drawDC(c, m, SITES[j], "#9dc92a", false); };
   const st = $("#step"); st.max = n; st.oninput = () => { const r = R.log_bo[+st.value - 1]; $("#step-label").textContent = `step ${r.step}: ${r.rule}, k = ${r.k}, E = ${fM(r.E)} M`; SM.draw(); }; st.oninput();
+}
+function liveSearch() {
+  if (!$("#live-search")) return;
+  const P_ = R.pool, seeds = P_.map((p, i) => (p.origin === "G2-best" ? i : -1)).filter(i => i >= 0), best = R.pool_best;
+  let mode = "seeds", draw = 1, running = false;
+  const startSet = () => { if (mode === "seeds") return seeds; const r = LIVE_SEARCH.rng(1000 + draw), n = +mode, s = []; while (s.length < n) { const i = Math.floor(r() * P_.length); if (!s.includes(i)) s.push(i); } return s; };
+  const curve = log => { let b = Infinity; return log.map(x => (b = x.ok98 ? Math.min(b, x.E) : b)); };
+  const chart = (a, b, B) => {
+    const s = $("#ls-fig"); s.innerHTML = "";
+    const all = [...a, ...b].filter(isFinite), hi = Math.min(Math.max(...all, best * 1.02), best * 1.45), lo = best * 0.985;
+    const { X, Y } = axesXY(s, [56, 12, 430, 185], [1, Math.max(B, 2)], [lo, hi], v => Math.round(v), v => f0(v / 1e6), 5, 4);
+    el("line", { x1: 56, x2: 430, y1: Y(best), y2: Y(best), stroke: "#4f6b0c", "stroke-dasharray": "3 3" }, s);
+    el("text", { x: 428, y: Y(best) + 13, "text-anchor": "end", "font-size": 10.5, fill: "#4f6b0c" }, s, "best in the pool");
+    const path = (c, col, w, dash) => { const p = c.map((v, i) => [i + 1, Math.min(v, hi)]).filter(([, v]) => isFinite(v)); if (p.length) el("path", { d: p.map(([x, v], i) => `${i ? "L" : "M"}${X(x)} ${Y(v)}`).join(""), fill: "none", stroke: col, "stroke-width": w, "stroke-dasharray": dash || "" }, s); };
+    path(b, "#9a8aa3", 2, "5 4"); path(a, "#751485", 3);
+    el("text", { x: 428, y: 26, "text-anchor": "end", "font-size": 11.5, "font-weight": 800, fill: "#751485" }, s, "GP + EI"); el("text", { x: 428, y: 41, "text-anchor": "end", "font-size": 11, fill: "#9a8aa3" }, s, "random selection, same start");
+    el("text", { x: 243, y: 214, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, s, "full evaluations used · best monthly cost so far, M KRW");
+  };
+  $("#ls-start").querySelectorAll("button").forEach(b => b.onclick = () => { if (running) return; $("#ls-start").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); mode = b.dataset.n; $("#ls-draw").hidden = mode === "seeds"; });
+  $("#ls-draw").hidden = true; $("#ls-draw").onclick = () => { if (!running) { draw++; $("#ls-status").textContent = `New draw of start networks (#${draw}).`; } };
+  $("#ls-budget").oninput = () => { $("#ls-bval").textContent = $("#ls-budget").value; };
+  $("#ls-run").onclick = () => {
+    if (running) return;
+    running = true; $("#ls-run").textContent = "running…";
+    const B = +$("#ls-budget").value, st = startSet(), ge = LIVE_SEARCH.run(P_, st, B, "ei", draw), gr = LIVE_SEARCH.run(P_, st, B, "random", 7919 + draw);
+    let le = [], lr = [], t0 = performance.now();
+    const tick = () => {
+      const a = ge.next(), b = gr.next();
+      if (!a.done) le = a.value; if (!b.done) lr = b.value;
+      const k = le.length, ce = curve(le), cr = curve(lr);
+      $("#ls-bar").style.width = `${(100 * k) / B}%`;
+      $("#ls-status").textContent = k < B ? `Evaluation ${k + 1} of ${B}: ${k < Math.min(st.length, B) ? "a start network" : "fitting the GP to the evaluated networks, then choosing by expected improvement"}…` : `Done in ${((performance.now() - t0) / 1000).toFixed(1)} s.`;
+      chart(ce, cr, B);
+      if (k < B && !a.done) { setTimeout(tick, 0); return; }
+      const hitE = ce.findIndex(v => v <= best + 1) + 1, hitR = cr.findIndex(v => v <= best + 1) + 1, same = mode === "seeds" && B === R.log_bo.length && le.every((x, i) => x.cand === R.log_bo[i].cand);
+      $("#ls-out").innerHTML = `<b>GP + EI</b>: ${hitE ? `reached the pool's best (${fM(best)} M) at evaluation ${hitE}` : `best ${isFinite(ce[ce.length - 1]) ? fM(ce[ce.length - 1]) : "none"} M, ${isFinite(ce[ce.length - 1]) ? fM(ce[ce.length - 1] - best) : "–"} M above the pool's best`}. <b>Random selection</b>: ${hitR ? `reached it at evaluation ${hitR}` : `ended ${isFinite(cr[cr.length - 1]) ? fM(cr[cr.length - 1] - best) + " M a month above it" : "without a valid network"}`}.${B === 1 ? " With a budget of one evaluation the search can only return its first start network: the boundary case." : ""}${same ? " The 40 picks are exactly those of the logged search." : ""}`;
+      running = false; $("#ls-run").textContent = "▶ Run the search";
+    };
+    tick();
+  };
+  chart([], [], 40);
 }
 let GKEY = "G2";
 function figScatter() {

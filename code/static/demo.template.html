@@ -69,6 +69,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 22px 24px 60px; }
 .kpi .n { font-size: 12.5px; color: var(--ink-2); }
 .badge { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: var(--lav); color: var(--purple-ink); }
 .badge.live { background: var(--lime-soft); color: var(--lime-ink); }
+.livebar { height: 8px; background: var(--lav); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; } .livebar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--purple), #9dc92a); transition: width .15s; }
 .seg { display: inline-flex; background: var(--lav); border-radius: 999px; padding: 3px; gap: 2px; }
 .seg button { all: unset; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-weight: 700; font-size: 13px; color: var(--purple-ink); }
 .seg button.on { background: var(--purple); color: #fff; }
@@ -354,6 +355,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
 <script id="math" type="application/json">/*__MATH__*/null</script>
 <script id="verifydata" type="application/json">/*__VERIFY__*/null</script>
 <script id="shapes" type="application/json">/*__SHAPES__*/null</script>
+<script>/*__SEARCH_LIVE__*/</script>
 <script>
 const R = JSON.parse(document.getElementById("data").textContent);
 const MATH = JSON.parse(document.getElementById("math").textContent);
@@ -1067,7 +1069,7 @@ RENDER.how = () => {
       <p><b>Budget B = ${M.budget}:</b> ${R.log_bo.filter(x => x.rule.includes("seed")).length} seeds (the G2 optimum of every k from ${M.k_range[0]} to ${M.k_range[1]}) and ${R.log_bo.filter(x => !x.rule.includes("seed")).length} chosen by EI. Forty is the brief's default; at hours per evaluation with the real routing system it is about a week of computing. The reported search is one fresh run from seed ${M.seed}; random selection spends the same ${M.budget} on the same pool.</p>
       ${R.search_check && R.search_check.selection_replay ? (() => { const S_ = R.search_check.selection_replay, g = (n, r) => S_.runs.find(x => x.starts === n && x.rule === r); return `<p><b>Without the seeds.</b> The seeds already sit within ${fM(R.curve_bo[R.log_bo.filter(x => x.rule.includes("seed")).length - 1] - R.pool_best)} M of the pool's best, which leaves random selection little to lose. Replayed on the evaluated pool (every candidate already priced, so no routing), with ${S_.reps} different random starts of 5 or 13 networks in place of the seeds: GP + EI finds the pool's best in ${Math.round(100 * g(5, "ei").found)}% and ${Math.round(100 * g(13, "ei").found)}% of replays; ${M.budget} random picks hold it with probability ${M.budget} / ${S_.pool} = ${(100 * M.budget / S_.pool).toFixed(1)}%, and stop a median ${fM(g(5, "random").regret_median)} M and ${fM(g(13, "random").regret_median)} M a month above it. The replay reproduces the reported search exactly first. Most of the search's value is in the seeds; the rule's value is that it does not depend on them (cached, <code>python checks/selection_replay.py</code>).</p>`; })() : ""}
       ${R.refinement && R.refinement.path.length > 1 ? (() => { const P_ = R.refinement.path, nm = s => s.replace(/\d+/g, d => SITES[+d].name); return `<p><b>Refinement after the search, outside the budget.</b> The search can only return a member of its pool, so its pick is then refined by a local search on E: every network one move away (any open site swapped for any closed one, one dropped or one added, within the store bounds) is priced on the same ${M.days[0]} search days, the cheapest is taken if it saves more than 1 M a month, and this repeats until no move does. ${f0(R.refinement.evaluations)} evaluations, kept apart from the ${M.budget} of the reported search: ${P_.map((s, i) => i ? `${nm(s.move)} → ${fM(s.E)} M` : `the search's pick ${fM(s.E)} M`).join("; ")}. The end point is the recommendation; no single change improves it, but larger changes may (precomputed, <code>python run_full.py</code>, <code>registry.json</code> → <code>refinement</code>).</p>`; })() : ""}`,
-      right: `<svg class="chart" viewBox="0 0 440 260" id="fig-search"></svg><div class="row"><input type="range" id="step" min="1" value="1" style="flex:1"><span class="note" id="step-label"></span></div><div class="mapbox" id="searchmap" style="height:300px;margin-top:8px"></div><details class="log"><summary>Evaluation log: every full evaluation of the reported search</summary><div class="seg" id="log-seg" style="margin:8px 0"><button data-n="bo" class="on">GP + EI</button><button data-n="rand">random selection</button></div><div class="scroll"><table id="logtab"></table></div></details>` },
+      right: `<svg class="chart" viewBox="0 0 440 260" id="fig-search"></svg><div class="row"><input type="range" id="step" min="1" value="1" style="flex:1"><span class="note" id="step-label"></span></div><div class="mapbox" id="searchmap" style="height:300px;margin-top:8px"></div><details class="log"><summary>Evaluation log: every full evaluation of the reported search</summary><div class="seg" id="log-seg" style="margin:8px 0"><button data-n="bo" class="on">GP + EI</button><button data-n="rand">random selection</button></div><div class="scroll"><table id="logtab"></table></div></details>${R.pool[0].features ? `<div class="card" id="live-search" style="margin-top:12px"><h3>Run the search yourself, live</h3><p class="note" style="margin:4px 0 8px">Every pool network was priced once by <code>python run_full.py</code>; here the selection rule itself (GP on E − G<sub>2</sub>, expected improvement) runs live, against random selection from the same start. With the reported seeds it repeats the logged search pick for pick.</p><div class="row"><div class="seg" id="ls-start"><button data-n="seeds" class="on">Reported seeds</button><button data-n="5">5 random networks</button><button data-n="13">13 random networks</button></div><button class="btn ghost small" id="ls-draw" title="draw other random start networks">new draw</button></div><div class="row" style="margin-top:8px"><label class="note" for="ls-budget">Budget B</label><input type="range" id="ls-budget" min="1" max="60" value="40" style="flex:1"><b id="ls-bval">40</b><button class="btn" id="ls-run">▶ Run the search</button></div><div class="livebar"><i id="ls-bar"></i></div><div class="note" id="ls-status">Ready.</div><svg class="chart" viewBox="0 0 440 220" id="ls-fig"></svg><p id="ls-out" class="note"></p></div>` : ""}` },
     { q: "Q6 · Can the cheap criterion be trusted?", lec: "Lecture 5 · prediction versus decision quality", title: "G versus E", use: `Use <b>Lecture 5's proxy diagnosis</b>: treat the cheap criterion G as a proxy for the full evaluation E and measure <b>prediction quality</b> (the R² of a least-squares line from G to E, Lecture 2) separately from <b>decision quality</b> (what G's own pick loses under E), because a proxy that ranks well on average can still be exploited by the search. Remedy: put <b>system knowledge</b> into G (the noon clock), giving G<sub>2</sub>, and judge every candidate by E.`,
       left: `<div class="formula">${MATH.bound}</div>
       <p><b>G1</b> (fixed cost, vehicles by load, continuous-approximation km) ignores the clock. Prediction quality: R² ${R.r3_g1.r2_line.toFixed(2)}; decision quality: among the evaluated candidates it picks k = ${R.r3_g1.g_pick_k} and loses ${fM(R.r3_g1.loss)} M a month; searched over the whole pool it picks ${R.finals.proxy_only.k} DCs and loses ${fM(R.finals.proxy_only.total - R.finals.recommended.total)} M on the final days.</p>
@@ -1078,7 +1080,7 @@ RENDER.how = () => {
   ];
   L.push(balanceLec());
   $("#lectures").innerHTML = L.map((x, i) => `<div class="lec${x.wide ? " wide" : ""}" id="q${i + 1}"><div><div class="tagline"><span class="q">${x.q}</span><span class="lnum">${x.lec}</span></div><h3>${x.title} <span class="pre-tag">${PRE}</span></h3>${x.use ? `<div class="use">${x.use}</div>` : ""}${x.left}</div><div>${x.right}</div></div>`).join("");
-  figHierarchy(); figGamma(); figPPC(); figInsert(); figCensus(); figNews(); figSearch(); figScatter(); figBound(); figR2(); logTable("bo");
+  figHierarchy(); figGamma(); figPPC(); figInsert(); figCensus(); figNews(); figSearch(); liveSearch(); figScatter(); figBound(); figR2(); logTable("bo");
   document.querySelectorAll("#log-seg button").forEach(b => b.onclick = () => { document.querySelectorAll("#log-seg button").forEach(z => z.classList.toggle("on", z === b)); logTable(b.dataset.n); });
 };
 function figR2() {
@@ -1202,6 +1204,47 @@ function figSearch() {
   SM = new MapView($("#searchmap"));
   SM.layers = m => { const r = R.log_bo[+$("#step").value - 1], c = m.ctx; for (const st of SITES) { const [x, y] = m.P(st.lat, st.lon); c.beginPath(); c.arc(x, y, 3.2, 0, 7); c.fillStyle = "#fff"; c.fill(); c.strokeStyle = "#b9a9c0"; c.stroke(); } for (const j of R.pool[r.cand].sites) drawDC(c, m, SITES[j], "#9dc92a", false); };
   const st = $("#step"); st.max = n; st.oninput = () => { const r = R.log_bo[+st.value - 1]; $("#step-label").textContent = `step ${r.step}: ${r.rule}, k = ${r.k}, E = ${fM(r.E)} M`; SM.draw(); }; st.oninput();
+}
+function liveSearch() {
+  if (!$("#live-search")) return;
+  const P_ = R.pool, seeds = P_.map((p, i) => (p.origin === "G2-best" ? i : -1)).filter(i => i >= 0), best = R.pool_best;
+  let mode = "seeds", draw = 1, running = false;
+  const startSet = () => { if (mode === "seeds") return seeds; const r = LIVE_SEARCH.rng(1000 + draw), n = +mode, s = []; while (s.length < n) { const i = Math.floor(r() * P_.length); if (!s.includes(i)) s.push(i); } return s; };
+  const curve = log => { let b = Infinity; return log.map(x => (b = x.ok98 ? Math.min(b, x.E) : b)); };
+  const chart = (a, b, B) => {
+    const s = $("#ls-fig"); s.innerHTML = "";
+    const all = [...a, ...b].filter(isFinite), hi = Math.min(Math.max(...all, best * 1.02), best * 1.45), lo = best * 0.985;
+    const { X, Y } = axesXY(s, [56, 12, 430, 185], [1, Math.max(B, 2)], [lo, hi], v => Math.round(v), v => f0(v / 1e6), 5, 4);
+    el("line", { x1: 56, x2: 430, y1: Y(best), y2: Y(best), stroke: "#4f6b0c", "stroke-dasharray": "3 3" }, s);
+    el("text", { x: 428, y: Y(best) + 13, "text-anchor": "end", "font-size": 10.5, fill: "#4f6b0c" }, s, "best in the pool");
+    const path = (c, col, w, dash) => { const p = c.map((v, i) => [i + 1, Math.min(v, hi)]).filter(([, v]) => isFinite(v)); if (p.length) el("path", { d: p.map(([x, v], i) => `${i ? "L" : "M"}${X(x)} ${Y(v)}`).join(""), fill: "none", stroke: col, "stroke-width": w, "stroke-dasharray": dash || "" }, s); };
+    path(b, "#9a8aa3", 2, "5 4"); path(a, "#751485", 3);
+    el("text", { x: 428, y: 26, "text-anchor": "end", "font-size": 11.5, "font-weight": 800, fill: "#751485" }, s, "GP + EI"); el("text", { x: 428, y: 41, "text-anchor": "end", "font-size": 11, fill: "#9a8aa3" }, s, "random selection, same start");
+    el("text", { x: 243, y: 214, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, s, "full evaluations used · best monthly cost so far, M KRW");
+  };
+  $("#ls-start").querySelectorAll("button").forEach(b => b.onclick = () => { if (running) return; $("#ls-start").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); mode = b.dataset.n; $("#ls-draw").hidden = mode === "seeds"; });
+  $("#ls-draw").hidden = true; $("#ls-draw").onclick = () => { if (!running) { draw++; $("#ls-status").textContent = `New draw of start networks (#${draw}).`; } };
+  $("#ls-budget").oninput = () => { $("#ls-bval").textContent = $("#ls-budget").value; };
+  $("#ls-run").onclick = () => {
+    if (running) return;
+    running = true; $("#ls-run").textContent = "running…";
+    const B = +$("#ls-budget").value, st = startSet(), ge = LIVE_SEARCH.run(P_, st, B, "ei", draw), gr = LIVE_SEARCH.run(P_, st, B, "random", 7919 + draw);
+    let le = [], lr = [], t0 = performance.now();
+    const tick = () => {
+      const a = ge.next(), b = gr.next();
+      if (!a.done) le = a.value; if (!b.done) lr = b.value;
+      const k = le.length, ce = curve(le), cr = curve(lr);
+      $("#ls-bar").style.width = `${(100 * k) / B}%`;
+      $("#ls-status").textContent = k < B ? `Evaluation ${k + 1} of ${B}: ${k < Math.min(st.length, B) ? "a start network" : "fitting the GP to the evaluated networks, then choosing by expected improvement"}…` : `Done in ${((performance.now() - t0) / 1000).toFixed(1)} s.`;
+      chart(ce, cr, B);
+      if (k < B && !a.done) { setTimeout(tick, 0); return; }
+      const hitE = ce.findIndex(v => v <= best + 1) + 1, hitR = cr.findIndex(v => v <= best + 1) + 1, same = mode === "seeds" && B === R.log_bo.length && le.every((x, i) => x.cand === R.log_bo[i].cand);
+      $("#ls-out").innerHTML = `<b>GP + EI</b>: ${hitE ? `reached the pool's best (${fM(best)} M) at evaluation ${hitE}` : `best ${isFinite(ce[ce.length - 1]) ? fM(ce[ce.length - 1]) : "none"} M, ${isFinite(ce[ce.length - 1]) ? fM(ce[ce.length - 1] - best) : "–"} M above the pool's best`}. <b>Random selection</b>: ${hitR ? `reached it at evaluation ${hitR}` : `ended ${isFinite(cr[cr.length - 1]) ? fM(cr[cr.length - 1] - best) + " M a month above it" : "without a valid network"}`}.${B === 1 ? " With a budget of one evaluation the search can only return its first start network: the boundary case." : ""}${same ? " The 40 picks are exactly those of the logged search." : ""}`;
+      running = false; $("#ls-run").textContent = "▶ Run the search";
+    };
+    tick();
+  };
+  chart([], [], 40);
 }
 let GKEY = "G2";
 function figScatter() {
