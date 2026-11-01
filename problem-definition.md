@@ -3,10 +3,10 @@
 **IE437 Midterm Project · Distribution-Centre Network Redesign - Formulating and Solving a Hierarchical Decision**
 
 Author / student ID: Louis Wellmeyer / 20264059  
-Date / version: 2026-11-01 / v1.3 (code run 8)  
+Date / version: 2026-11-01 / v1.3 (full pipeline run 8)  
 Summary: Run ten DCs instead of twelve (keep Gimpo Gochon, Cheonan Seobuk and Incheon Namdong, open seven new sites); in the fictional instance this saves 524 M KRW a month (90% interval over demand days 512-541; about 390-530 M across the model checks, 507 M with routes from a stronger solver) with every delivery before noon, and the saving rests on how far today's real network has drifted from a good design, which the real outcome tables must measure first  
 Files: `problem-definition.md`, `code/` (README, three commands), `demo.html` (offline; the live solve also runs from `code/app.py`), `proposal.html`  
-LLM tools and use: Claude Opus 5.5 in Claude Code, 19 Oct to 2 Nov 2026, for problem discussion, OSRM setup, code, checks, the demo and slides; every number in this file comes from `code/` (Section 5) and three discussions are reviewed in Section 7.
+LLM tools and use: Claude Opus 5.5 in Claude Code, for problem discussion, OSRM setup, code, checks, the demo and slides; every number in this file comes from `code/` (Section 5) and three discussions are reviewed in Section 7.
 
 All company data are fictional and generated from seed 437 (Section 3).
 Road distances are real OpenStreetMap values.
