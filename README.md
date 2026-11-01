@@ -8,8 +8,8 @@ A convenience-store chain of 9,718 stores runs 12 distribution centres, and thei
 This project decides how many DCs to run, at which sites, which stores each serves and how many vehicles each owns, with every delivery before noon.
 Every candidate network is priced the same full way: road distances from OpenStreetMap, each store's demand as a Bayesian belief, every DC routed on sampled demand days, and a budgeted Bayesian-optimisation search over the site choice; every method comes from the course (Lectures 0-6).
 
-**The answer in the fictional instance:** run 10 DCs instead of 12, keeping 2 sites and opening 8, which saves about 469 M KRW a month (469 M on days the search never saw).
-The quick estimate that ignores the noon clock would have picked 8 DCs and cost 357 M KRW a month more.
+**The answer in the fictional instance:** run 10 DCs instead of 12, keeping 3 sites and opening 7, which saves about 524 M KRW a month (535 M on days the search never saw).
+The quick estimate that ignores the noon clock would have picked 8 DCs and cost 412 M KRW a month more.
 The saving rests on how far the real network has drifted from a good design, so the first step is a check against Dasol's real delivery records.
 All figures come from the reported run (`code/results/full/registry.json`); Dasol Retail is fictional, the geography and road distances are real.
 
