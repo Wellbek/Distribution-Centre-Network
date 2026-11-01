@@ -342,3 +342,13 @@ Known from search abstracts only, to verify before any of them enters `problem-d
 ## Dated notes
 
 - 2026-10-21: Naju Bitgaram and Gimhae Hallim rerun at 0.3 s per store (`routing_gap_recommended_0_dc40-47.json`), completing the k = 10 column of E1; the first summary (3.3% on 8 of 10 territories, "today's lead grows by about 50 M") was an extrapolation and is replaced by the measured 3.9% and about 12 M.
+- 2026-11-01: exhaustive one-move neighbourhood of run 7's recommended network under E (`experiments/e_neighbourhood_check.py`, results in `e_neighbourhood_recommended.json` and `.jsonl`; laptop, 3 workers, 4,619 s).
+  Scope: all 560 swaps (any open site for any closed site), drops and adds that keep 500-1,400 stores per DC feasible, scored on the 7 search days; the 14 neighbours within 25 M of the start re-scored on the 28 final days.
+  The start reproduces the registry (5,981.98 M on the search days, 6,110.9 M on the final days).
+  Result: the recommended network is not a one-move local optimum.
+  Siheung Banwol (S18) swapped for Incheon Namdong (S12) is 28.5 M a month cheaper on the search days and 24.0 M cheaper on the final days (6,086.9 against 6,110.9), which would lift the saving from 468.7 M to about 493 M.
+  Two more swaps also lower the final-days cost: Gimhae Hallim for Changwon Jinyeong (-9.8 M) and Namyangju Jingeon for Yangju Gwangjeok (-1.4 M); the other eleven close neighbours are worse.
+  Meaning: the search found the best member of its pool, but the pool lacked this neighbour; the claim "best network found" holds only for the pool.
+  The gain is about 0.4%, k = 10 and the sign of the saving are unchanged.
+  Open for the night of 1 Nov: (a) disclose in the definition, proposal and demo as a checked limit, or (b) adopt the swap, which needs a Spark run of `run_full.py` and a rebuild of every deliverable, the trailer and the ZIP, plus a second neighbourhood round from the new network (about 75 min on the laptop).
+  The Spark was unreachable (SSH timeout), so nothing shipped was changed.

@@ -438,3 +438,14 @@ Fixes:
 - New findings: departure waves with 23 docks move k* to 12 (the 10- and 11-DC networks overflow the docks of their largest DCs by 3.3 vehicles a day), 29 docks keep 10; the myopic lease path ends 6 M a month cheaper than the committed one but keeps Gangneung at 123 stores; Gimpo is in four of the five best networks (the third keeps Yongin, Hanam, Incheon), but the best 9- to 12-DC networks all keep Gimpo and Cheonan.
 - `verify.py` 29/29 on run 7; exact enumeration: 0 extra vehicles, km 8.9% above the optimum on average (savings had 0.4%).
 - The laptop reset once during the session (the scratchpad with the PyVRP environment was lost and rebuilt).
+
+### One-move neighbourhood check, 1 Nov
+
+- `experiments/e_neighbourhood_check.py` scored all 560 one-move neighbours of the recommended network under E: Siheung Banwol for Incheon Namdong is 24.0 M a month cheaper on the final days, so the recommendation is not a local optimum (details in `ALGORITHM_REVIEW.md`, dated notes).
+- Decision open for tonight: disclose as a limit, or adopt the swap with a Spark rerun and rebuild. Shipped files unchanged.
+- Combined moves on the final days: Siheung for Incheon -24.0 M; plus Gimhae for Changwon -28.2 M; plus Namyangju for Yangju -43.5 M (6,067.4 against 6,110.9), so the network is still moving.
+- `experiments/e_local_search.py` started (laptop, 3 workers, about 77 min a round): best-improvement on E with the full one-move neighbourhood until no move saves 1 M; reuses round 1.
+- `experiments/selection_replay.py` on run 7's evaluated pool (reproduces the reported search exactly; 30 random starts each): from 5 random starts EI finds the pool best in 100% of runs (median at evaluation 17), random in 17% (median regret 120.9 M); from 13 random starts EI 90%, random 17% (regret 119.2 M).
+- Local search finished (`code/checks/local_search.py`, seeded with the experiment's cache after a laptop crash; rounds 1-3 replayed from the cache with the same moves): local optimum after 4 swaps (Siheung Banwol for Incheon Namdong, Namyangju Jingeon for Yangju Gwangjeok, Gimhae Hallim for Changwon Jinyeong, Chilgok Waegwan for Gumi Sandong), 2,800 evaluations; best neighbour 6.2 M worse; still 10 DCs; 55.7 M cheaper on the final days (0.9%), 65.6 M on the held-out days (fleet from the final days, as the pipeline).
+- Option A shipped: both checks in `code/checks/` with cached results, embedded by `build_demo.py`; demo test 4 and Q5 paragraph, proposal slide 9 retitled "Why 10 DCs is the answer" with a sixth test; definition R4 paragraph (also fixes the reason behind the 87%: 2 candidates beat the best seed, 86.2% exact), new local-search paragraph, balance-table and register rows. `verify.py` 29/29, pages render offline without errors, ZIP 48.6 MB, 72 files.
+- Option B (recommend the local optimum) needs a Spark rerun of `run_full.py`; the Spark was still unreachable at 17:40.
