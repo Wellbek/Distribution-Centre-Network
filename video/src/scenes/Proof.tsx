@@ -23,7 +23,7 @@ export const Proof: React.FC = () => {
           <FadeUp delay={72}><div style={tile}><div style={v}><CountUp to={data.networks} delay={78} /></div><div style={l}>networks priced in full;<br />none is cheaper</div></div></FadeUp>
         </div>
         <div style={{ display: "flex", gap: 26, marginTop: 34 }}>
-          {[`Found by the search at evaluation ${data.found_at} of ${data.budget}; random picking stops ${data.random_gap} M worse`, `${data.reversals} of ${data.reversal_rows} changed assumptions keep it paying`, `With a stronger router still about ${Math.round(data.pyvrp ?? 0)} M a month`].map((t, i) => (
+          {[`Found at evaluation ${data.found_at} of ${data.budget}, then refined site by site; random picking stops ${data.random_gap} M worse`, `${data.reversals} of ${data.reversal_rows} changed assumptions keep it paying`, `With a stronger router still about ${Math.round(data.pyvrp ?? 0)} M a month`].map((t, i) => (
             <FadeUp key={t} delay={120 + i * 16} style={{ flex: 1 }}><div style={{ fontFamily: SANS, fontSize: 26, color: COLORS.white, borderLeft: `6px solid ${COLORS.lime}`, paddingLeft: 18, lineHeight: 1.35 }}>{t}</div></FadeUp>
           ))}
         </div>
