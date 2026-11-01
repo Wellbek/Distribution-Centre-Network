@@ -254,6 +254,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
         <div class="ctrl"><label for="lv-speed">Average speed (km/h)</label><output id="o-speed"></output><input type="range" id="lv-speed" min="25" max="50" step="1" value="35"></div>
         <div class="ctrl"><label for="lv-cap">Vehicle capacity (cages)</label><output id="o-cap"></output><input type="range" id="lv-cap" min="30" max="60" step="1" value="48"></div>
         <div class="ctrl"><label for="lv-stops">Max stops per vehicle</label><output id="o-stops"></output><input type="range" id="lv-stops" min="10" max="35" step="1" value="25"></div>
+        <div class="ctrl"><label for="lv-km">Max km per vehicle (one driver)</label><output id="o-km"></output><input type="range" id="lv-km" min="150" max="350" step="10" value="250"></div>
         <div class="ctrl" id="lv-fleet-ctrl"><label for="lv-fleet">Vehicles available (owned + spot)</label><output id="o-fleet"></output><input type="range" id="lv-fleet" min="3" max="400" step="1" value="400"></div>
         <div class="row"><button class="btn" id="lv-solve">Solve and show on the map</button><button class="btn ghost small" id="lv-reset">Defaults</button></div>
         <div class="livebar" id="lv-barbox" hidden><i id="lv-bar"></i></div><div class="note" id="lv-status"></div>
@@ -1177,8 +1178,8 @@ function initLive() {
   $("#lv-reset").onclick = () => { liveDefaults(); solveLive(); };
   sync();
 }
-function liveDefaults() { $("#lv-day").value = 0; Object.entries({ "lv-dead": 12, "lv-stop": 15, "lv-speed": 35, "lv-cap": 48, "lv-stops": 25, "lv-fleet": +$("#lv-fleet").max }).forEach(([k, v]) => $("#" + k).value = v); sync(); }
-function sync() { $("#o-dead").textContent = hhmm(+$("#lv-dead").value); $("#o-stop").textContent = $("#lv-stop").value; $("#o-speed").textContent = $("#lv-speed").value; $("#o-cap").textContent = $("#lv-cap").value; $("#o-stops").textContent = $("#lv-stops").value; $("#o-fleet").textContent = $("#lv-fleet").value; }
+function liveDefaults() { $("#lv-day").value = 0; Object.entries({ "lv-dead": 12, "lv-stop": 15, "lv-speed": 35, "lv-cap": 48, "lv-stops": 25, "lv-km": P.max_km, "lv-fleet": +$("#lv-fleet").max }).forEach(([k, v]) => $("#" + k).value = v); sync(); }
+function sync() { $("#o-dead").textContent = hhmm(+$("#lv-dead").value); $("#o-stop").textContent = $("#lv-stop").value; $("#o-speed").textContent = $("#lv-speed").value; $("#o-cap").textContent = $("#lv-cap").value; $("#o-stops").textContent = $("#lv-stops").value; $("#o-km").textContent = $("#lv-km").value; $("#o-fleet").textContent = $("#lv-fleet").value; }
 function roadKm(la1, lo1, la2, lo2, mt) { const r = Math.PI / 180, dp = (la2 - la1) * r, dl = (lo2 - lo1) * r; const a = Math.sin(dp / 2) ** 2 + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.sin(dl / 2) ** 2; const d = 2 * 6371 * Math.asin(Math.sqrt(Math.min(a, 1))); if (!P.road_coef) return d * (mt ? P.detour_mountain : P.detour); if (d === 0) return 0; const c = P.road_coef[mt ? 1 : 0], x = Math.max(d, 0.5); return x * Math.exp(c[0] + c[1] * Math.log(x)); }
 function solveJS(dc, st, p) {
   // In-browser copy of routing.solve without the segment reversal: step-by-step construction, then a relay pass for stores no one-driver route reaches
@@ -1254,7 +1255,7 @@ function setScope(n) {
 async function solveLive() {
   if ($("#lv-solve").disabled) return;
   const p = { deadline: +$("#lv-dead").value, stop_h: +$("#lv-stop").value / 60, speed: +$("#lv-speed").value, cap: +$("#lv-cap").value, max_stops: +$("#lv-stops").value,
-              depart: P.depart, max_km: P.max_km, shift_end: P.shift_end, break_h: P.break_h, relay_km: P.relay_km, relay_shift_end: P.relay_shift_end };
+              depart: P.depart, max_km: +$("#lv-km").value, shift_end: P.shift_end, break_h: P.break_h, relay_km: P.relay_km, relay_shift_end: P.relay_shift_end };
   const di = +$("#lv-day").value || 0, day = LIVE.days[di], country = LIVE_SCOPE === "country" && day.q_all, fleet = country ? Infinity : +$("#lv-fleet").value;
   // The territories to solve: one DC, or every DC of the network shown on the map with its own stores
   const asg = DNET === "baseline" ? S.base_dc : S.rec_dc;
