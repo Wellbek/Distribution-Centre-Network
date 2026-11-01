@@ -2,7 +2,7 @@
 
 Each accepted move is the best of all its round's neighbours under E, so a refinement that fully evaluates only the top-m neighbours by G2
 takes the same path whenever every accepted move ranks within m, and stops where the full one stops.
-About 4 minutes on one core; writes results/checks/refinement_screen.json, quoted in problem-definition.md Section 5.
+About 20 minutes on one core (one assignment LP per neighbour); writes results/checks/refinement_screen.json, quoted in problem-definition.md Section 5.
 """
 import json
 import sys
@@ -17,6 +17,14 @@ from dcn import demand, evaluate, search  # noqa: E402
 from dcn.world import make_world  # noqa: E402
 
 
+def g2(ctx, sites):
+    # G2 exactly as the pool computes it: the assignment LP's territories, then the clock-aware route approximation
+    lp = evaluate.assign_lp(ctx, np.array(sites))
+    if lp is None:
+        return float("inf")
+    return search.g1(ctx, sites, np.searchsorted(np.array(sites), lp["site"]), clock=True)[0]
+
+
 def main():
     R = json.loads((CODE / "results" / "full" / "registry.json").read_text())
     world = make_world(C.FULL["fraction"], C.SEED)
@@ -27,7 +35,7 @@ def main():
     path, rounds = R["refinement"]["path"], []
     for cur, nxt in zip(path[:-1], path[1:]):
         moves = search.one_move(ctx, cur["sites"])
-        g = np.array([search.g1(ctx, n, clock=True)[0] for _, n in moves])
+        g = np.array([g2(ctx, n) for _, n in moves])
         i = next(i for i, (_, n) in enumerate(moves) if n == nxt["sites"])
         rounds.append(dict(move=nxt["move"], neighbours=len(moves), g2_rank=int((g < g[i]).sum()) + 1))
         print(f"{nxt['move']}: G2 rank {rounds[-1]['g2_rank']} of {len(moves)}", flush=True)

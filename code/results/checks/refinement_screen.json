@@ -3,25 +3,25 @@
   {
    "move": "swap 17 for 11",
    "neighbours": 560,
-   "g2_rank": 16
+   "g2_rank": 8
   },
   {
    "move": "swap 15 for 2",
    "neighbours": 560,
-   "g2_rank": 28
+   "g2_rank": 17
   },
   {
    "move": "swap 47 for 45",
    "neighbours": 560,
-   "g2_rank": 16
+   "g2_rank": 8
   },
   {
    "move": "swap 56 for 52",
    "neighbours": 560,
-   "g2_rank": 33
+   "g2_rank": 20
   }
  ],
- "worst_rank": 33,
+ "worst_rank": 20,
  "screened_evaluations_top40": 200,
  "full_evaluations": 2800
 }
