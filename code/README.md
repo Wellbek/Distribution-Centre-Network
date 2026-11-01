@@ -18,6 +18,7 @@ The numbers do not depend on it.
 Every sort that can meet ties is stable, so the numbers do not depend on the processor either: run 5's reduced run gave the same registry on the Spark (aarch64) and on a laptop (x86_64) up to one expected-improvement value 0.07% apart. That fresh run reproduced an earlier laptop run of the same code in all 57,807 registry values.
 Run the reduced profile before the full one if you want the thinning check (the full run compares itself with `results/reduced/registry.json` when it exists).
 
+`results/run8.log` is the console log of run 8 on the Spark; its first part is a reduced run made before the reduced profile dropped the refinement step, replaced by a rerun without it (54 s, the shipped `results/reduced/registry.json`).
 Each run writes `results/<profile>/registry.json` and the input tables of brief §2.5 in `results/<profile>/tables/`.
 The full run also writes the outcome tables (`deliveries`, `vehicle_days`, `spot_hires`), the departure-wave check and the reversals, and after the pipeline computes the extensions (`dcn/extensions.py`: closure sequence along the lease expiries, robustness to demand shifts and the distance source, value of information, today's network rebuilt for other years of its last redesign, and a CbAS-style candidate generator) and stores them in the same registry.
 The profile named by `DEMO_PROFILE` in `dcn/config.py` (`full`) also rebuilds `../demo.html` and `../proposal.html`.
