@@ -241,7 +241,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
       <div class="livebanner" id="live-banner" hidden><span id="live-banner-text"></span><button class="btn small" id="live-back">Back to the whole network</button></div>
       <div class="mapbox" id="daymap"></div>
       <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i><span id="lg-before">delivered before 12:00</span></span><span><i class="sw" style="background:#e8950f"></i><span id="lg-after">after 12:00</span></span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span id="geom-note"></span></div>
-      <div class="clockcard"><div class="row spread"><b>The day against the clock</b><span class="note">trucks on the road by DC (areas) and stores served (lime line); deliveries end by 12:00, trucks are back by 13:00</span></div><svg class="chart" id="clockchart" viewBox="0 0 760 170"></svg></div>
+      <div class="clockcard"><div class="row spread"><b>The day against the clock</b><span class="note" id="clock-sub">trucks on the road by DC (areas) and stores served (lime line); deliveries end by 12:00, trucks are back by 13:00</span></div><svg class="chart" id="clockchart" viewBox="0 0 760 170"></svg></div>
     </div>
     <div class="grid" style="align-content:start">
       <div class="card"><div class="grid g2e" id="day-kpis"></div><div class="truckcard" id="truckcard"></div></div>
@@ -751,19 +751,20 @@ function clockChart() {
   // Stacked trucks on the road per DC over the day, the share of stores served, the noon and return lines, and a moving now line
   const svg = $("#clockchart"); svg.innerHTML = ""; const t0 = 3.5, t1 = 14, X = t => 50 + (t - t0) / (t1 - t0) * 670, ts = [];
   for (let t = t0; t <= t1 + 1e-9; t += 0.05) ts.push(t);
-  const open = DAY.open, n = DAY.routes.length, Y = v => 140 - v / n * 125;
+  const routes = LIVE_ROUTES || DAY.routes, open = LIVE_ROUTES ? (LIVE_OPEN || [LIVE.dc]) : DAY.open, n = Math.max(routes.filter(r => r.ret > 0).length, 1), Y = v => 140 - v / n * 125, dl = dayDeadline();
   let below = ts.map(() => 0);
   for (const j of open) {
-    const rs = DAY.routes.filter(r => r.dc === j), top = ts.map((t, i) => below[i] + rs.filter(r => t >= P.depart && t <= r.ret).length);
+    const rs = routes.filter(r => r.dc === j), top = ts.map((t, i) => below[i] + rs.filter(r => t >= P.depart && t <= r.ret).length);
     el("path", { d: ts.map((t, i) => `${i ? "L" : "M"}${X(t).toFixed(1)} ${Y(top[i]).toFixed(1)}`).join("") + ts.slice().reverse().map((t, i) => `L${X(t).toFixed(1)} ${Y(below[ts.length - 1 - i]).toFixed(1)}`).join("") + "Z", fill: colorOf(j, open), opacity: 0.55 }, svg);
     below = top;
   }
-  const I = routeIndex(DAY.routes), tot = I.t.length;
+  const I = routeIndex(routes), tot = I.t.length;
   el("path", { d: ts.map((t, i) => `${i ? "L" : "M"}${X(t).toFixed(1)} ${(140 - upperIdx(I.t, t) / tot * 125).toFixed(1)}`).join(""), fill: "none", stroke: "#4f6b0c", "stroke-width": 2.5 }, svg);
-  for (const [t, lab, col, left] of [[P.deadline, "12:00 deadline", "#d23f3f", true], [P.shift_end, "13:00 back", "#9a9aa2", false]]) { el("line", { x1: X(t), x2: X(t), y1: 30, y2: 140, stroke: col, "stroke-dasharray": "5 4", "stroke-width": 1.5 }, svg); el("text", { x: X(t) + (left ? -5 : 5), y: 40, "text-anchor": left ? "end" : "start", "font-size": 11, fill: col, "font-weight": 700, stroke: "#f6eff8", "stroke-width": 3, "paint-order": "stroke" }, svg, lab); }
+  for (const [t, lab, col, left] of [[dl, `${hhmm(dl)} deadline`, "#d23f3f", true], [P.shift_end, "13:00 back", "#9a9aa2", false]]) { el("line", { x1: X(t), x2: X(t), y1: 30, y2: 140, stroke: col, "stroke-dasharray": "5 4", "stroke-width": 1.5 }, svg); el("text", { x: X(t) + (left ? -5 : 5), y: 40, "text-anchor": left ? "end" : "start", "font-size": 11, fill: col, "font-weight": 700, stroke: "#f6eff8", "stroke-width": 3, "paint-order": "stroke" }, svg, lab); }
   for (let h = 4; h <= 14; h += 2) el("text", { x: X(h), y: 158, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, svg, `${String(h).padStart(2, "0")}:00`);
   el("text", { x: 44, y: Y(n) + 4, "text-anchor": "end", "font-size": 10.5, fill: "#63636b" }, svg, f0(n)); el("text", { x: 44, y: 144, "text-anchor": "end", "font-size": 10.5, fill: "#63636b" }, svg, "0");
-  el("text", { x: 726, y: 13, "font-size": 10.5, fill: "#4f6b0c", "font-weight": 700 }, svg, "100% served");
+  el("text", { x: 716, y: 10, "text-anchor": "end", "font-size": 10.5, fill: "#4f6b0c", "font-weight": 700 }, svg, "100% served");
+  $("#clock-sub").textContent = `trucks on the road by DC (areas) and stores served (lime line); deliveries end by ${hhmm(dl)}, one-driver trucks are back by ${hhmm(P.shift_end)}${LIVE_ROUTES ? " · your live solve" : ""}`;
   el("line", { id: "clock-now", x1: X(T), x2: X(T), y1: 8, y2: 140, stroke: "#751485", "stroke-width": 2 }, svg);
   svg._X = X;
 }
@@ -775,7 +776,7 @@ function truckAt(x, y) {
 }
 function followTruck(k) { FOLLOW = k; $("#unfollow").hidden = false; const p = truckPos(DAY.routes[k], Math.max(T, P.depart + 0.01)); if (p) DM.centerOn(p[0][0], p[0][1], Math.max(DM.z, 9)); else { const d = SITES[DAY.routes[k].dc]; DM.centerOn(d.lat, d.lon, 9); } DM.draw(); truckCard(); }
 $("#follow").onclick = () => { if (LIVE_ROUTES) $("#live-back").onclick(); if (T < P.depart + 0.2) T = P.depart + 0.2; const cand = DAY.routes.map((r, k) => k).filter(k => truckPos(DAY.routes[k], T)); followTruck(cand[Math.floor(Math.random() * cand.length)] ?? 0); if (!playing) $("#play").click(); };
-$("#live-back").onclick = () => { LIVE_ROUTES = null; $("#live-banner").hidden = true; T = 3.5; playing = false; $("#play").textContent = "▶ Play"; if (DM) { DM.fit(); DM.draw(); } kpisDay(); };
+$("#live-back").onclick = () => { LIVE_ROUTES = null; $("#live-banner").hidden = true; T = 3.5; playing = false; $("#play").textContent = "▶ Play"; if (DM) { DM.fit(); DM.draw(); } clockChart(); kpisDay(); };
 $("#unfollow").onclick = () => { FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; DM.fit(); };
 function truckCard() {
   if (FOLLOW < 0) return; const r = DAY.routes[FOLLOW], p = truckPos(r, T), done = r.arr.filter(a => a + P.stop_h <= T).length;
@@ -862,6 +863,16 @@ function drawDay(m) {
   const cn = $("#clock-now"); if (cn && !LIVE_ROUTES) { const x = $("#clockchart")._X(Math.min(Math.max(T, 3.5), 14)); cn.setAttribute("x1", x); cn.setAttribute("x2", x); }
 }
 function kpisDay() {
+  if (LIVE_ROUTES) {
+    // The live solve on screen: its own routes and deadline
+    const dl = dayDeadline(); let done = 0, late = 0, total = 0, road = 0, unc = 0;
+    LIVE_ROUTES.forEach(r => { if (r.ret < 0) { unc += r.stores.length; total += r.stores.length; return; } r.arr.forEach(a => { total++; if (T >= a) { done++; if (a > dl) late++; } }); if (truckPos(r, T)) road++; });
+    const driven = LIVE_ROUTES.filter(r => r.ret > 0);
+    $("#day-kpis").innerHTML = [["Delivered", `${f0(done)}<small>/ ${f0(total)}</small>`, `${late} after ${hhmm(dl)}`], ["Trucks on the road", road, `${driven.length} routes, ${driven.filter(r => r.relay).length} with two drivers`],
+      ["Kilometres this day", `${f0(driven.reduce((a, r) => a + r.km, 0))}<small>km</small>`, `${driven.length} vehicles`], ["Uncovered stores", f0(unc), unc ? "the fleet limit leaves them without a delivery" : "every store gets its delivery"]]
+      .map(([l, v, n]) => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n}</div></div>`).join("") + `<div class="kpi-tag"><span class="badge live">live</span> your solve and settings</div>`;
+    return;
+  }
   const s = DAY.summary; let done = 0, late = 0, total = 0, road = 0;
   for (let i = 0; i < S.lat.length; i++) { const a = DAY.arrOf[i]; if (isNaN(a)) continue; total++; if (T >= a) { done++; if (a > P.deadline) late++; } }
   DAY.routes.forEach(r => { if (truckPos(r, T)) road++; });
@@ -1006,9 +1017,10 @@ async function solveLive() {
   T = 14; playing = false; $("#play").textContent = country ? "▶ Play the solved day" : "▶ Play this DC's day";
   if (DM) { if (country) DM.fit(); else DM.centerOn(SITES[LIVE.dc].lat, SITES[LIVE.dc].lon, 6); }
   const what = country ? `the whole ${DNET === "baseline" ? "baseline" : ALT} network, ${jobs.length} DCs` : `${SITES[LIVE.dc].name} only`;
-  $("#live-banner").hidden = false; $("#live-banner-text").innerHTML = `<b>Live solve: ${what}</b> (${f0(all)} stores, ${day.name}, your settings).${country ? "" : " The figures beside the map still describe the whole network."}`;
+  $("#live-banner").hidden = false; $("#live-banner-text").innerHTML = `<b>Live solve: ${what}</b> (${f0(all)} stores, ${day.name}, your settings).${country ? "" : " The clock chart and the figures beside the map now describe this DC."}`;
   // Reveal the routes one by one, then leave the day ready to play
   await new Promise(done => { let n = 0; const stepN = Math.max(1, Math.ceil(lr.length / 45)); const reveal = () => { n = Math.min(lr.length, n + stepN); LIVE_ROUTES = lr.slice(0, n); $("#lv-bar").style.width = `${80 + 20 * n / lr.length}%`; $("#lv-status").textContent = `Route ${n} of ${lr.length} drawn`; if (DM) DM.draw(); if (n < lr.length) requestAnimationFrame(reveal); else done(); }; reveal(); });
+  clockChart(); kpisDay();
   $("#lv-status").textContent = `${lr.length} routes from ${jobs.length} DC${jobs.length > 1 ? "s" : ""} in ${(ms / 1000).toFixed(1)} s of solving; press ▶ to watch the trucks.`; $("#lv-barbox").hidden = true;
   $("#lv-solve").disabled = false; $("#lv-solve").textContent = "Solve and show on the map";
   const fail = lost > 0 ? `<div class="err" style="margin-top:8px"><b>The fleet cannot cover this day.</b> ${vehicles} vehicles are needed, ${fleet} are available: ${lost} stores (${pct(lost / all)}) get no delivery, a stock-out penalty of ${f0(lost * 500000)} KRW. Raise the fleet or hire more spot trucks.</div>` : "";
