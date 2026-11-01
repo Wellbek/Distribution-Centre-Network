@@ -246,7 +246,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
     <div class="grid" style="align-content:start">
       <div class="card"><div class="grid g2e" id="day-kpis"></div><div class="truckcard" id="truckcard"></div></div>
       <div class="card" id="live-card"><h3>Solve live <span class="badge live">computed in your browser or by app.py</span></h3><span id="engine" class="pill warn"><span class="dot"></span>checking engine</span><p class="sub" id="live-sub"></p>
-        <div class="seg" id="lv-scope" style="margin:6px 0 4px"><button data-n="dc" class="on">One DC</button><button data-n="country">Whole network</button></div>
+        <div class="seg" id="lv-scope" style="margin:6px 0 4px"><button data-n="country" class="on">Whole network</button><button data-n="dc">One DC (largest)</button></div>
         <div class="ctrl"><label for="lv-day">Demand day</label><span></span><select id="lv-day" style="grid-column:1/-1"></select></div>
         <div class="ctrl"><label for="lv-dead">Delivery deadline</label><output id="o-dead"></output><input type="range" id="lv-dead" min="10" max="14" step="0.25" value="12"></div>
         <div class="ctrl"><label for="lv-stop">Stop time (min)</label><output id="o-stop"></output><input type="range" id="lv-stop" min="5" max="25" step="1" value="15"></div>
@@ -885,8 +885,9 @@ function initLive() {
   $("#lv-fleet").max = $("#lv-fleet").value = Math.ceil(LIVE.stores.length / 8);
   $("#live-sub").textContent = `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the ${ALT} network's largest territory. Changing a setting re-solves it.`;
   document.querySelectorAll("#v-day input[type=range]:not(#scrub), #lv-day").forEach(i => i.oninput = () => { sync(); if (LIVE_SCOPE === "dc") { clearTimeout(i._t); i._t = setTimeout(solveLive, 250); } });
-  $("#lv-scope").querySelectorAll("button").forEach(b => b.onclick = () => { $("#lv-scope").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); LIVE_SCOPE = b.dataset.n; $("#lv-fleet-ctrl").hidden = LIVE_SCOPE === "country"; $("#live-sub").textContent = LIVE_SCOPE === "country" ? `Every DC of the network chosen above the map (baseline or ${ALT}), each with its own stores, one after another; about 10-20 s in the browser. Press Solve after changing a setting.` : `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the ${ALT} network's largest territory. Changing a setting re-solves it.`; });
+  $("#lv-scope").querySelectorAll("button").forEach(b => b.onclick = () => setScope(b.dataset.n));
   if (!LIVE.days[0].q_all) $("#lv-scope").hidden = true;
+  setScope(LIVE.days[0].q_all ? "country" : "dc");
   $("#lv-solve").onclick = solveLive;
   $("#lv-reset").onclick = () => { liveDefaults(); solveLive(); };
   sync();
@@ -954,6 +955,10 @@ function constructJS(D, q, p) {
   return out.sort((a, b) => a.arr[0] - b.arr[0]);
 }
 let LIVE_SCOPE = "dc", LIVE_OPEN = null;
+function setScope(n) {
+  LIVE_SCOPE = n; $("#lv-scope").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.n === n)); $("#lv-fleet-ctrl").hidden = n === "country";
+  $("#live-sub").textContent = n === "country" ? `Every DC of the network chosen above the map (baseline or ${ALT}), each with its own stores, one after another: ${f0(S.lat.length)} stores in about 10 s in the browser. Press Solve after changing a setting.` : `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the ${ALT} network's largest territory. Changing a setting re-solves it.`;
+}
 async function solveLive() {
   if ($("#lv-solve").disabled) return;
   const p = { deadline: +$("#lv-dead").value, stop_h: +$("#lv-stop").value / 60, speed: +$("#lv-speed").value, cap: +$("#lv-cap").value, max_stops: +$("#lv-stops").value,
@@ -1504,7 +1509,7 @@ RENDER.checks = () => {
   $("#cases").innerHTML = `
   <div class="card case"><div class="tag">Normal</div><h3>${ALTC} network, ordinary weekday</h3><p>${r.k} DCs, ${f0(r.vehicles_day)} vehicles a day, ${f0(r.km_day)} km a day, ${pct(r.service_mean)} before noon over the 28 final days.</p><button class="btn small" onclick="show('day')">Watch the day</button></div>
   <div class="card case b"><div class="tag">Boundary</div><h3>At the limits</h3><p><b>Capacity.</b> ${bh.length ? `${bh.join(", ")} ${bh.length > 1 ? "sit" : "sits"} at the upper bound of ${M.bounds[1]} stores` : `no DC at the upper bound`}; ${bl.length ? `${bl.join(", ")} at the lower bound of ${M.bounds[0]}` : "none at the lower bound"}.</p><p><b>Budget of one.</b> With B = 1 the search returns its first seed at ${fM(c.budget_one)} M; with B = ${M.budget}, ${fM(c.budget_full)} M.</p></div>
-  <div class="card case f"><div class="tag">Failure</div><h3>Inputs the system refuses</h3>${c.failure ? `<div class="err"><b>k = ${c.failure.k} is infeasible.</b> ${c.failure.reason}; no cost is reported.</div>` : ""}<p style="margin-top:8px"><b>A day the fleet cannot cover.</b> On the peak day (${R.r2.peak_date}) the network needs ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned. Cap the fleet in the live solve to see uncovered stores.</p><button class="btn ghost small" onclick="show('day');liveDefaults();document.getElementById('lv-day').value=2;document.getElementById('lv-fleet').value=12;sync();solveLive()">Show the peak day with 12 vehicles</button></div>`;
+  <div class="card case f"><div class="tag">Failure</div><h3>Inputs the system refuses</h3>${c.failure ? `<div class="err"><b>k = ${c.failure.k} is infeasible.</b> ${c.failure.reason}; no cost is reported.</div>` : ""}<p style="margin-top:8px"><b>A day the fleet cannot cover.</b> On the peak day (${R.r2.peak_date}) the network needs ${f0(R.r2.peak_vehicles)} vehicles against ${R.r2.owned} owned. Cap the fleet in the live solve to see uncovered stores.</p><button class="btn ghost small" onclick="show('day');setScope('dc');liveDefaults();document.getElementById('lv-day').value=2;document.getElementById('lv-fleet').value=12;sync();solveLive()">Show the peak day with 12 vehicles</button></div>`;
   const svg = $("#storehist"); svg.innerHTML = "";
   // Stores always on time sit in a caption; the bars show the rest
   const bins = 20, hb = new Array(bins).fill(0), hr = new Array(bins).fill(0), full = a => a.filter(v => v >= 0.9995).length;
