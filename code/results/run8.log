@@ -1,0 +1,70 @@
+[   0.2s] world: 1938 planning stores, 60 sites; prior strength [2.21 2.77 1.87 1.99], kappa 8.0
+[   2.1s] baseline E = 1,601.2 M KRW/month, 7.0 over-limit routes/day
+[   2.1s] route-length constant c = 0.838, fitted on the baseline's routed search days
+[  20.5s] pool: 182 candidates for k = 7..19
+[  27.8s] reported search done, best E = 1,471.8 M
+[  49.3s] whole pool evaluated (validation)
+[  51.3s] top 5 re-scored on 28 days; search pick k = 9
+[ 392.2s] refinement: 4 moves, 2677 evaluations, E 1,472.8 -> 1,444.6 M
+[ 395.3s] final and held-out comparisons done
+[ 395.7s] demand checks done
+[ 395.9s] map routes done
+[ 396.0s] registry written: /home/louis/dcn/code/results/reduced/registry.json
+[   0.5s] world: 9718 planning stores, 60 sites; prior strength [2.09 2.17 1.92 1.84], kappa 8.1
+[  69.9s] outcome tables: 365 history days, service 1.0000, 636 vehicles/day
+[  70.7s] baseline E = 6,454.1 M KRW/month, 15.0 over-limit routes/day
+[  70.7s] route-length constant c = 1.077, fitted on the baseline's routed search days
+[ 271.6s] pool: 390 candidates for k = 7..19
+[ 312.4s] reported search done, best E = 5,982.0 M
+[ 671.2s] whole pool evaluated (validation)
+[ 685.3s] top 5 re-scored on 28 days; search pick k = 10
+[3239.5s] refinement: 4 moves, 2800 evaluations, E 5,982.0 -> 5,926.9 M
+[3261.7s] final and held-out comparisons done
+[3298.5s] departure-wave check: k* 10 -> 12 (23 docks), 10 (29 docks)
+[3431.0s] reversals: as reported  k*=10, stop time 10 min k*=10, stop time 20 min k*=10, speed 30 km/h k*=11, speed 45 km/h k*=9, distance model calibrated model only k*=9, vehicle limits strict brief: no relay routes, stores beyond one driver-day are stock-outs k*=11, vehicle limits and minimum strict brief and no 500-store minimum for redesigns k*=12, DC fixed cost 100 M k*=11, DC fixed cost 200 M k*=9, today's network already optimal for today's stores (p-median on road km) k*=10, 500-store minimum dropped for redesigns k*=11
+[3431.0s] thinning check: k* full 10, reduced 11
+[3433.3s] demand checks done
+[3434.6s] map routes done
+[3434.8s] registry written: /home/louis/dcn/code/results/full/registry.json
+[   9.2s] extensions: committed 2027-06-30 Hanam Gamil: close and open ['Yangju Gwangjeok'] -> 6,225.2 M, k = 12
+[  14.9s] extensions: committed 2027-12-31 Yongin Giheung: close and open ['Wonju Munmak', 'Gyeongju Oedong'] -> 6,146.1 M, k = 13
+[  20.9s] extensions: committed 2028-03-31 Busan Gangseo: close and open ['Changwon Jinyeong'] -> 6,154.6 M, k = 13
+[  26.7s] extensions: committed 2028-06-30 Daegu Dalseong: close and open ['Gumi Sandong'] -> 6,162.9 M, k = 13
+[  30.7s] extensions: committed 2028-09-30 Daejeon Daedeok: close and open ['Nonsan Yeonmu'] -> 6,043.3 M, k = 13
+[  32.6s] extensions: committed 2029-03-31 Gwangju Pyeongdong: close and open ['Naju Bitgaram'] -> 6,007.2 M, k = 13
+[  33.6s] extensions: committed 2029-06-30 Namwon Ijin: close [] -> 5,968.0 M, k = 12
+[  34.5s] extensions: committed 2029-09-30 Andong Pungsan: close [] -> 5,886.8 M, k = 11
+[  35.4s] extensions: committed 2029-12-31 Gangneung Gujeong: close and open [] -> 5,888.7 M, k = 10
+[  35.7s] extensions: myopic 2027-06-30 Hanam Gamil: renew [] -> 6,175.7 M, k = 12
+[  41.5s] extensions: myopic 2027-12-31 Yongin Giheung: renew [] -> 6,175.7 M, k = 12
+[  47.2s] extensions: myopic 2028-03-31 Busan Gangseo: close and open ['Changwon Jinyeong', 'Gyeongju Oedong'] -> 6,141.1 M, k = 13
+[  53.0s] extensions: myopic 2028-06-30 Daegu Dalseong: renew [] -> 6,141.1 M, k = 13
+[  58.7s] extensions: myopic 2028-09-30 Daejeon Daedeok: close and open ['Nonsan Yeonmu'] -> 6,025.9 M, k = 13
+[  64.4s] extensions: myopic 2029-03-31 Gwangju Pyeongdong: close and open ['Naju Bitgaram'] -> 5,988.7 M, k = 13
+[  70.1s] extensions: myopic 2029-06-30 Namwon Ijin: close [] -> 5,947.3 M, k = 12
+[  75.7s] extensions: myopic 2029-09-30 Andong Pungsan: renew [] -> 5,947.3 M, k = 12
+[  81.3s] extensions: myopic 2029-12-31 Gangneung Gujeong: renew [] -> 5,947.3 M, k = 12
+[  81.5s] extensions: sequence: myopic ends at k = 12, committed at the recommendation: True
+[  97.2s] extensions: robustness chain volume -15%: k* 10, saving 429.5 M
+[ 104.6s] extensions: robustness chain volume +20%: k* 10, saving 481.3 M
+[ 111.8s] extensions: robustness capital region +30%: k* 10, saving 488.7 M
+[ 127.0s] extensions: travel grid 10 min, 30 km/h: k* 11, regret of k = 10: 98.9 M
+[ 134.7s] extensions: travel grid 10 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 142.4s] extensions: travel grid 10 min, 45 km/h: k* 9, regret of k = 10: 22.2 M
+[ 150.1s] extensions: travel grid 15 min, 30 km/h: k* 11, regret of k = 10: 131.7 M
+[ 150.1s] extensions: travel grid 15 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 157.7s] extensions: travel grid 15 min, 45 km/h: k* 9, regret of k = 10: 10.7 M
+[ 165.2s] extensions: travel grid 20 min, 30 km/h: k* 11, regret of k = 10: 176.3 M
+[ 172.6s] extensions: travel grid 20 min, 35 km/h: k* 10, regret of k = 10: 0.0 M
+[ 180.2s] extensions: travel grid 20 min, 45 km/h: k* 9, regret of k = 10: 38.3 M
+[ 187.9s] extensions: VOI: travel times 25.1 M/month, chain volume 0.0, store rates 0.0
+[ 191.6s] extensions: drift: designed in 2010 (4197 stores open): today's cost 6,625.1 M, saving of the best redesign 643.2 M
+[ 200.6s] extensions: drift: designed in 2013 (5188 stores open): today's cost 6,398.8 M, saving of the best redesign 416.8 M
+[ 212.4s] extensions: drift: designed in 2016 (6178 stores open): today's cost 6,454.1 M, saving of the best redesign 472.2 M
+[ 228.8s] extensions: drift: designed in 2019 (7168 stores open): today's cost 6,227.1 M, saving of the best redesign 245.2 M
+[ 241.1s] extensions: drift: designed in 2022 (8300 stores open): today's cost 6,201.6 M, saving of the best redesign 219.6 M
+[ 275.4s] extensions: drift: designed in 2026 (10000 stores open): today's cost 6,234.6 M, saving of the best redesign 252.6 M
+[ 297.5s] extensions: generation: 12 new networks evaluated, best 6,063.2 M against the pool's best 5,982.0 M
+[ 297.5s] extensions: 193 evaluations, written to /home/louis/dcn/code/results/full/registry.json
+wrote /home/louis/dcn/demo.html (2.53 MB)
+wrote /home/louis/dcn/proposal.html (0.50 MB)

@@ -54,5 +54,5 @@ REACH_KM, FAR_KM = 55.0, 125.0              # noon reach of a full route; 250 km
 DEMO_PROFILE = "full"                    # only this profile rebuilds ../demo.html
 
 # Run profiles: fraction of stores kept (fixed cost and bounds scale with it)
-REDUCED = dict(name="reduced", fraction=0.2, pool_per_k=14, checks=False)  # structure only: no outcome tables, waves, reversals, extensions
-FULL = dict(name="full", fraction=1.0, pool_per_k=30, checks=True)
+REDUCED = dict(name="reduced", fraction=0.2, pool_per_k=14, checks=False, refine=False)  # structure only: no outcome tables, waves, reversals, extensions, refinement
+FULL = dict(name="full", fraction=1.0, pool_per_k=30, checks=True, refine=True)

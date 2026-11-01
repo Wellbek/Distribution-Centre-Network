@@ -222,8 +222,16 @@ def _run(profile):
     top = ranked[:5]
     top_final = {i: evaluate.evaluate(ctx, pool[i]["sites"], d_final) for i in top}
     best_i = min(top, key=lambda i: top_final[i]["total"])
-    rec = pool[best_i]["sites"]
-    clock(f"top 5 re-scored on {C.FINAL_DAYS} days; recommended k = {len(rec)}")
+    pick = pool[best_i]["sites"]
+    clock(f"top 5 re-scored on {C.FINAL_DAYS} days; search pick k = {len(pick)}")
+
+    # Refinement after the reported search, outside B: descent on E over every one-move neighbour until none saves 1 M
+    def score(nets):
+        es = [ev(dict(sites=n)) for n in nets]
+        return [(e["total"], e["ok98"]) if e.get("feasible", True) else (float("inf"), False) for e in es]
+    refine = search.local_search(ctx, pick, score) if profile["refine"] else dict(path=[dict(move="start", sites=pick, E=ev(dict(sites=pick))["total"])], log=[], best_neighbour=None)
+    rec = refine["path"][-1]["sites"]
+    clock(f"refinement: {len(refine['path']) - 1} moves, {len(refine['log'])} evaluations, E {refine['path'][0]['E'] / 1e6:,.1f} -> {refine['path'][-1]['E'] / 1e6:,.1f} M")
 
     def best_k(k):
         cands = [i for i, p in enumerate(pool) if p["k"] == k and cache[tuple(p["sites"])]["ok98"]] or [i for i, p in enumerate(pool) if p["k"] == k]
@@ -237,6 +245,7 @@ def _run(profile):
         "reassigned12": evaluate.evaluate(dict(ctx, lo=0), list(ctx["current"]), d_final),
         "best12": evaluate.evaluate(ctx, pool[b12]["sites"], d_final) if b12 is not None else None,
         "recommended": evaluate.evaluate(ctx, rec, d_final, keep_stores=True),
+        "search_pick": evaluate.evaluate(ctx, pick, d_final) if pick != rec else None,
         "proxy_only": evaluate.evaluate(ctx, pool[proxy_i]["sites"], d_final),
         "best_k8": evaluate.evaluate(ctx, pool[k8]["sites"], d_final),
     }
@@ -421,6 +430,7 @@ def _run(profile):
         pool=[dict(sites=p["sites"], k=p["k"], origin=p["origin"], G1=p["G1"], G2=p["G2"], features=p["features"], E=float(E_pool[i]),
                    ok98=cache[tuple(p["sites"])]["ok98"]) for i, p in enumerate(pool)],
         feature_names=search.FEATURE_NAMES, top5=[dict(cand=i, k=pool[i]["k"], search_E=E_pool[i], final_E=top_final[i]["total"]) for i in top],
+        refinement=dict(search_pick=pick, path=refine["path"], evaluations=len(refine["log"]), best_neighbour=refine["best_neighbour"]),
         log_bo=log_bo, log_random=log_rand, curve_bo=curve(log_bo), curve_random=curve(log_rand), random_band=band, pool_best=pool_best,
         sweep=sweep, waves=waves, thinning=thinning, history_ops=hist_ops, reversals=reversals,
         r2=dict(sampled=e_sampled["total"], expected_counts=e_mean["total"], average_day=e_avg["total"], peak_vehicles=float(np.sum(e_peak["V"])),
