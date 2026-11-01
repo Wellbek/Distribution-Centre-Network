@@ -70,6 +70,8 @@ main { max-width: 1440px; margin: 0 auto; padding: 22px 24px 60px; }
 .kpi .n { font-size: 12.5px; color: var(--ink-2); }
 .badge { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 8px; background: var(--lav); color: var(--purple-ink); }
 .badge.live { background: var(--lime-soft); color: var(--lime-ink); }
+.livebanner { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--lav); border-left: 5px solid var(--lime); border-radius: 12px; padding: 8px 12px; margin: 0 0 8px; font-size: 13.5px; }
+.livebanner[hidden] { display: none; }
 .livebar { height: 8px; background: var(--lav); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; } .livebar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--purple), #9dc92a); transition: width .15s; }
 .seg { display: inline-flex; background: var(--lav); border-radius: 999px; padding: 3px; gap: 2px; }
 .seg button { all: unset; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-weight: 700; font-size: 13px; color: var(--purple-ink); }
@@ -236,6 +238,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
       </div>
       <div class="row" style="margin:10px 0"><button class="btn" id="play">▶ Play</button><button class="btn lime" id="follow">Follow a truck</button><button class="btn ghost small" id="unfollow" hidden>Stop following</button>
         <input type="range" id="scrub" min="3.5" max="14" step="0.01" value="3.5" style="flex:1;min-width:160px" aria-label="time of day"><select id="speed" aria-label="speed"><option value="0.5">slow</option><option value="1" selected>normal</option><option value="2.5">fast</option></select></div>
+      <div class="livebanner" id="live-banner" hidden><span id="live-banner-text"></span><button class="btn small" id="live-back">Back to the whole network</button></div>
       <div class="mapbox" id="daymap"></div>
       <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span id="geom-note"></span></div>
       <div class="clockcard"><div class="row spread"><b>The day against the clock</b><span class="note">trucks on the road by DC (areas) and stores served (lime line); deliveries end by 12:00, trucks are back by 13:00</span></div><svg class="chart" id="clockchart" viewBox="0 0 760 170"></svg></div>
@@ -251,6 +254,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
         <div class="ctrl"><label for="lv-stops">Max stops per vehicle</label><output id="o-stops"></output><input type="range" id="lv-stops" min="10" max="35" step="1" value="25"></div>
         <div class="ctrl"><label for="lv-fleet">Vehicles available (owned + spot)</label><output id="o-fleet"></output><input type="range" id="lv-fleet" min="3" max="400" step="1" value="400"></div>
         <div class="row"><button class="btn" id="lv-solve">Solve and show on the map</button><button class="btn ghost small" id="lv-reset">Defaults</button></div>
+        <div class="livebar" id="lv-barbox" hidden><i id="lv-bar"></i></div><div class="note" id="lv-status"></div>
         <div id="live-out" style="margin-top:10px"></div>
       </div>
     </div>
@@ -1004,11 +1008,11 @@ RENDER.day = () => {
     DM = new MapView($("#daymap"));
     DM.layers = drawDay; DM.draw = function () { if (this.W) drawDay(this); };
     DM.hover = (x, y) => {
-      const k = truckAt(x, y); if (k >= 0) { const r = DAY.routes[k]; return `<b>Truck ${k + 1}</b> from ${SITES[r.dc].name}<br>${r.stores.length} stores, ${r.load.toFixed(0)} cages, ${r.km.toFixed(0)} km<br>back at ${hhmm(r.ret)} · limit: ${r.binding}<br><span class="note">click to follow</span>`; }
+      const k = truckAt(x, y); if (k >= 0) { const r = (LIVE_ROUTES || DAY.routes)[k]; return `<b>Truck ${k + 1}</b> from ${SITES[r.dc].name}<br>${r.stores.length} stores, ${r.load.toFixed(0)} cages, ${r.km.toFixed(0)} km<br>back at ${hhmm(r.ret)} · limit: ${r.binding}<br><span class="note">click to follow</span>`; }
       const i = nearestStore(DM, x, y, i => !isNaN(DAY.arrOf[i])); if (i < 0) return null;
       const a = DAY.arrOf[i]; return storeTip(i) + `<br><b>baseline:</b> ${a > P.deadline ? "arrives" : "arrived"} ${hhmm(a)} by truck ${DAY.routeOf[i] + 1}`;
     };
-    DM.onClick = (x, y) => { const k = truckAt(x, y); if (k >= 0) followTruck(k); };
+    DM.onClick = (x, y) => { const k = truckAt(x, y); if (k >= 0 && !LIVE_ROUTES) followTruck(k); };
     DM.onUser = () => { if (FOLLOW >= 0 && !playing) {} };
     document.querySelectorAll("#day-net button").forEach(b => b.onclick = () => { DNET = b.dataset.n; document.querySelectorAll("#day-net button").forEach(z => z.classList.toggle("on", z === b)); LIVE_ROUTES = null; resetDay(); });
     document.querySelectorAll("#day-kind button").forEach(b => b.onclick = () => { DKIND = b.dataset.n; document.querySelectorAll("#day-kind button").forEach(z => z.classList.toggle("on", z === b)); LIVE_ROUTES = null; resetDay(); });
@@ -1039,11 +1043,12 @@ function clockChart() {
 function resetDay() { $("#geom-note").textContent = SHAPES ? "Trucks follow the roads from OSRM; a live solve draws straight lines" : "Straight lines between stops; costs use road km"; DAY = buildDay(); clockChart(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "the 12 baseline DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
 function truckAt(x, y) {
   let best = -1, bd = 400;
-  DAY.routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
+  (LIVE_ROUTES || DAY.routes).forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
   return best;
 }
 function followTruck(k) { FOLLOW = k; $("#unfollow").hidden = false; const p = truckPos(DAY.routes[k], Math.max(T, P.depart + 0.01)); if (p) DM.centerOn(p[0][0], p[0][1], Math.max(DM.z, 9)); else { const d = SITES[DAY.routes[k].dc]; DM.centerOn(d.lat, d.lon, 9); } DM.draw(); truckCard(); }
-$("#follow").onclick = () => { if (T < P.depart + 0.2) T = P.depart + 0.2; const cand = DAY.routes.map((r, k) => k).filter(k => truckPos(DAY.routes[k], T)); followTruck(cand[Math.floor(Math.random() * cand.length)] ?? 0); if (!playing) $("#play").click(); };
+$("#follow").onclick = () => { if (LIVE_ROUTES) $("#live-back").onclick(); if (T < P.depart + 0.2) T = P.depart + 0.2; const cand = DAY.routes.map((r, k) => k).filter(k => truckPos(DAY.routes[k], T)); followTruck(cand[Math.floor(Math.random() * cand.length)] ?? 0); if (!playing) $("#play").click(); };
+$("#live-back").onclick = () => { LIVE_ROUTES = null; $("#live-banner").hidden = true; T = 3.5; playing = false; $("#play").textContent = "▶ Play"; if (DM) { DM.fit(); DM.draw(); } kpisDay(); };
 $("#unfollow").onclick = () => { FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; DM.fit(); };
 function truckCard() {
   if (FOLLOW < 0) return; const r = DAY.routes[FOLLOW], p = truckPos(r, T), done = r.arr.filter(a => a + P.stop_h <= T).length;
@@ -1111,7 +1116,13 @@ function drawDay(m) {
   const v = m._lv, S0 = m.s(), ox = -PAD + (v.cx - m.cx) * S0, oy = -PAD + (v.cy - m.cy) * S0;
   c.fillStyle = "#e8f2f8"; c.fillRect(0, 0, m.W, m.H); c.drawImage(m._sc, ox, oy, v.W, v.H);
   c.drawImage(m._st, ox, oy, v.W, v.H);
-  // Each DC with a ring that fills as its stores are served
+  {
+    const pos = [];
+    routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; pos.push([x, y, p[1], r, k]); });
+    const sc = Math.min(0.55 + m.z * 0.09, 1.6);
+    for (const [x, y, dir, r, k] of pos) { const col = r.over || r.relay ? "#b02f2f" : "#751485"; if (k === FOLLOW) drawTruck(c, x, y, dir, sc, col, true); else { const sp = truckSprite(col, dir < 0, sc); c.drawImage(sp, x - sp.w / 2, y - sp.h / 2, sp.w, sp.h); } }
+  }
+  // Each DC, drawn over the trucks, with a ring that fills as its stores are served
   const open = LIVE_ROUTES ? [LIVE.dc] : DAY.open;
   for (const j of open) {
     drawDC(c, m, SITES[j], colorOf(j, DAY.open), m.z > 2.5);
@@ -1119,12 +1130,6 @@ function drawDay(m) {
     const [x, y] = m.P(SITES[j].lat, SITES[j].lon), f = upperIdx(arr, T) / arr.length;
     c.lineWidth = 4; c.strokeStyle = "rgba(255,255,255,.85)"; c.beginPath(); c.arc(x, y, 16, 0, 7); c.stroke();
     if (f > 0) { c.strokeStyle = "#9dc92a"; c.beginPath(); c.arc(x, y, 16, -Math.PI / 2, -Math.PI / 2 + f * 2 * Math.PI); c.stroke(); }
-  }
-  if (!LIVE_ROUTES) {
-    const pos = [];
-    routes.forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [x, y] = m.P(p[0][0], p[0][1]); if (x < -20 || y < -20 || x > m.W + 20 || y > m.H + 20) return; pos.push([x, y, p[1], r, k]); });
-    const sc = Math.min(0.55 + m.z * 0.09, 1.6);
-    for (const [x, y, dir, r, k] of pos) { const col = r.over || r.relay ? "#b02f2f" : "#751485"; if (k === FOLLOW) drawTruck(c, x, y, dir, sc, col, true); else { const sp = truckSprite(col, dir < 0, sc); c.drawImage(sp, x - sp.w / 2, y - sp.h / 2, sp.w, sp.h); } }
   }
   $("#clock").textContent = hhmm(Math.max(T, P.depart)); $("#scrub").value = T;
   const cn = $("#clock-now"); if (cn && !LIVE_ROUTES) { const x = $("#clockchart")._X(Math.min(Math.max(T, 3.5), 14)); cn.setAttribute("x1", x); cn.setAttribute("x2", x); }
@@ -1146,8 +1151,8 @@ function tick(ts) {
   DM.draw(); if (Math.floor(ts / 250) !== Math.floor((ts - 16) / 250)) kpisDay();
   if (playing) requestAnimationFrame(tick);
 }
-$("#play").onclick = () => { if (LIVE_ROUTES) { LIVE_ROUTES = null; } if (T >= 14) T = 3.5; playing = !playing; lastTs = null; $("#play").textContent = playing ? "❚❚ Pause" : "▶ Play"; if (playing) requestAnimationFrame(tick); };
-$("#scrub").oninput = e => { T = +e.target.value; LIVE_ROUTES = null; DM.draw(); kpisDay(); truckCard(); };
+$("#play").onclick = () => { if (T >= 14) T = 3.5; playing = !playing; lastTs = null; $("#play").textContent = playing ? "❚❚ Pause" : "▶ Play"; if (playing) requestAnimationFrame(tick); };
+$("#scrub").oninput = e => { T = +e.target.value; DM.draw(); kpisDay(); truckCard(); };
 
 // Live lower level on one DC
 const LIVE = R.live;
@@ -1228,6 +1233,9 @@ async function solveLive() {
   const day = LIVE.days[+$("#lv-day").value || 0], dc = SITES[LIVE.dc], fleet = +$("#lv-fleet").value;
   const st = LIVE.stores.map((i, k) => [S.lat[i], S.lon[i], S.mountain[i], day.q[k]]);
   const idx = LIVE.stores;
+  $("#lv-solve").disabled = true; $("#lv-solve").textContent = "Solving…"; $("#lv-barbox").hidden = false; $("#lv-bar").style.width = "15%";
+  $("#lv-status").textContent = `Routing ${f0(LIVE.stores.length)} stores of ${SITES[LIVE.dc].name}…`;
+  await new Promise(r => requestAnimationFrame(() => setTimeout(r, 30)));
   let res, engine; const t0 = performance.now();
   if (BACKEND) { try { res = await (await fetch("/api/solve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ dc: [dc.lat, dc.lon], stores: st, params: p, site: LIVE.dc, ids: idx }) })).json(); engine = "Python engine (step-by-step construction and segment reversal, cached road distances)"; } catch (e) { BACKEND = false; setEngine(); } }
   if (!res) { res = solveJS([dc.lat, dc.lon], st, p); engine = "in-browser engine (same construction and relay rules; no segment reversal, calibrated distance model instead of the OSRM cache)"; }
@@ -1236,13 +1244,24 @@ async function solveLive() {
   const covered = res.routes.slice().sort((a, b) => b.load - a.load).slice(0, fleet), uncovered = res.routes.filter(r => !covered.includes(r));
   const lost = uncovered.reduce((a, r) => a + r.seq.length, 0), all = res.routes.reduce((a, r) => a + r.seq.length, 0);
   const late = covered.reduce((a, r) => a + r.arr.filter(t => t > p.deadline).length, 0);
-  LIVE_ROUTES = res.routes.map((r, k) => ({ dc: LIVE.dc, col: PAL[k % PAL.length], pts: [[dc.lat, dc.lon], ...r.seq.map(q => [st[q][0], st[q][1]]), [dc.lat, dc.lon]], arr: covered.includes(r) ? r.arr : r.arr.map(() => 99), ret: r.ret, stores: r.seq.map(q => idx[q]), over: !covered.includes(r) || r.binding === "violates limit" }));
-  T = 14; playing = false; $("#play").textContent = "▶ Play";
-  if (DM) { DM.centerOn(dc.lat, dc.lon, 6); DM.draw(); }
+  const lr = res.routes.map((r, k) => {
+    const q = { dc: LIVE.dc, col: PAL[k % PAL.length], pts: [[dc.lat, dc.lon], ...r.seq.map(q => [st[q][0], st[q][1]]), [dc.lat, dc.lon]], arr: covered.includes(r) ? r.arr : r.arr.map(() => 99), ret: covered.includes(r) ? r.ret : -1, stores: r.seq.map(q => idx[q]), over: !covered.includes(r) || r.binding === "violates limit", relay: r.binding === "relay", km: r.km, load: r.load };
+    const nodes = [`d${q.dc}`, ...q.stores.map(s => `s${s}`), `d${q.dc}`];
+    q.legs = nodes.slice(1).map((n, m) => legPath(nodes[m], n, q.pts[m], q.pts[m + 1])); q.path = q.legs.flatMap((L, m) => (m ? L.p.slice(1) : L.p));
+    return q;
+  });
+  FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none";
+  T = 14; playing = false; $("#play").textContent = "▶ Play this DC's day";
+  if (DM) DM.centerOn(dc.lat, dc.lon, 6);
+  $("#live-banner").hidden = false; $("#live-banner-text").innerHTML = `<b>Live solve: ${dc.name} only</b> (${f0(lr.reduce((a, r) => a + r.stores.length, 0))} stores, your settings). The figures beside the map still describe the whole network.`;
+  // Reveal the routes one by one, then leave the day ready to play
+  await new Promise(done => { let n = 0; const stepN = Math.max(1, Math.ceil(lr.length / 40)); const reveal = () => { n = Math.min(lr.length, n + stepN); LIVE_ROUTES = lr.slice(0, n); $("#lv-bar").style.width = `${15 + 85 * n / lr.length}%`; $("#lv-status").textContent = `Route ${n} of ${lr.length} built`; if (DM) DM.draw(); if (n < lr.length) requestAnimationFrame(reveal); else done(); }; reveal(); });
+  $("#lv-status").textContent = `${lr.length} routes in ${ms.toFixed(0)} ms; press ▶ to watch this DC's trucks.`; $("#lv-barbox").hidden = true;
+  $("#lv-solve").disabled = false; $("#lv-solve").textContent = "Solve and show on the map";
   const fail = lost > 0 ? `<div class="err" style="margin-top:8px"><b>The fleet cannot cover this day.</b> ${res.vehicles} vehicles are needed, ${fleet} are available: ${lost} stores (${pct(lost / all)}) get no delivery, a stock-out penalty of ${f0(lost * 500000)} KRW. Raise the fleet or hire more spot trucks.</div>` : "";
   $("#live-out").innerHTML = `<div class="grid g2e"><div class="kpi"><div class="l">Vehicles needed</div><div class="v">${res.vehicles}</div><span class="badge live">live</span></div><div class="kpi"><div class="l">Kilometres</div><div class="v">${f0(res.km)}<small>km</small></div><span class="badge live">live</span></div>
     <div class="kpi"><div class="l">Before the deadline</div><div class="v">${pct((all - lost - late) / Math.max(all, 1))}</div><span class="badge live">live</span></div><div class="kpi"><div class="l">Uncovered stores</div><div class="v" style="color:${lost ? "#d23f3f" : "inherit"}">${lost}</div><span class="badge live">live</span></div></div>${fail}
-    <p class="note">${engine}, ${ms.toFixed(0)} ms. Shown on the map; press Play to return to the animated day.</p>`;
+    <p class="note">${engine}, ${ms.toFixed(0)} ms. Shown on the map: press ▶ to watch this DC's trucks drive the solved routes, or <i>Back to the whole network</i> above the map.</p>`;
 }
 
 // ---------- 3 · How it works (lecture-aligned) ----------
@@ -1266,14 +1285,24 @@ function whyStrip() {
   const col = Object.fromEntries(ORIG.map(o => [o[0], o[2]])), lab = Object.fromEntries(ORIG.map(o => [o[0], o[1]]));
   pts.sort((a, b) => (a.o === "swap" ? 0 : 1) - (b.o === "swap" ? 0 : 1));
   for (const k of ks) { const n = pts.filter(p => p.k === k && p.E > cap).length; if (n) el("text", { x: box[2] + 4, y: Y(k) + 4, "font-size": 10.5, fill: "#9a9aa2" }, svg, `+${n}`); }
+  const hits = [];
   for (const p of pts.filter(p => p.E <= cap)) {
     const jit = ((p.i ?? p.E) * 7919 % 97) / 97 - 0.5, y = Y(p.k) + jit * (box[3] - box[1]) / ks.length * 0.7;
-    const c = el("circle", { cx: X(p.E), cy: y, r: p.o === "swap" ? 3 : 4.5, fill: p.o === "gen" ? "#fff" : col[p.o], stroke: p.o === "gen" ? "#4f6b0c" : "#fff", "stroke-width": p.o === "gen" ? 1.6 : 0.8, opacity: 0.95 }, svg);
-    el("title", {}, c, `k = ${p.k} · ${lab[p.o]} · E ${fM(p.E)} M a month`);
+    el("circle", { cx: X(p.E), cy: y, r: p.o === "swap" ? 3 : 4.5, fill: p.o === "gen" ? "#fff" : col[p.o], stroke: p.o === "gen" ? "#4f6b0c" : "#fff", "stroke-width": p.o === "gen" ? 1.6 : 0.8, opacity: 0.95 }, svg);
+    hits.push({ x: X(p.E), y, html: `<b>k = ${p.k}</b> · ${lab[p.o]}<br>E ${fM(p.E)} M a month on the search days` });
   }
   const r0 = pts.find(p => p.rec), xr = X(recE), yr = Y(r0.k);
   if (RF) { el("circle", { cx: X(r0.E), cy: yr, r: 8, fill: "none", stroke: "#5c0f69", "stroke-width": 2, "stroke-dasharray": "3 2" }, svg); el("text", { x: X(r0.E) + 12, y: yr + 22, "font-size": 11, fill: "#5c0f69" }, svg, `search's pick ${fM(r0.E)}`); el("circle", { cx: xr, cy: yr, r: 5, fill: "#5c0f69" }, svg); }
   el("circle", { cx: xr, cy: yr, r: 11, fill: "none", stroke: "#9dc92a", "stroke-width": 4 }, svg);
+  hits.push({ x: xr, y: yr, html: `<b>The recommendation</b> · k = ${r0.k}<br>E ${fM(recE)} M a month${RF ? ", after the refinement step" : ""}` });
+  if (RF) hits.push({ x: X(r0.E), y: yr, html: `<b>The search's pick</b> · k = ${r0.k}<br>E ${fM(r0.E)} M a month, before refinement` });
+  const tip = $("#tip");
+  svg.onpointermove = e => {
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const q = pt.matrixTransform(svg.getScreenCTM().inverse()), h = hits.reduce((a, b) => (Math.hypot(b.x - q.x, b.y - q.y) < Math.hypot(a.x - q.x, a.y - q.y) ? b : a), hits[0]);
+    if (h && Math.hypot(h.x - q.x, h.y - q.y) < 12) { tip.innerHTML = h.html; tip.style.display = "block"; tip.style.left = `${e.clientX + 14}px`; tip.style.top = `${e.clientY + 14}px`; } else tip.style.display = "none";
+  };
+  svg.onpointerleave = () => { tip.style.display = "none"; };
   el("text", { x: xr + 12, y: yr - 15, "font-size": 12, "font-weight": 800, fill: "#5c0f69", stroke: "#fff", "stroke-width": 3, "paint-order": "stroke" }, svg, `recommended ${fM(recE)}`);
   el("text", { x: (box[0] + box[2]) / 2, y: box[3] + 34, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, svg, `E on the ${M.days[0]} search days, M KRW per month (+n: networks above ${f0(cap / 1e6)})`);
   const sorted = [...new Set(pts.map(p => p.E))].sort((a, b) => a - b), off = pts.filter(p => p.E > cap).length;
