@@ -1,7 +1,12 @@
 {
- "generated": "2026-11-01T20:13:18",
+ "generated": "2026-11-01T20:45:18",
  "registry": "2026-11-01T18:54:40",
  "checks": [
+  {
+   "check": "live demand days of every store match the sampler",
+   "ok": true,
+   "detail": "4 days x 9718 stores"
+  },
   {
    "check": "world rebuilt",
    "ok": true,
@@ -125,7 +130,7 @@
   {
    "check": "app.py live solve = routing.solve",
    "ok": true,
-   "detail": "66 vehicles 5127.3 km in 557 ms"
+   "detail": "66 vehicles 5127.3 km in 656 ms"
   },
   {
    "check": "demo embeds this registry",

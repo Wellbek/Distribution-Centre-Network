@@ -440,7 +440,7 @@ def _run(profile):
                 hist_dates=hist["cal"]["date"], example=_example_store(world, model, hist)),
         r3=r3, r3_g1=r3_g1,
         show=dict(day=dict(date=show_day["date"], label=show_day["label"]), peak=dict(date=d_peak["date"], label=d_peak["label"]), **show),
-        live=dict(dc=live_dc, stores=live_idx.tolist(), days=[dict(name=nm, q=np.round(d["q"][live_idx], 2).tolist()) for nm, d in live_days]),
+        live=dict(dc=live_dc, stores=live_idx.tolist(), days=[dict(name=nm, q=np.round(d["q"][live_idx], 2).tolist(), q_all=np.round(d["q"], 2).tolist()) for nm, d in live_days]),
         cases=dict(failure=None, boundary_hi=[int(j) for j, n_ in zip(fr["open"], fr["loads"]) if n_ >= ctx["hi"]],
                    boundary_lo=[int(j) for j, n_ in zip(fr["open"], fr["loads"]) if n_ <= ctx["lo"]],
                    budget_one=log_bo[0]["E"], budget_full=min(r["E"] for r in log_bo)),

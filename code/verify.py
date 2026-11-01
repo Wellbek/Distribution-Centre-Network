@@ -34,6 +34,10 @@ model = demand.fit(world, hist)
 ctx = evaluate.context(world, model)
 d_final = demand.sample_days(model, world, C.FINAL_DAYS, C.SEED + 12, ctx["mask"])
 show_day = next((d for d in d_final if d["label"] == "weekday"), d_final[0])
+if REG["live"]["days"][0].get("q_all"):
+    wkend = next((d for d in d_final if d["label"] == "weekend"), d_final[1])
+    lv = [show_day, wkend, demand.peak_day(model, world, ctx["mask"], C.SEED + 14), demand.average_day(model, world, ctx["mask"])]
+    check("live demand days of every store match the sampler", all(np.allclose(np.round(d["q"], 2), r["q_all"]) for d, r in zip(lv, REG["live"]["days"])), f"{len(lv)} days x {len(lv[0]['q'])} stores")
 check("world rebuilt", show_day["date"] == REG["show"]["day"]["date"] and ctx["n"] == REG["meta"]["stores_planning"],
       f"{ctx['n']} stores, showcase day {show_day['date']}")
 
