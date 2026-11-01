@@ -76,7 +76,7 @@ For fixed sites the assignment is linear and solved exactly; the site choice is 
 - **Budgeted search** (Lectures 4-5): $B$ = 40 full evaluations; first the `G2` optimum of every $k$, then expected improvement on a Kennedy-O'Hagan model $E(x) = G_2(x) + \delta(x)$, with $\delta$ a Gaussian process (Matérn 5/2, one length scale per summary feature, hyperparameters by marginal likelihood) on seven features: $k$, mean, 95th-percentile and maximum road km to the DC, load imbalance, demand share beyond 55 km, store share beyond 125 km.
   The next evaluation maximises $\mathrm{EI}(x) = (f^\ast - \mu(x))\Phi(z) + \sigma(x)\varphi(z)$, $z = (f^\ast - \mu(x))/\sigma(x)$.
 - **Refinement** (after the search, outside $B$; Lecture 0's improve role and Lecture 1's descent): best-improvement local search on E over every one-move neighbour of the search's pick (any open site swapped for any of the 50 closed ones, one dropped, one added; 560 networks a round) until no move saves 1 M KRW a month.
-  It ran 5 rounds and 2,800 evaluations: Siheung Banwol for Incheon Namdong, Namyangju Jingeon for Yangju Gwangjeok, Gimhae Hallim for Changwon Jinyeong, Chilgok Waegwan for Gumi Sandong, 55.7 M a month cheaper on the final days.
+  It ran 5 rounds and 2,800 evaluations, affordable because E costs about a second here; each accepted move ranked within the 33 best of its round's 560 neighbours by the cheap criterion `G2`, so screening each round to the 40 `G2`-best neighbours would take the same path with 200 full evaluations (`code/checks/refinement_screen.py`), the version for a real system at hours per evaluation. The moves: Siheung Banwol replaced by Incheon Namdong, Namyangju Jingeon by Yangju Gwangjeok, Gimhae Hallim by Changwon Jinyeong, Chilgok Waegwan by Gumi Sandong, 55.7 M a month cheaper on the final days.
 
 ### What is proven, what is checked, what is not
 
@@ -89,7 +89,7 @@ For fixed sites the assignment is linear and solved exactly; the site choice is 
 | The recommended network is optimal under the model | No single swap, drop or add improves it (the best neighbour costs 6.2 M more): a one-move local optimum of E | Local optimum only; global optimality among $7.5\times10^{10}$ sets is not proven |
 | The number of DCs is 10 | The sweep is U-shaped with its minimum at 10; 9 and 11 lie within 37 M on unrefined networks; the refinement keeps 10; PyVRP's routes keep 10 | Near-tie with 9 and 11, stated as such |
 | The saving holds beyond the days the search used | 14 held-out days with the fleet fixed from the final days: 534.9 M (521.6-554.0) | Verified on held-out days |
-| The saving survives the assumptions | 9 of 11 one-at-a-time changes keep it positive; it reverses if today's network were already optimal for today's stores (−60 M) or under the strict brief without relay routes (−452 M) | Conditional: two reversals are business facts to measure |
+| The saving survives the assumptions | 9 of 11 one-at-a-time changes keep it positive; it reverses if today's network were already optimal for today's stores (−59 M) or under the strict brief without relay routes (−452 M) | Conditional: two reversals are business facts to measure |
 
 `python verify.py` re-checks the shown run independently (32 checks, all pass): every store served once, no unflagged limit violation, cost identities, the paired saving, the LP bounds, determinism, the router against exact enumeration, the page's JavaScript engines against Python, and more.
 

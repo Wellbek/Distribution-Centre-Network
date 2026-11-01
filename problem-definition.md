@@ -106,7 +106,7 @@ Far stores go first because a far store left for last needs a vehicle of its own
 *Improve:* inside each route, reverse a segment whenever that shortens the route and all limits still hold.
 Then the relay pass for stores no one-driver route can serve.
 It is deterministic, so every candidate sees exactly the same procedure.
-**Cost of one solve:** about 0.2-0.4 s per territory-day on one core at full scale (1,400 stores) (run 8: 91 territory-days per evaluation in 1.03 s on 16 processes, 0.18 core-seconds each).
+**Cost of one solve:** about 0.2-0.4 s per territory-day on one core for a full 1,400-store territory, and 0.18 core-seconds averaged over all territory sizes (run 8: an evaluation of a pool network averages 91 territory-days, its mean k of 13 times 7 days, in 1.03 s on 16 processes).
 **Accuracy**, measured three ways:
 
 | Check | Instance | Result | Source |
@@ -115,6 +115,7 @@ It is deterministic, so every candidate sees exactly the same procedure.
 | Load lower bound $\lceil \sum q_i / 48 \rceil$ | Every territory of the showcase day | 41-44% above the bound max(load / 48, stores / 25), because the binding limit is the clock, which the bound ignores; the bound is too weak to measure accuracy here, so PyVRP is the real comparison | `code/verify.py` |
 | PyVRP 0.11.3 (a genetic algorithm with local search, Lecture 5's family of black-box optimisers), same matrix, limits and relay structure | Full territories, one search day, the baseline network, the recommendation, the search's pick before refinement, the baseline sites redrawn and the best 9- and 11-DC networks | Baseline network: 653 vehicles by our router against 610 by PyVRP, day cost 7.2% higher (3.0% to 13.8% per territory, worst on Daejeon 49 against 43 vehicles and Daegu 66 against 59). Recommended network: 628 against 590, 6.9% higher (4.2% to 14.0%, worst on Gyeongju 39 against 34 vehicles). PyVRP left stores unrouted on some territories at 0.1 s per store (two of the recommendation's ten); a second pass at 0.5 s per store routed them all | `code/checks/routing_gap.py` (optional dependency; cached results) |
 
+Exact enumeration is limited to 7 stores, where a route rarely meets the noon clock, so it checks the construction rule, not the clock-bound case; the clock-bound case is what the full-size comparison with PyVRP measures, on every territory of 1,400 stores and fewer.
 **What its error does to the upper level:** our router over-states operating cost by 7.2% on the baseline network and 6.9% on the recommended one, nearly the same, so the error mostly cancels in the comparison.
 With PyVRP's routes on the same day the day's operating saving falls from 3.9 M to 3.3 M KRW, so the monthly saving would be about 17 M lower, about 507 M instead of 524 M; most of what remains is rent (two DCs fewer).
 The redraw step alone (baseline sites, territories redrawn) is worth 9.6 M a day with our routes and 7.1 M with PyVRP's.
@@ -135,7 +136,7 @@ $f_j$ is the site's monthly fixed cost, $c_m$ = 5.5 M KRW per owned vehicle, $n_
 **Fleet policy.** $n_j$ is the $1 - c_m/(30.42\,c_s) = 0.671$ quantile of DC j's daily vehicle need over the sampled days: one more owned vehicle costs 180,822 KRW every day and saves a 550,000 KRW spot truck only on the days it is needed, so it pays when it is needed on more than 33% of days; this is where the brief's two-thirds default comes from.
 **Demand uncertainty enters here:** E routes N sampled days, not one average day, because the fleet quantile and the spot hires are not linear in demand (Section 3 measures the difference).
 **The same days for every network:** every candidate and the baseline see the same store-level demand days, so differences between networks are paired.
-**Cost of one evaluation:** k × N lower-level solves: about 70 territory-days for k = 10 and N = 7, 1.0 s with 16 worker processes, about 16 core-seconds (run 8, `meta.timing`).
+**Cost of one evaluation:** k × N lower-level solves: about 70 territory-days for k = 10 and N = 7, about 13 core-seconds at 0.18 core-seconds each, under a second with 16 worker processes (run 8, `meta.timing`: 1.03 s for the pool's average of 91 territory-days).
 
 **Where the assignment lives: re-solved inside E.**
 The candidate is only the set of open sites; E assigns stores by a capacitated transportation LP
@@ -169,7 +170,7 @@ A k below 7 is infeasible (six DCs at the cap hold at most 8,400 stores), which 
 | Input | `candidate_sites` | `site_id`, `lat`, `lon`, `monthly_fixed_cost`, `max_stores` | KRW / month | one leasable site (60, the 12 baseline sites included) |
 | Input | `cost_parameters` | `parameter`, `value`, `unit` | mixed | one finance figure (teaching defaults [A §2.6] plus the relay-driver assumption) |
 | Input | road distance cache | store-to-site km, store-to-50-nearest-store km, calibration coefficients | km | `code/data/road_cache.npz` (Section 3) |
-| Input | outcome tables `deliveries`, `vehicle_days`, `spot_hires` | as in [A §2.5] | | produced by our lower level on the baseline network over the history year; used for the baseline's service level and fleet check, not as inputs to E |
+| Input | outcome tables `deliveries`, `vehicle_days`, `spot_hires` | as in [A §2.5] | | produced by our lower level on the baseline network over the history year; they describe the baseline's service level and fleet and cannot validate the router, being its output (Section 3); not inputs to E |
 | Output | recommended network | open sites, k, stores per DC, owned fleet per DC | | the decision |
 | Output | cost breakdown | fixed, owned fleet, fuel, spot, relay, penalties; saving against the baseline with its 90% interval on final and held-out days | M KRW / month | the evidence |
 | Output | evaluation log | step, candidate, sites, k, G1, G2, E, service level, rule that chose it | | one full evaluation (Section 5) |
@@ -228,6 +229,9 @@ This is the reading every later number depends on, so it comes first.
 | `demand_history` | 365 days from 2025-10-01: store level (lognormal, mean 2.2 cages, clipped to 0.5-6) × weekday profile by store type × summer peak × Korean holidays and their eves × a chain-wide AR(1) shock (weather) × store-day gamma noise, Poisson counts | Weekends, summer, holidays, chain-wide moves, short histories |
 | outcome tables | Our lower level on the baseline network over the 365 days, owned fleet = 0.671 quantile of that year's daily need | Labelled as produced by our own model [A §2.5] |
 
+The outcome tables give the baseline network 194 M KRW a month of spot hire over the history year, against 112.8 M under E on the 28 final days, with a similar margin of owned over average vehicles in both (646 owned against 636 a day; 654 against 644).
+The difference is the tail of daily need: the 365 history days contain the year's storm days and holiday peaks at their real frequency, while 28 sampled days see that tail less often, so E probably understates spot hire for every network alike; because all networks are scored on the same days, the effect on the saving is second-order, and the real `spot_hires` table is the check (Section 6).
+
 **Distances.**
 Self-hosted OSRM v6.0.0, car profile, Geofabrik `south-korea-latest.osm.pbf` (OpenStreetMap data of 2026-10-18), ferries excluded.
 Computed: every store-to-site pair (9,718 × 60) and each store's 50 nearest stores; cached in `code/data/road_cache.npz` (5 MB), so no network access is needed to reproduce anything.
@@ -259,7 +263,7 @@ The prior mean per store type comes from the chain; its strength $b$ is set from
 The prior is worth about two days of a store's own orders, so after one week a new store's posterior already puts about 80% of its weight on its own data, and a store opened yesterday moves about a third of the way from its type's mean towards its first order; store ST00211 opened 61 days before the horizon and ordered 135 cages against 63.2 store-days of exposure; its prior Gamma(4.55, 1.92) (mean 2.37, mixed stores) becomes Gamma(139.6, 65.1), posterior mean 2.14 against its own data mean 2.14 (its true rate, hidden from the model, is 1.89).
 Extra store-day variation beyond Poisson is gamma with shape κ = 8.1; the chain shock is AR(1) with φ = 0.46 and σ = 0.061.
 **Posterior predictive for a planning day:** draw a calendar day of the planning year, the chain shock from its AR(1), each $\lambda_s$ from its posterior, then the counts.
-A posterior predictive check replicates the history's chain totals (shown in the demo, Data & baseline tab).
+A posterior predictive check replicates the history's 365 chain totals from the fitted model: mean 22,270 against 22,277 cages a day, standard deviation 2,648 against 2,651, correlation 0.998 day by day (shown in the demo, Data & baseline tab).
 
 **Sampled days versus one average day.**
 On the recommended network and the 7 search days, sampled days give E = 5,926.9 M a month; the same days with each store's expected count instead of its sampled count give 5,894.1 M (33 M less: store-level noise largely cancels at the DC); one average day gives 5,851.7 M (75 M less, 1.3%).
@@ -294,7 +298,7 @@ The gap would grow with a stronger chain-wide shock (φ or σ) or a sharper holi
 | Spot trucks | 550,000 KRW a day; supply not stated | Unlimited at that rate `[ASSUMPTION]` | No limit is given | Peak day: 118 spot trucks above 631 owned |
 | Fleet quantile | Two-thirds | 0.671, computed from the brief's own prices (one owned vehicle-day against the spot rate) | The same rule, computed exactly | None needed |
 | Orders and the network | Not addressed | Orders do not change when a store's delivery time changes `[ASSUMPTION]` | No data on ordering by delivery slot | 24% of stores would be served more than 2 h later: first real-data check (Section 6) |
-| Baseline network | Placed plausibly, as a chain that grew [A §2.5] | The 2016 planner's design with growth since (Section 3) | The brief gives no real network; this rule was fixed before scoring | Baseline network at the optimum instead: −60 M, the reversing row |
+| Baseline network | Placed plausibly, as a chain that grew [A §2.5] | The 2016 planner's design with growth since (Section 3) | The brief gives no real network; this rule was fixed before scoring | Baseline network at the optimum instead: −59 M, the reversing row |
 | Scope | Fresh food out of scope unless brought in; one-off costs not mentioned | Fresh food, Jeju and ferry-only islands, moving and opening costs left out | Allowed by the brief or not costable without data | Moving cost as a payback condition (Section 6) |
 | Closure sequence | Leases expire one after another | First month a redesign can operate: January 2027; leases end on the fictional dates of `dcs` `[ASSUMPTION]` | Two months to fit out a site | Extensions (Section 5) |
 | Value-of-information prior | Not given | 0.25 / 0.5 / 0.25 on low / reported / high stop time and speed `[ASSUMPTION]` | A neutral prior around the teaching defaults | EVPI reported as a lower bound |
@@ -319,7 +323,7 @@ Do not act on the recommendation before the real outcome tables have scored the 
 | Approach | Mechanism and required information | Strengths, limitations, and effort | Selection and reason |
 |---|---|---|---|
 | Baseline | Keep the 12 baseline DCs and territories; renew leases as they expire | No transition cost or risk; carries a decade of drift (Section 3) | The reference every candidate is scored against, under the same E (Section 5) |
-| Proxy-only: centre of gravity (`G0`) | The Data Team's method: centres of gravity on straight-line coordinates for a chosen k (Section 2), snapped to sites | Minutes; no road distances, no clock, no choice of k; optimal only for its own criterion | Rejected as the decider; scored under E for comparison: its best network (k = 13) costs 6,480.9 M a month on the search days, 498.9 M more than the best network found; 5 of its 13 networks miss 98% before noon |
+| Proxy-only: centre of gravity (`G0`) | The Data Team's method: centres of gravity on straight-line coordinates for a chosen k (Section 2), snapped to sites | Minutes; no road distances, no clock, no choice of k; optimal only for its own criterion | Rejected as the decider; scored under E for comparison: its best network (k = 13) costs 6,480.9 M a month on the search days, 554.0 M more than the recommendation (498.9 M more than the search's pick); 5 of its 13 networks miss 98% before noon |
 | Proxy-only: best network under the cheap criterion | Search the pool by `G1` and pick its minimum, without any full evaluation | Milliseconds per candidate; ignores the noon deadline, so it favours fewer, larger territories | Rejected; its pick costs 412.4 M a month more than the recommendation on the final days (it picks eight DCs, 6,467.5 against 6,055.1 M) under E (Section 5) |
 | Generator knobs with BO (brief option i) | k, a volume exponent, a detour penalty and a minimum spacing as four continuous inputs to the generator, GP + EI on them | The GP's home ground; still produces G-optimal networks, so it shares G's blind spot unless G knows the clock | Considered, not built: the pool option below covers the same budget and lets us use `G2` directly |
 | **Selected: pool + discrepancy GP + EI under a budget** | A pool of candidates per k from `G2`, `G1`, `G0`, baseline sites adjusted and random swaps; a Gaussian-process model of the gap E − `G2` over seven summary features; expected improvement picks the next full evaluation; B = 40 | Spends full evaluations where the cheap criterion is least trusted; needs the pool to contain good candidates (checked: the whole pool is also evaluated once for validation) | Chosen: it is the course's default (Lectures 4 and 5), it keeps G and E apart, and it beat random selection at the same budget (Section 5) |
@@ -347,14 +351,14 @@ The first row is the choice the conclusion hangs on most.
 
 | Modelling choice | What the real operation does | What we model | What it costs to compute | What the simplification could get wrong | How we checked whether it changes the decision |
 |---|---|---|---|---|---|
-| Baseline network | A network grown and patched over decades, unknown to us in detail | The 2016 planner's design with growth since (Section 3) | Free | If the real network is closer to optimal, the saving shrinks | Re-scored with the baseline network placed at the optimum for today's stores: a 12-DC p-median on today's stores and road km costs 5,922 M a month on the search days, 60 M less than the best redesign: one of the two rows that reverse the recommendation; between the two, the year of the last redesign is swept from 2010 to 2026 (the saving stays between 220 and 643 M for every year; only the road-km design reverses it) (Section 5) |
+| Baseline network | A network grown and patched over decades, unknown to us in detail | The 2016 planner's design with growth since (Section 3) | Free | If the real network is closer to optimal, the saving shrinks | Re-scored with the baseline network placed at the optimum for today's stores: a 12-DC p-median on today's stores and road km costs 5,922 M a month on the search days, 59 M less than the best redesign: one of the two rows that reverse the recommendation; between the two, the year of the last redesign is swept from 2010 to 2026 (the saving stays between 220 and 643 M for every year; only the road-km design reverses it) (Section 5) |
 | Distance model | Trucks drive roads; speed varies by hour | OSRM road km for every store-site pair and each store's 50 nearest stores, a calibrated model for other pairs; time = km / 35 km/h + 15 min per stop | One-off: 0.6 M site pairs and 0.5 M store pairs on the Spark, cached (5 MB) | Peak-hour slowdowns ignored, which flatters long routes; model pairs off by 20% for pairs of 1-10 km, 9% for 10-50 km and 4% for 50-250 km on a held-out half | Re-scored the best network of every k and the baseline with the calibrated model only and at 30 km/h: calibrated model only: k* = 9, saving 391 M; 30 km/h: k* = 11, saving 658 M; the saving keeps its sign and k moves by one |
 | Instance size | 10,000 stores | All 10,000 (not thinned) | Full run 3,732 s on a DGX Spark with 16 worker processes: 3,435 s for the pipeline (2,559 s of it the refinement step), 297 s for the extensions; reduced run (1 in 5, without the refinement step) 8 min on a laptop with two worker processes | Nothing from thinning; slower development | Reduced run against full run, k by k: the reduced sweep's minimum is at k = 11 against 10 for the full instance (after re-scoring its top five on 28 days the reduced run recommends 9; 9, 10 and 11 lie within 1.2 M of each other there); cost per store 1.19-1.24 times the full run's for k = 8 to 19 (1.44 at k = 7); km per store 1.50 times the full run's for the baseline network, below the √5 = 2.24 the continuous approximation predicts because the out-leg does not shrink with density; the reduced instance cannot separate 9, 10 and 11 |
 | Demand model and days | Store orders with calendar, shocks, short histories | Poisson-Gamma with chain exposure and AR(1) shock; 7 search days, 28 final, 14 held-out | 28 days cost four times 7 | A 0.671 quantile from 7 days is noisy; rankings may change with more days | Top five re-scored on 28 days: the search's best stays first on 28 days (6,110.9 M, refined to 6,055.1 M); the next three (k = 9, 11 and another 10) lie within 45 M of it; sampled versus average day: one average day understates E by 75 M a month (1.3%) |
 | Routing method | Experienced dispatchers | Step-by-step construction with masked stores, segment reversal, relay pass (Lecture 0's construct and improve), deterministic | 0.18 core-seconds per territory-day | 7.2% of operating cost above PyVRP on the baseline network and 6.9% on the recommended one; on 7-store cases 0.3% above the exact optimum | PyVRP on every territory of both networks, one search day (Section 2a): the saving falls from 524 to about 507 M a month and keeps its sign; the best 9-, 10- and 11-DC networks under PyVRP: ten stays best |
 | Delivery window | ≥ 98% before 12:00, failure after 14:00 | Every stop by 12:00 (hard) | A check on every insertion | Leaves the 2% tolerance unused, over-stating vehicles slightly | Every compared network reaches 100% before noon on every final day; the slack is a saving we do not claim |
 | Departure and docks | Waves 04:00-07:00 limited by docks | Every vehicle leaves at 04:00 | None | Flatters large DCs, so it favours fewer DCs | Departure waves with 23 docks per DC: k* 10 → 12, because the 10- and 11-DC networks overflow the docks of their largest DCs by 3.3 vehicles a day (the 12-DC network costs 66 M a month more than ten under waves and still saves 417 M against the baseline); with 25% more docks (29): k* 10. The dock count decides k between 10 and 12, so it is a data request (Section 3) |
-| Assignment | Historical territories | Window-aware transportation LP inside E (Section 2b) | One LP per evaluation | Distance-optimal is not route-optimal | The LP beats the historical assignment on the baseline's own sites (Section 5, saving decomposition) |
+| Assignment | Historical territories | Window-aware transportation LP inside E (Section 2b) | One LP per evaluation | Distance-optimal is not route-optimal | The LP beats the historical assignment on the baseline's own sites (Section 5, saving decomposition); not tested: moving boundary stores between DCs after routing, which could lower E further for every network alike; `TBD`, a route-aware reassignment pass is the next upper-level improvement |
 | Fleet policy | Vehicle contracts, spot market | 0.671 quantile of daily need, unlimited spot trucks at 550,000 KRW | Free | Spot supply may be capped on peak days | Peak day reported: 2027-09-13, a holiday eve: 749 vehicles needed against 631 owned, 118 spot trucks (64.9 M that day), 100% before noon |
 | Candidate set | Real-estate options | 60 sites at interchanges and logistics zones, the 12 baseline sites included | Pool size | The optimum may sit off the list, or among site sets the pool never held | Inside the list: a learned generator samples site sets the pool never held (Section 5, candidate generation); off the list: `TBD` with the real-estate team (Section 3, requests) |
 | Number of DCs swept | Any k the bounds allow | k = 7 to 19, one `G2` seed each | 13 of the 40 evaluations | Wasted evaluations on hopeless k | All 13 reported in the sweep (Section 5) |
@@ -452,15 +456,20 @@ Every evaluation is in `registry.json` (`log_bo`, `log_random`) with step, candi
 **Refinement after the search: a local search on E.**
 The reported search can only return a member of its pool, so the pipeline refines its pick before the final comparison (`code/dcn/pipeline.py`, `search.local_search`): it prices every swap of an open site for any of the 50 closed sites, every drop and every add that the 500-1,400 bounds allow (560 networks), with the same E on the same search days, moves to the cheapest if it saves more than 1 M a month, and repeats until no move does.
 It runs after the reported search and outside the budget B, so the reported search and its comparison with random selection are unchanged; it used 2,800 evaluations in 5 rounds, about 43 minutes on the Spark's 16 worker processes, and every move is in `registry.json` (`refinement`).
-Path on the search days (M KRW a month): the search's pick at 5,982.0, then Siheung Banwol for Incheon Namdong 5,953.5, Namyangju Jingeon for Yangju Gwangjeok 5,939.9, Gimhae Hallim for Changwon Jinyeong 5,933.1 and Chilgok Waegwan for Gumi Sandong 5,926.9; at the end no single swap, drop or add is cheaper (the best neighbour costs 6.2 M more).
+Path on the search days (M KRW a month): the search's pick at 5,982.0, then Siheung Banwol replaced by Incheon Namdong 5,953.5, Namyangju Jingeon replaced by Yangju Gwangjeok 5,939.9, Gimhae Hallim replaced by Changwon Jinyeong 5,933.1 and Chilgok Waegwan replaced by Gumi Sandong 5,926.9; at the end no single swap, drop or add is cheaper (the best neighbour costs 6.2 M more).
 The refined network keeps ten DCs and costs 55.7 M a month less than the search's pick on the final days (6,055.1 against 6,110.9 M, 0.9%); it is the recommendation, and every number in this section, the demo and the proposal describes it.
 What it means: the number of DCs holds under a search the pool does not limit, while four of the ten sites were near-ties with a neighbouring site, worth 6 to 29 M a month each on the search days; the refined network is a local optimum only, among 7.5 × 10^10 possible sets of ten sites.
+**Reconciled with the budget.** The 2,800 evaluations are affordable here because E costs about a second on 16 processes; with the real routing system at hours per evaluation they would not be, and B = 40 stays the budget of the reported search.
+The refinement does not need them: each accepted move is the best of all its round's neighbours under E, and ranked by `G2` among those 560 neighbours the four accepted moves sit at places 16, 28, 16 and 33 (`code/checks/refinement_screen.py`).
+A refinement that fully evaluates only the 40 `G2`-best neighbours of each round therefore takes the same four moves and stops at the same network, with 5 × 40 = 200 full evaluations instead of 2,800; its last round certifies only the screened 40, a weaker claim than the full neighbourhood's.
+On the real system that is the plan: about five budgets of 40, spent only after the reported search has fixed the number of DCs, for 55.7 M a month (0.9%), the part of the saving the first budget leaves on the table.
 The pool's sweep and the reversal rows below price each k's best pool network, before refinement; refining them would lower every row, by about 56 M at k = 10.
 
 **Sampled days versus one average day (R2)** is reported in Section 3.
 
 **When the recommendation reverses (R5).**
 Baseline network and the best evaluated network of every k re-scored on the search days with one assumption changed.
+The rows use each k's best pool network before the refinement step, on the 7 search days, so the base row is 472 M rather than the reported 524.5 M (final days, refined); the relay rows are final-day figures and are marked so.
 
 | Changed assumption | k* | Saving against the baseline (M a month) |
 |---|---:|---:|
@@ -475,10 +484,10 @@ Baseline network and the best evaluated network of every k re-scored on the sear
 | Strict brief and no 500-store minimum for redesigns | 12 | 699 |
 | Departure waves 04:00-07:00 with 23 docks per DC / 29 docks | 12 / 10 | 417 / (k* unchanged) |
 | Routes built by PyVRP instead of ours (day 0, measured; k not re-searched) | (10) | about 507 |
-| **Baseline network already optimal for today's stores** (p-median on road km, 12 DCs) | 10 | **−60** |
+| **Baseline network already optimal for today's stores** (p-median on road km, 12 DCs) | 10 | **−59** |
 
 Two rows reverse the conclusion.
-First, if today's real network were already as good as a p-median design for today's stores, keeping it would be 60 M a month cheaper than the best redesign: the redesign's value lies in how far today's real network is from a design on road km for today's stores (swept by design year below).
+First, if today's real network were already as good as a p-median design for today's stores, keeping it would be 59 M a month cheaper than the best redesign: the redesign's value lies in how far today's real network is from a design on road km for today's stores (swept by design year below).
 Second, if the business holds every vehicle to the brief's one-driver limits and also keeps the 500-store minimum, the far east-coast and mountain stores can be served neither by relay routes nor by a small DC near them, and the best redesign checked costs 452 M a month more than the baseline (126 of the recommendation's stores lie beyond one driver-day against 48 of the baseline's); allowing either the second driver (the main case, 472 M) or a small coastal DC below 500 stores (12 DCs, 699 M) restores the saving.
 Which of the two the business accepts is a decision to make before any lease (register, Section 3).
 
@@ -492,7 +501,7 @@ Which of the two the business accepts is a decision to make before any lease (re
 
 The saving stays positive for every year: even a network drawn in 2026 for all of today's stores keeps 253 M, because it is planned on straight-line km and without the noon clock.
 The saving is not monotone in the year, because each year's design is a different discrete set of sites.
-Only a design on road km for today's stores (the reversal row, −60 M) removes it, so the saving rests on how the baseline network was planned as much as on when; the first real-data check (Section 6) measures both, by scoring today's real network under the same E.
+Only a design on road km for today's stores (the reversal row, −59 M) removes it, so the saving rests on how the baseline network was planned as much as on when; the first real-data check (Section 6) measures both, by scoring today's real network under the same E.
 The number of DCs moves between 9 and 11 under every single changed input, never to 8; two inputs give 12: the strict brief with the minimum dropped (a small coastal DC kept) and departure waves with 23 docks per DC.
 
 **Extensions (additional points).**
@@ -525,9 +534,9 @@ These scenarios change the regime, not the unobserved quantity behind the record
 The best k ranges from 9 (45 km/h) to 11 (30 km/h); under the prior the best decision now is eleven DCs (expected regret 25.1 M a month), with ten close behind (38.8 M), so EVPI = 25.1 M a month, about 3.0 bn over a ten-year lease, against a GPS study of one DC for one month.
 *Collect more demand history:* EVPI over chain volume −15% / as now / +20% is 0 (k = 10 is best in all three), and evaluating every network on days drawn from the true store rates, which the generator knows and the model does not, leaves k = 10 best with a saving of 470 M (regret 0).
 More history cannot change the decision because the network depends on where stores are and how long a stop and a kilometre take, not on each store's exact rate.
-**Decision, reconciled with the recommendation:** under the prior, eleven DCs has the lower expected cost (by 14 M a month), while at the reported 15 min and 35 km/h ten is best.
-The choice between them does not have to be made now: the best 9-, 10- and 11-DC networks take the same action at every one of the twelve lease expiries (keep Gimpo and Cheonan, give up the other ten), and eleven is ten plus Jinju Sabong.
-So the plan follows the leases now and decides whether to add Jinju after the GPS study has measured stop time and speed; that is exactly the information the EVPI says is worth having first.
+**Decision, reconciled with the recommendation:** under the prior, the best pool network with eleven DCs has the lower expected cost (by 14 M a month), while at the reported 15 min and 35 km/h ten is best.
+These scores use each k's best pool network before refinement; the refinement lowered the ten-DC network by 55 M a month on the search days, more than eleven's 14 M lead, and the eleven-DC network was not refined, so ten against eleven stays open under the prior.
+The choice does not have to be made now: the first lease steps are the same for both (renew Gimpo Gochon in 2027-03, defer Hanam Gamil in 2027-06), and the GPS study that measures stop time and speed, the information the EVPI says is worth having first, reports before the next decision.
 
 *Candidate generation (Lecture 6).* A learned generator, after Lecture 6's CbAS: for k = 9, 10 and 11 a product of per-site inclusion probabilities, fitted to that k's pool, then refitted four times on 200 proposals each toward networks the search's own surrogate (G2 plus the GP on its 40 evaluations) predicts below a rising bar (the 20th percentile of its predictions), each draw weighted by the prior ratio (`dcn/extensions.py`).
 The four best new networks of each k, all absent from the pool, were evaluated in full on the search days: the best costs 6,063 M against the pool's best 5,982 M (1.4% more); between 53% and 75% of the sites in the two networks together are not shared with the pool's best network of its k, and the surrogate's prediction missed E by up to 5.7% in either direction.
@@ -547,6 +556,7 @@ It would pay with a weaker pool (no clock-aware G, or a longer candidate list), 
 | Router against PyVRP 0.11.3 | Every territory of the baseline, the recommendation, the redrawn baseline and the best 9- and 11-DC networks, one search day; a second pass at 0.5 s per store where PyVRP left stores unrouted | 653 against 610 vehicles on the baseline, 628 against 590 recommended; the saving would be about 507 M; ten stays the best k |
 | Selection rule without the seeds | `code/checks/selection_replay.py`: the reported search replayed on the evaluated pool (reproduced exactly), then 100 random starts of 5 and 13 networks for GP + EI and random selection | GP + EI finds the pool's best in 98% and 88% of replays; random selection holds it with probability 10.3% and stops a median 122.3 M and 119.5 M a month above it |
 | Refinement step (local search on E) | Inside `run_full.py` (run 8, Spark); reproduced first on the laptop by a separate check with two worker processes, the same four moves | Local optimum after 4 site swaps and 2,800 evaluations: still ten DCs, 55.7 M a month below the search's pick on the final days |
+| Screening the refinement by `G2` | `code/checks/refinement_screen.py`: rank by `G2` of each accepted move among its round's 560 neighbours | Places 16, 28, 16 and 33: a top-40 screen takes the same path with 200 full evaluations instead of 2,800 |
 | Router choice and speed-up | Four course-based routers on 44 territory-days of both networks against the earlier savings router; the chosen one sped up (nearest-store sets by partition, plain indexing) | Chosen router 2.0% more vehicles than savings, about the same on both networks; after the speed-up routes identical bit for bit on the 44 territory-days and a tie-heavy case, a third faster; JavaScript copy identical on five territories |
 | Reversal rows, departure waves, thinning, extensions | Inside the full run | Sections 4 and 5 |
 | `verify.py` | Independent re-check of the shown run | 32 of 32 pass |
@@ -570,14 +580,14 @@ This is a demonstrated result of the fictional instance only.
 For Dasol's real network the saving is unknown: it equals how far today's real network is from a design on road km for today's stores, which only the real outcome tables can measure (Section 3); in the fictional instance it stays positive whatever year the last redesign was made (Section 5).
 
 **What would reverse it.**
-A real network already close to the optimum for today's stores (−60 M a month), or a business that accepts neither relay drivers on far routes nor a small coastal DC below 500 stores (−452 M a month; Section 5, reversals); short of reversing it, a measured stop time or road speed far from the defaults (they move the best number of DCs between nine and eleven) or fewer loading docks than assumed (twelve DCs with 23 docks per DC).
+A real network already close to the optimum for today's stores (−59 M a month), or a business that accepts neither relay drivers on far routes nor a small coastal DC below 500 stores (−452 M a month; Section 5, reversals); short of reversing it, a measured stop time or road speed far from the defaults (they move the best number of DCs between nine and eleven) or fewer loading docks than assumed (twelve DCs with 23 docks per DC).
 Rent, the distance model, the relay price, the store minimum, departure waves, demand shifts and the routing method change the size of the saving, not its sign (Section 5 and the extensions).
 
 **Risks and mitigations** (likelihood: my guess for the real chain; impact: measured in the fictional instance).
 
 | Risk | Likelihood | Measured impact | Mitigation |
 |---|---|---|---|
-| Today's real network is already close to a good design | Medium | Reverses: keeping it is 60 M a month cheaper | Real-data check before any new lease |
+| Today's real network is already close to a good design | Medium | Reverses: keeping it is 59 M a month cheaper | Real-data check before any new lease |
 | Neither a second driver on far routes nor a small coastal DC is allowed | Unknown, a business rule | Reverses: −452 M a month | Decide the rule now |
 | Stop time or speed differ from 15 min and 35 km/h | Medium | Best k between 9 and 11; saving 427-658 M | GPS study; the best 9- to 12-DC networks take the same lease steps until 2029 |
 | Our router is weaker than a state-of-the-art one | High (measured) | About 7% of operating cost on both networks; saving about 507 M instead of 524 M | Re-score with a stronger router before the 2027-12 steps |
@@ -597,7 +607,7 @@ Rent, the distance model, the relay price, the store minimum, departure waves, d
 
 **Conditions.**
 *Proceed* with the lease sequence below if today's real network, scored under the same E, costs more than the best redesign by more than the one-off cost of moving (to be priced by finance; at 524 M a month, a one-off cost of 6.3 bn KRW pays back within a year).
-*Revise* the number of DCs if the measured stop time or speed lies outside 10-20 min or 30-45 km/h, or if the largest DCs have fewer than 29 docks: re-run `run_full.py` with the measured values, three commands and about 20 minutes.
+*Revise* the number of DCs if the measured stop time or speed lies outside 10-20 min or 30-45 km/h, or if the largest DCs have fewer than 29 docks: re-run `run_full.py` with the measured values, three commands and about an hour on the Spark (62 minutes, most of it the refinement step).
 *Stop* and renew leases as they expire if the real network comes within the moving cost of the best redesign.
 
 **How to implement: follow the lease expiries.**

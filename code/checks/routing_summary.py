@@ -43,7 +43,7 @@ def summary(folder=CHECKS):
         if len(rs) != len(sites):
             continue
         rent = sum(fixed[j] for j in sites) / DAYS_MONTH
-        out["k_check"].append(dict(k=len(sites), ours=rent + sum(r["ours_cost"] for r in rs),
+        out["k_check"].append(dict(net=n, k=len(sites), ours=rent + sum(r["ours_cost"] for r in rs),
                                    hgs=rent + sum(r["hgs_cost"] if r["hgs_bad"] == 0 else r["ours_cost"] for r in rs),
                                    unrouted=sum(r["hgs_bad"] > 0 for r in rs)))
     out["k_check"].sort(key=lambda x: x["k"])

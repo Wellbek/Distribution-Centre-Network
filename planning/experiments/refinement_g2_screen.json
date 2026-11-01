@@ -1,0 +1,36 @@
+[
+ {
+  "round": 1,
+  "move": "swap 17 for 11",
+  "g2_rank": 16,
+  "improving_g2_ranks": [
+   7,
+   16,
+   19
+  ]
+ },
+ {
+  "round": 2,
+  "move": "swap 15 for 2",
+  "g2_rank": 28,
+  "improving_g2_ranks": [
+   28
+  ]
+ },
+ {
+  "round": 3,
+  "move": "swap 47 for 45",
+  "g2_rank": 16,
+  "improving_g2_ranks": [
+   16
+  ]
+ },
+ {
+  "round": 4,
+  "move": "swap 56 for 52",
+  "g2_rank": 33,
+  "improving_g2_ranks": [
+   33
+  ]
+ }
+]

@@ -1,6 +1,6 @@
 # Dasol network lab - code
 
-Version v1.1.
+Version v1.3.
 Python 3.10 or newer, no network access needed at run time.
 
 ## Three commands
@@ -29,7 +29,8 @@ The profile named by `DEMO_PROFILE` in `dcn/config.py` (`full`) also rebuilds `.
 - `python build_demo.py` embeds the registry, the verification record and the road shapes into `../demo.html`, and the registry into `../proposal.html`.
 - `python checks/routing_gap.py [baseline|recommended] [days] [sec_per_store] [dcs]` measures the routing heuristic against PyVRP 0.11.3 (optional: `pip install pyvrp==0.11.3`); its cached results are in `results/checks/`, and `python checks/routing_summary.py` (no PyVRP needed) summarises them per network; `build_demo.py` embeds that summary in both pages.
 - `python checks/selection_replay.py [reps]` replays the search on the evaluated pool (no routing, about 25 min on one core for 100 replays): it reproduces the reported search exactly, then starts GP + EI and random selection from the same random networks instead of the seeds; cached in `results/checks/selection_replay.json`.
-  `build_demo.py` embeds its summary in both pages.
+- `python checks/refinement_screen.py` ranks each accepted refinement move among its round's neighbours by `G2` (about 4 minutes on one core): all within the top 33 of 560, so a refinement that fully evaluates only the 40 `G2`-best neighbours per round takes the same path with 200 instead of 2,800 evaluations; cached in `results/checks/refinement_screen.json`.
+  `build_demo.py` embeds both summaries in both pages.
 - `../demo.html` opens offline from disk; its live solve runs a simplified in-browser copy of the routing rules (no segment reversal, calibrated distance model instead of the OSRM cache) and says so on the page.
 - `python app.py` serves the same page on `http://localhost:8437` and answers the live solve with `dcn/routing.py` on the cached road distances, the same rules and inputs as the reported run.
 
@@ -55,6 +56,7 @@ If the cache is missing the code warns and falls back to an uncalibrated placeho
 | `dcn/pipeline.py` | Whole run: search, validation, refinement of the search's pick (full run only), finals, held-out days, reversals, departure-wave and thinning checks, outcome tables, registry |
 | `dcn/extensions.py` | Closure sequence along the lease expiries, robustness, value of information, design-year drift sweep, candidate generation (CbAS) |
 | `checks/routing_gap.py` | Optional accuracy check of the routing heuristic against PyVRP |
+| `checks/refinement_screen.py` | Rank by G2 of each accepted refinement move among its neighbours: how far the refinement can be screened |
 | `checks/selection_replay.py` | GP + EI against random selection from random starts, replayed on the evaluated pool |
 | `checks/routing_summary.py` | Per-network summary of the cached PyVRP comparison and its effect on the saving |
 | `osrm/` | Rebuilds the road cache and the road shapes from a self-hosted OSRM server (not needed to run) |
