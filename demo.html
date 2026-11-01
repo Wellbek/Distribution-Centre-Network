@@ -1046,7 +1046,7 @@ function clockChart() {
   for (const [t, lab, col, left] of [[dl, `${hhmm(dl)} deadline`, "#d23f3f", true], [P.shift_end, "13:00 back", "#9a9aa2", false]]) { el("line", { x1: X(t), x2: X(t), y1: 30, y2: 140, stroke: col, "stroke-dasharray": "5 4", "stroke-width": 1.5 }, svg); el("text", { x: X(t) + (left ? -5 : 5), y: 40, "text-anchor": left ? "end" : "start", "font-size": 11, fill: col, "font-weight": 700, stroke: "#f6eff8", "stroke-width": 3, "paint-order": "stroke" }, svg, lab); }
   for (let h = 4; h <= 14; h += 2) el("text", { x: X(h), y: 158, "text-anchor": "middle", "font-size": 11, fill: "#63636b" }, svg, `${String(h).padStart(2, "0")}:00`);
   el("text", { x: 44, y: Y(n) + 4, "text-anchor": "end", "font-size": 10.5, fill: "#63636b" }, svg, f0(n)); el("text", { x: 44, y: 144, "text-anchor": "end", "font-size": 10.5, fill: "#63636b" }, svg, "0");
-  el("text", { x: 716, y: 10, "text-anchor": "end", "font-size": 10.5, fill: "#4f6b0c", "font-weight": 700 }, svg, "100% served");
+  el("text", { x: 716, y: 10, "text-anchor": "end", "font-size": 10.5, fill: "#4f6b0c", "font-weight": 700 }, svg, `${Math.round(100 * upperIdx(I.t, 98) / Math.max(tot, 1))}% served`);
   $("#clock-sub").textContent = `trucks on the road by DC (areas) and stores served (lime line); deliveries end by ${hhmm(dl)}, one-driver trucks are back by ${hhmm(P.shift_end)}${LIVE_ROUTES ? " · your live solve" : ""}`;
   el("line", { id: "clock-now", x1: X(T), x2: X(T), y1: 8, y2: 140, stroke: "#751485", "stroke-width": 2 }, svg);
   svg._X = X;
