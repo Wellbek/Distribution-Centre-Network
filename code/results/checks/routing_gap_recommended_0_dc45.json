@@ -1,0 +1,24 @@
+[
+ {
+  "net": "recommended",
+  "day": 0,
+  "label": "weekday",
+  "dc": 45,
+  "stores": 1220,
+  "cages": 2858.0,
+  "lb_load": 60,
+  "far": 3,
+  "ours_veh": 83,
+  "ours_km": 12013.1,
+  "ours_relay": 1,
+  "ours_s": 0.32,
+  "hgs_veh": 76,
+  "hgs_km": 10999.4,
+  "hgs_relay": 1,
+  "hgs_bad": 0,
+  "hgs_feasible": true,
+  "hgs_s": 610.0,
+  "ours_cost": 19393609.749739178,
+  "hgs_cost": 17773089.814619362
+ }
+]
