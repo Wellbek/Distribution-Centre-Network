@@ -243,3 +243,28 @@ def run_search(pool, evaluate, budget, rule, seed):
         done.add(i)
         log.append(dict(step=len(log) + 1, cand=i, rule="EI on GP gap" if rule != "random" else "random", E=e["total"], G1=pool[i]["G1"], G2=pool[i]["G2"], k=pool[i]["k"], ei=ei, ok98=e["ok98"]))
     return log
+
+
+def one_move(ctx, sites):
+    """Every network one move away: swap an open site for any closed one, drop one, add one; only sizes the store bounds allow."""
+    s, J = sorted(sites), len(ctx["fixed"])
+    out = [(f"swap {a} for {b}", sorted([x for x in s if x != a] + [b])) for a in s for b in range(J) if b not in s]
+    out += [(f"drop {a}", [x for x in s if x != a]) for a in s]
+    out += [(f"add {b}", sorted(s + [b])) for b in range(J) if b not in s]
+    return [(m, n) for m, n in out if len(n) * ctx["hi"] >= ctx["n"] and len(n) * ctx["lo"] <= ctx["n"]]
+
+
+def local_search(ctx, start, score, min_gain=1e6):
+    """Best-improvement descent on E over one_move until no neighbour saves min_gain; score maps a list of networks to (E, ok98) pairs."""
+    cur = sorted(start)
+    val = score([cur])[0][0]
+    path, log = [dict(move="start", sites=cur, E=val)], []
+    while True:
+        moves = one_move(ctx, cur)
+        vals = score([n for _, n in moves])
+        log += [dict(round=len(path), move=m, sites=n, E=v, ok98=ok) for (m, n), (v, ok) in zip(moves, vals)]
+        best = min((i for i, (_, ok) in enumerate(vals) if ok), key=lambda i: vals[i][0])
+        if vals[best][0] > val - min_gain:
+            return dict(path=path, log=log, best_neighbour=vals[best][0])
+        cur, val = moves[best][1], vals[best][0]
+        path.append(dict(move=moves[best][0], sites=cur, E=val))

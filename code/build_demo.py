@@ -22,6 +22,9 @@ def build(profile="reduced"):
     # The cached PyVRP comparison (optional check) travels with the registry so both pages can show it
     r = json.loads((res / "registry.json").read_text())
     r["routing_check"] = summary() if profile == "full" else None
+    # So do the cached search checks (checks/selection_replay.py, checks/local_search.py)
+    ck = {n: ROOT / "results" / "checks" / f"{n}.json" for n in ("selection_replay", "local_search")}
+    r["search_check"] = {n: json.loads(f.read_text()) for n, f in ck.items() if f.exists()} if profile == "full" else None
     reg = json.dumps(r)
     ver = (res / "verification.json").read_text() if (res / "verification.json").exists() else "null"
     tpl = (ROOT / "static" / "demo.template.html").read_text()
@@ -34,7 +37,7 @@ def build(profile="reduced"):
     out.write_text(html)
     print(f"wrote {out} ({out.stat().st_size / 1e6:.2f} MB)")
     # The proposal reads the same registry, slimmed to what its slides show
-    keep = ["meta", "routing_check", "finals", "saving", "sweep", "reversals", "r3", "r3_g1", "extensions", "networks", "sites", "geo", "top5", "pool_best",
+    keep = ["meta", "routing_check", "search_check", "finals", "saving", "sweep", "reversals", "r3", "r3_g1", "extensions", "networks", "sites", "geo", "top5", "pool_best",
             "baseline_search", "stores_view", "log_bo", "random_band", "waves"]
     slim = {k: r.get(k) for k in keep}
     slim["stores"] = {k: r["stores"][k] for k in ("lat", "lon", "base_dc", "rec_dc")}

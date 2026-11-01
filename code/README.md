@@ -27,6 +27,9 @@ The profile named by `DEMO_PROFILE` in `dcn/config.py` (`full`) also rebuilds `.
 - `python verify.py` checks the shown run independently (route audit, cost identities, LP bounds, determinism, worker pool, departure waves, outcome tables, the router against exact enumeration, engine parity, the local app) and writes `results/full/verification.json`; the demo checks need `pip install playwright && playwright install chromium` and are skipped without it.
 - `python build_demo.py` embeds the registry, the verification record and the road shapes into `../demo.html`, and the registry into `../proposal.html`.
 - `python checks/routing_gap.py [baseline|recommended] [days] [sec_per_store] [dcs]` measures the routing heuristic against PyVRP 0.11.3 (optional: `pip install pyvrp==0.11.3`); its cached results are in `results/checks/`, and `python checks/routing_summary.py` (no PyVRP needed) summarises them per network; `build_demo.py` embeds that summary in both pages.
+- `python checks/selection_replay.py [reps]` replays the search on the evaluated pool (no routing, about 25 min on one core for 100 replays): it reproduces the reported search exactly, then starts GP + EI and random selection from the same random networks instead of the seeds; cached in `results/checks/selection_replay.json`.
+- `python checks/local_search.py [workers]` descends from the recommended network on E over every one-move neighbour (any site swapped for any other, one dropped, one added; 560 networks a round) until no move saves 1 M, then prices both ends on the final and held-out days (about 4 core-hours a round; every evaluation cached in `results/checks/local_search_cache.jsonl`, so a rerun reads the cache and an interrupted run resumes); summary in `results/checks/local_search.json`.
+  `build_demo.py` embeds both summaries in both pages.
 - `../demo.html` opens offline from disk; its live solve runs a simplified in-browser copy of the routing rules (no segment reversal, calibrated distance model instead of the OSRM cache) and says so on the page.
 - `python app.py` serves the same page on `http://localhost:8437` and answers the live solve with `dcn/routing.py` on the cached road distances, the same rules and inputs as the reported run.
 
@@ -52,6 +55,8 @@ If the cache is missing the code warns and falls back to an uncalibrated placeho
 | `dcn/pipeline.py` | Whole run: search, validation, finals, held-out days, reversals, departure-wave and thinning checks, outcome tables, registry |
 | `dcn/extensions.py` | Closure sequence along the lease expiries, robustness, value of information, design-year drift sweep, candidate generation (CbAS) |
 | `checks/routing_gap.py` | Optional accuracy check of the routing heuristic against PyVRP |
+| `checks/selection_replay.py` | GP + EI against random selection from random starts, replayed on the evaluated pool |
+| `checks/local_search.py` | Descent on E over every one-move neighbour of the recommended network, to a local optimum |
 | `checks/routing_summary.py` | Per-network summary of the cached PyVRP comparison and its effect on the saving |
 | `osrm/` | Rebuilds the road cache and the road shapes from a self-hosted OSRM server (not needed to run) |
 | `prep/` | One-off inputs (not needed to run): `build_hexes.py` (Kontur population hexagons), `road_connected.py` (drops hexagons without a road to the mainland), `current_network.py` (today's 12 DCs: the 2016 design, a p-median on straight-line km over the stores open in 2016, every store within one driver-day), `districts.py` (district of every hexagon) |
