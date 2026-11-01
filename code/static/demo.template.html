@@ -715,7 +715,8 @@ function decodePoly(str) {
   return out;
 }
 function legPath(a, b, pa, pb) {
-  const enc = SHAPES && SHAPES[`${a}>${b}`], p = enc ? decodePoly(enc) : [pa, pb];
+  // A leg is stored in one direction; the other direction is the same road reversed
+  const fw = SHAPES && SHAPES[`${a}>${b}`], bw = !fw && SHAPES && SHAPES[`${b}>${a}`], enc = fw || bw, p = enc ? (bw ? decodePoly(enc).reverse() : decodePoly(enc)) : [pa, pb];
   if (enc) { p[0] = pa; p[p.length - 1] = pb; }
   const c = [0];
   for (let k = 1; k < p.length; k++) c.push(c[k - 1] + Math.hypot((p[k][0] - p[k - 1][0]), (p[k][1] - p[k - 1][1]) * KX));
