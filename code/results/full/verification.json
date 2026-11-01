@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-29T00:33:13",
+ "generated": "2026-11-01T17:41:03",
  "registry": "2026-10-28T14:31:55",
  "checks": [
   {
@@ -115,7 +115,7 @@
   {
    "check": "app.py live solve = routing.solve",
    "ok": true,
-   "detail": "71 vehicles 5329.4 km in 542 ms"
+   "detail": "71 vehicles 5329.4 km in 503 ms"
   },
   {
    "check": "demo embeds this registry",
