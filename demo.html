@@ -233,7 +233,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
   <div class="grid g2">
     <div class="card">
       <div class="row spread">
-        <div class="row"><div class="clockbig" id="clock">04:00</div><div><div class="note" id="day-label"></div><div class="note">deadline 12:00 · back by 13:00 incl. a 30 min break</div></div></div>
+        <div class="row"><div class="clockbig" id="clock">04:00</div><div><div class="note" id="day-label"></div><div class="note" id="day-rules">deadline 12:00 · back by 13:00 incl. a 30 min break</div></div></div>
         <div class="row"><div class="seg" id="day-net"><button data-n="baseline">Baseline 12</button><button data-n="recommended" class="on"><span data-alt="cap">Recommended</span></button></div>
           <div class="seg" id="day-kind"><button data-n="weekday" class="on">Weekday</button><button data-n="peak">Peak day</button></div></div>
       </div>
@@ -241,7 +241,7 @@ footer { margin-top: 36px; font-size: 12px; color: var(--muted); }
         <input type="range" id="scrub" min="3.5" max="14" step="0.01" value="3.5" style="flex:1;min-width:160px" aria-label="time of day"><select id="speed" aria-label="speed"><option value="0.5">slow</option><option value="1" selected>normal</option><option value="2.5">fast</option></select></div>
       <div class="livebanner" id="live-banner" hidden><span id="live-banner-text"></span><button class="btn small" id="live-back">Back to the whole network</button></div>
       <div class="mapbox" id="daymap"></div>
-      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i>delivered before 12:00</span><span><i class="sw" style="background:#e8950f"></i>after 12:00</span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span id="geom-note"></span></div>
+      <div class="legend"><span><i class="sw" style="background:#cfc4d4"></i>waiting</span><span><i class="sw" style="background:#9dc92a"></i><span id="lg-before">delivered before 12:00</span></span><span><i class="sw" style="background:#e8950f"></i><span id="lg-after">after 12:00</span></span><span><i class="sw" style="background:#d23f3f"></i>dashed: relay route, two drivers (an assumption the business must approve)</span><span><i class="sw" style="background:#fff;border:3px solid #9dc92a"></i>ring: share of a DC's stores served</span><span id="geom-note"></span></div>
       <div class="clockcard"><div class="row spread"><b>The day against the clock</b><span class="note">trucks on the road by DC (areas) and stores served (lime line); deliveries end by 12:00, trucks are back by 13:00</span></div><svg class="chart" id="clockchart" viewBox="0 0 760 170"></svg></div>
     </div>
     <div class="grid" style="align-content:start">
@@ -981,8 +981,9 @@ function truckPos(r, t) {
   let prevT = P.depart;
   for (let k = 0; k < r.arr.length; k++) {
     if (t < r.arr[k]) { const f = (t - prevT) / Math.max(r.arr[k] - prevT, 1e-6); return [...along(r.legs[k], f), k]; }
-    if (t < r.arr[k] + P.stop_h) return [r.pts[k + 1], r.pts[k + 1][1] - r.pts[k][1], k + 1];
-    prevT = r.arr[k] + P.stop_h;
+    const sh = r.stop_h ?? P.stop_h;
+    if (t < r.arr[k] + sh) return [r.pts[k + 1], r.pts[k + 1][1] - r.pts[k][1], k + 1];
+    prevT = r.arr[k] + sh;
   }
   const n = r.pts.length, f = (t - prevT) / Math.max(r.ret - prevT, 1e-6);
   return [...along(r.legs[n - 2], f), r.arr.length];
@@ -1106,7 +1107,7 @@ function dayStatic(m, routes) {
 function storeState(c, m, routes, I, e) {
   const s = I.s[e], [x, y] = m.P(S.lat[s], S.lon[s]); if (x < -12 || y < -12 || x > m.W + 12 || y > m.H + 12) return;
   const a = I.t[e], done = T >= a, sz = Math.min(1.6 + m.z * 0.45, 6);
-  const col = !done ? "#cfc4d4" : routes[I.k[e]].over ? "#d23f3f" : a > P.deadline ? "#e8950f" : "#9dc92a";
+  const col = !done ? "#cfc4d4" : routes[I.k[e]].over ? "#d23f3f" : a > dayDeadline() ? "#e8950f" : "#9dc92a";
   if (m.z > 4.5) drawStore(c, x, y, sz * 0.85, col); else { c.fillStyle = col; c.beginPath(); c.arc(x, y, done ? sz * 0.75 : sz * 0.55, 0, 7); c.fill(); }
 }
 function dayStores(m, routes, full) {
@@ -1139,7 +1140,7 @@ function drawDay(m) {
     c.lineWidth = 4; c.strokeStyle = "rgba(255,255,255,.85)"; c.beginPath(); c.arc(x, y, 16, 0, 7); c.stroke();
     if (f > 0) { c.strokeStyle = "#9dc92a"; c.beginPath(); c.arc(x, y, 16, -Math.PI / 2, -Math.PI / 2 + f * 2 * Math.PI); c.stroke(); }
   }
-  $("#clock").textContent = hhmm(Math.max(T, P.depart)); $("#scrub").value = T;
+  $("#clock").textContent = hhmm(Math.max(T, P.depart)); $("#scrub").value = T; dayRules();
   const cn = $("#clock-now"); if (cn && !LIVE_ROUTES) { const x = $("#clockchart")._X(Math.min(Math.max(T, 3.5), 14)); cn.setAttribute("x1", x); cn.setAttribute("x2", x); }
 }
 function kpisDay() {
@@ -1238,7 +1239,14 @@ function constructJS(D, q, p) {
   const out = routes.map(seq => { const [km, arr, ret] = walk(seq); return { seq: seq.map(v => v - 1), km, load: seq.reduce((a, v) => a + q[v - 1], 0), arr, ret, binding: km > p.max_km || arr[arr.length - 1] > p.deadline || ret + p.break_h > p.shift_end ? "violates limit" : "" }; });
   return out.sort((a, b) => a.arr[0] - b.arr[0]);
 }
-let LIVE_SCOPE = "dc", LIVE_OPEN = null;
+let LIVE_SCOPE = "dc", LIVE_OPEN = null, LIVE_P = null;
+// The deadline the map shows: the live solve's own when one is on screen, the reported one otherwise
+const dayDeadline = () => (LIVE_ROUTES && LIVE_P ? LIVE_P.deadline : P.deadline);
+function dayRules() {
+  const d = hhmm(dayDeadline()), sm = Math.round(60 * (LIVE_ROUTES && LIVE_P ? LIVE_P.stop_h : P.stop_h));
+  $("#day-rules").textContent = `deadline ${d} · ${sm} min per stop · back by ${hhmm(P.shift_end)} incl. a ${Math.round(60 * P.break_h)} min break${LIVE_ROUTES && LIVE_P ? " (your live settings)" : ""}`;
+  $("#lg-before").textContent = `delivered before ${d}`; $("#lg-after").textContent = `after ${d}`;
+}
 function setScope(n) {
   LIVE_SCOPE = n; $("#lv-scope").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.n === n)); $("#lv-fleet-ctrl").hidden = n === "country";
   $("#live-sub").textContent = n === "country" ? `Every DC of the network chosen above the map (baseline or ${ALT}), each with its own stores, one after another: ${f0(S.lat.length)} stores in about 10 s in the browser. Press Solve after changing a setting.` : `${SITES[LIVE.dc].name}, ${LIVE.stores.length} stores: the ${ALT} network's largest territory. Changing a setting re-solves it.`;
@@ -1269,13 +1277,13 @@ async function solveLive() {
     lost += unc.reduce((a, r) => a + r.seq.length, 0); all += res.routes.reduce((a, r) => a + r.seq.length, 0);
     late += covered.reduce((a, r) => a + r.arr.filter(x => x > p.deadline).length, 0); vehicles += res.vehicles; km += res.km;
     res.routes.forEach((r, k) => {
-      const q = { dc: j, col: country ? colorOf(j, R.networks[DNET]) : PAL[k % PAL.length], pts: [[dc.lat, dc.lon], ...r.seq.map(s => [st[s][0], st[s][1]]), [dc.lat, dc.lon]], arr: covered.includes(r) ? r.arr : r.arr.map(() => 99), ret: covered.includes(r) ? r.ret : -1, stores: r.seq.map(s => idx[s]), over: !covered.includes(r) || r.binding === "violates limit", relay: r.binding === "relay", km: r.km, load: r.load };
+      const q = { dc: j, col: country ? colorOf(j, R.networks[DNET]) : PAL[k % PAL.length], pts: [[dc.lat, dc.lon], ...r.seq.map(s => [st[s][0], st[s][1]]), [dc.lat, dc.lon]], arr: covered.includes(r) ? r.arr : r.arr.map(() => 99), ret: covered.includes(r) ? r.ret : -1, stores: r.seq.map(s => idx[s]), over: !covered.includes(r) || r.binding === "violates limit", relay: r.binding === "relay", km: r.km, load: r.load, stop_h: p.stop_h };
       const nodes = [`d${j}`, ...q.stores.map(s => `s${s}`), `d${j}`];
       q.legs = nodes.slice(1).map((nd, m) => legPath(nodes[m], nd, q.pts[m], q.pts[m + 1])); q.path = q.legs.flatMap((L, m) => (m ? L.p.slice(1) : L.p));
       lr.push(q);
     });
   }
-  LIVE_OPEN = jobs.map(x => x.j);
+  LIVE_OPEN = jobs.map(x => x.j); LIVE_P = p;
   FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none";
   T = 14; playing = false; $("#play").textContent = country ? "▶ Play the solved day" : "▶ Play this DC's day";
   if (DM) { if (country) DM.fit(); else DM.centerOn(SITES[LIVE.dc].lat, SITES[LIVE.dc].lon, 6); }
