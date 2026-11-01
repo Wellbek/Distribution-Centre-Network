@@ -765,7 +765,7 @@ function clockChart() {
   el("line", { id: "clock-now", x1: X(T), x2: X(T), y1: 8, y2: 140, stroke: "#751485", "stroke-width": 2 }, svg);
   svg._X = X;
 }
-function resetDay() { $("#geom-note").textContent = SHAPES ? "Trucks follow the roads from OSRM; a live solve draws straight lines" : "Straight lines between stops; costs use road km"; DAY = buildDay(); clockChart(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "the 12 baseline DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
+function resetDay() { $("#geom-note").textContent = SHAPES ? "Trucks follow the roads from OSRM; a live solve uses the same cached road shapes (each store to its 12 nearest stores and to its DC, about 95% of its legs) and straight lines for the rest" : "Straight lines between stops; costs use road km"; DAY = buildDay(); clockChart(); FOLLOW = -1; $("#unfollow").hidden = true; $("#truckcard").style.display = "none"; $("#day-label").textContent = `${DAY.label.date} · ${DAY.label.label} · ${DNET === "baseline" ? "the 12 baseline DCs" : `${ALT} network`} · ${DAY.routes.length} routes${SCALED}`; DM.draw(); kpisDay(); }
 function truckAt(x, y) {
   let best = -1, bd = 400;
   (LIVE_ROUTES || DAY.routes).forEach((r, k) => { const p = truckPos(r, T); if (!p) return; const [tx, ty] = DM.P(p[0][0], p[0][1]); const d = (tx - x) ** 2 + (ty - y) ** 2; if (d < bd) { bd = d; best = k; } });
